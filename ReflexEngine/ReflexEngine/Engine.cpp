@@ -1,104 +1,95 @@
 // Includes
 #include "Engine.h"
-#include "Window.h"
-#include "Sprite.h"
 
 // Implementation
 namespace Reflex
 {
 	namespace Core
 	{
-		Engine::Engine()
+		Engine::Engine() 
+			: m_update_interval( sf::seconds( 1.0f / 60.f ) )
 		{
+			// 2560, 1377
+			m_window.create( sf::VideoMode( 640, 300 ), "ReflexEngine", sf::Style::Default );
+			//m_window.setPosition( sf::Vector2i( -6, 0 ) );
 
+			if( !m_texture.loadFromFile( "Data/Textures/3zlcnZu.jpg" ) )
+			{
+				Log( ELogType::CRIT, "Texture failed to load" );
+				return;
+			}
+
+			m_sprite.setTexture( m_texture );
+			m_sprite.setPosition( 100.0f, 100.0f );
 		}
 
 		Engine::~Engine()
 		{
-			if( m_event_queue )
-				al_destroy_event_queue( m_event_queue );
-
-			if( m_timer )
-				al_destroy_timer( m_timer );
-		}
-
-		bool Engine::Initialise()
-		{
-			m_window = std::make_unique< Window >();
-
-			if( !m_window->Initialise() )
-			{
-				fprintf( stderr, "Failed to initialise Window class!\n" );
-				return false;
-			}
-
-			m_event_queue = al_create_event_queue();
-
-			if( !m_event_queue )
-			{
-				fprintf( stderr, "Failed to create event_queue!\n" );
-				return false;
-			}
-
-			m_timer = al_create_timer( 1.0 / 60.0f );
-
-			if( !m_timer )
-			{
-				fprintf( stderr, "Failed to create timer!\n" );
-				return -1;
-			}
-
-			al_start_timer( m_timer );
-
-			al_register_event_source( m_event_queue, al_get_display_event_source( m_window->GetDisplay() ) );
-			al_register_event_source( m_event_queue, al_get_timer_event_source( m_timer ) );
-
-			m_sprite = std::make_unique< Sprite >();
-			m_sprite->Initialise( 32, 32 );
-			m_sprite->SetLocation( Vector2d( m_window->GetWidth() / 2.0f - 16.0f, m_window->GetHeight() / 2.0f - 16.0f ) );
-			m_sprite->SetColour( Colour( 255.0f, 255.0f, 255.0f ), *m_window->GetDisplay() );
-			velocity = Vector2d( -4.0f, 4.0f );
-
-			return true;
 		}
 
 		void Engine::Run()
 		{
-			bool redraw = true;
+			sf::Clock clock;
+			sf::Time accumlated_time = sf::Time::Zero;
 
-			while( true )
+			while( m_window.isOpen() )
 			{
-				ALLEGRO_EVENT ev;
-				al_wait_for_event( m_event_queue, &ev );
-
-				if( ev.type == ALLEGRO_EVENT_TIMER )
+				ProcessEvents();
+				accumlated_time += clock.restart();
+				while( accumlated_time > m_update_interval )
 				{
-					auto& location = m_sprite->GetLocation();
-					if( location.x < 0 || location.x > m_window->GetWidth() - 32 )
-					{
-						velocity.x = -velocity.x;
-					}
-
-					if( location.y < 0 || location.y > m_window->GetHeight() - 32 )
-					{
-						velocity.y = -velocity.y;
-					}
-
-					location += velocity;
-
-					redraw = true;
+					accumlated_time -= m_update_interval;
+					ProcessEvents();
+					Update( m_update_interval );
 				}
-				else if( ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE )
+
+				const auto pos = m_window.getPosition();
+				Render();
+			}
+		}
+
+		void Engine::ProcessEvents()
+		{
+			sf::Event event;
+
+			while( m_window.pollEvent( event ) )
+			{
+				switch( event.type )
+				{
+				case sf::Event::KeyPressed:
+					KeyboardInput( event.key.code, true );
 					break;
 
-				if( redraw && al_is_event_queue_empty( m_event_queue ) )
-				{
-					redraw = false;
-					m_window->RenderBegin();
-					m_sprite->Render();
-					m_window->RenderEnd();
+				case sf::Event::KeyReleased:
+					KeyboardInput( event.key.code, false );
+					break;
+
+				case sf::Event::Closed:
+					m_window.close();
+					break;
+				default: break;
 				}
 			}
+		}
+
+		void Engine::KeyboardInput( const sf::Keyboard::Key key, const bool is_pressed )
+		{
+			if( key == sf::Keyboard::Escape )
+				m_window.close();
+		}
+
+		void Engine::Update( const sf::Time delta_time )
+		{
+
+		}
+
+		void Engine::Render()
+		{
+			m_window.clear();
+
+			m_window.draw( m_sprite );
+
+			m_window.display();
 		}
 	}
 }

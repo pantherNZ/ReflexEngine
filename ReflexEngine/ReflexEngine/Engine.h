@@ -3,13 +3,13 @@
 // Includes
 #include "CommonIncludes.h"
 
+#include <SFML/Graphics.hpp>
+
 // Forward declarations
 namespace Reflex
 {
 	namespace Core
 	{
-		class Window;
-		class Sprite;
 	}
 }
 
@@ -24,16 +24,20 @@ namespace Reflex
 			Engine();
 			~Engine();
 
-			bool Initialise();
 			void Run();
 
 		private:
-			std::unique_ptr< Window > m_window = nullptr;
-			ALLEGRO_TIMER* m_timer = nullptr;
-			ALLEGRO_EVENT_QUEUE* m_event_queue = nullptr;
+			void KeyboardInput( const sf::Keyboard::Key key, const bool is_pressed );
+			void ProcessEvents();
+			void Update( const sf::Time delta_time );
+			void Render();
+		
+			sf::RenderWindow m_window;
+			const sf::Time m_update_interval;
 
-			std::unique_ptr< Sprite > m_sprite = nullptr;
-			Vector2d velocity;
+
+			sf::Sprite m_sprite;
+			sf::Texture m_texture;
 		};
 	}
 }
