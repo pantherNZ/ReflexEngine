@@ -26,6 +26,11 @@ namespace Reflex
 
 			void Run();
 
+		protected:
+			//virtual SceneId GetStartupScene() const = 0;
+			//virtual void RegisterScenes( std::vector< Scene > scenes() = 0;
+			//virtual void OnPostSetup() { }
+
 		private:
 			void KeyboardInput( const sf::Keyboard::Key key, const bool is_pressed );
 			void ProcessEvents();
