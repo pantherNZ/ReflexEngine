@@ -159,10 +159,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="GraphNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GraphNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReflexEngine\ReflexEngine.vcxproj">

@@ -1,24 +1,18 @@
 #pragma once
 
 // Includes
-#include "CommonIncludes.h"
+#include "Common.h"
+#include "World.h"
 
-#include <SFML/Graphics.hpp>
-
-// Forward declarations
 namespace Reflex
 {
 	namespace Core
 	{
-	}
-}
+		// Forward declarations
+		class SceneManager;
 
-// Engine class
-namespace Reflex
-{
-	namespace Core
-	{
-		class Engine
+		// Engine class
+		class Engine : private sf::NonCopyable
 		{
 		public:
 			Engine();
@@ -32,17 +26,22 @@ namespace Reflex
 			//virtual void OnPostSetup() { }
 
 		private:
-			void KeyboardInput( const sf::Keyboard::Key key, const bool is_pressed );
+			void KeyboardInput( const sf::Keyboard::Key key, const bool isPressed );
 			void ProcessEvents();
-			void Update( const sf::Time delta_time );
+			void Update( const sf::Time deltaTime );
 			void Render();
+
+			void UpdateStatistics( const sf::Time deltaTime );
 		
+		private:
 			sf::RenderWindow m_window;
-			const sf::Time m_update_interval;
+			World m_world;
 
-
-			sf::Sprite m_sprite;
-			sf::Texture m_texture;
+			const sf::Time m_updateInterval;
+			sf::Font m_font;
+			sf::Text m_statisticsText;
+			sf::Time m_statisticsUpdateTime;
+			unsigned int m_statisticsNumFrames = 0U;
 		};
 	}
 }

@@ -6,21 +6,18 @@ namespace Reflex
 {
 	namespace Core
 	{
-		Engine::Engine() 
-			: m_update_interval( sf::seconds( 1.0f / 60.f ) )
+		Engine::Engine()
+			: m_updateInterval( sf::seconds( 1.0f / 60.f ) )
+			, m_window( sf::VideoMode( 640, 300 ), "ReflexEngine", sf::Style::Default )
+			, m_world( m_window )
 		{
 			// 2560, 1377
-			m_window.create( sf::VideoMode( 640, 300 ), "ReflexEngine", sf::Style::Default );
 			//m_window.setPosition( sf::Vector2i( -6, 0 ) );
 
-			if( !m_texture.loadFromFile( "Data/Textures/3zlcnZu.jpg" ) )
-			{
-				Log( ELogType::CRIT, "Texture failed to load" );
-				return;
-			}
-
-			m_sprite.setTexture( m_texture );
-			m_sprite.setPosition( 100.0f, 100.0f );
+			m_font.loadFromFile( "arial.ttf" );
+			m_statisticsText.setFont( m_font );
+			m_statisticsText.setPosition( 5.0f, 5.0f );
+			m_statisticsText.setCharacterSize( 10 );
 		}
 
 		Engine::~Engine()
@@ -30,20 +27,22 @@ namespace Reflex
 		void Engine::Run()
 		{
 			sf::Clock clock;
-			sf::Time accumlated_time = sf::Time::Zero;
+			sf::Time accumlatedTime = sf::Time::Zero;
 
 			while( m_window.isOpen() )
 			{
 				ProcessEvents();
-				accumlated_time += clock.restart();
-				while( accumlated_time > m_update_interval )
+				sf::Time deltaTime = clock.restart();
+				accumlatedTime += deltaTime;
+
+				while( accumlatedTime > m_updateInterval )
 				{
-					accumlated_time -= m_update_interval;
+					accumlatedTime -= m_updateInterval;
 					ProcessEvents();
-					Update( m_update_interval );
+					Update( m_updateInterval );
 				}
 
-				const auto pos = m_window.getPosition();
+				UpdateStatistics( deltaTime );
 				Render();
 			}
 		}
@@ -72,24 +71,40 @@ namespace Reflex
 			}
 		}
 
-		void Engine::KeyboardInput( const sf::Keyboard::Key key, const bool is_pressed )
+		void Engine::KeyboardInput( const sf::Keyboard::Key key, const bool isPressed )
 		{
 			if( key == sf::Keyboard::Escape )
 				m_window.close();
 		}
 
-		void Engine::Update( const sf::Time delta_time )
+		void Engine::Update( const sf::Time deltaTime )
 		{
-
+			m_world.Update( deltaTime );
 		}
 
 		void Engine::Render()
 		{
 			m_window.clear();
-
-			m_window.draw( m_sprite );
-
+			m_world.Render();
+			m_window.setView( m_window.getDefaultView() );
+			m_window.draw( m_statisticsText );
 			m_window.display();
+		}
+
+		void Engine::UpdateStatistics( const sf::Time deltaTime )
+		{
+			m_statisticsUpdateTime += deltaTime;
+			m_statisticsNumFrames += 1;
+
+			if( m_statisticsUpdateTime >= sf::seconds( 1.0f ) )
+			{
+				m_statisticsText.setString(
+					"Frames / Second = " + std::to_string( m_statisticsNumFrames ) + "\n" +
+					"Time / Update = " + std::to_string( m_statisticsUpdateTime.asMicroseconds() / m_statisticsNumFrames ) + "us" );
+
+				m_statisticsUpdateTime -= sf::seconds( 1.0f );
+				m_statisticsNumFrames = 0;
+			}
 		}
 	}
 }

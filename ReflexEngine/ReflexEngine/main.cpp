@@ -4,9 +4,15 @@
 // Entry point
 int main( int argc, char** argv )
 {
-	// Engine instance
-	Reflex::Core::Engine engine;
-	engine.Run();
+	try
+	{
+		Reflex::Core::Engine engine;
+		engine.Run();
+	}
+	catch( std::exception& e )
+	{
+		Reflex::LOG_CRIT( "EXCEPTION: " + std::to_string( *e.what() ) + "\n" );
+	}
 
 	return 0;
 }

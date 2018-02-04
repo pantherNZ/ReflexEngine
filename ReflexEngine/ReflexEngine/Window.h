@@ -1,7 +1,7 @@
 #pragma once
 
 // Includes
-#include "CommonIncludes.h"
+#include "Common.h"
 
 #include <SFML/Graphics.hpp>
 
