@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "WorldNode.h"
+#include "SceneNode.h"
 #include "ResourceManager.h"
 
 // Engine class
@@ -9,11 +9,6 @@ namespace Reflex
 {
 	namespace Core
 	{
-		template< typename Resource >
-		class ResourceManager;
-
-		typedef std::unique_ptr< ResouceManager< sf::Texture > > TextureManager;
-
 		// World class
 		class World : private sf::NonCopyable
 		{
@@ -23,8 +18,10 @@ namespace Reflex
 			void Update( const sf::Time deltaTime );
 			void Render();
 
+			SceneNode* GetWorldGraphFromLayer( unsigned short layer ) const;
+			void AddSceneNode( unsigned short layer, std::unique_ptr< SceneNode > node );
+
 		protected:
-			void LoadTextures();
 			void BuildScene();
 
 		protected:
@@ -36,12 +33,9 @@ namespace Reflex
 			sf::RenderTarget& m_window;
 			sf::View m_worldView;
 
-			sf::FloatRect m_worldBounds;
-			WorldNode m_worldGraph;
-			std::array< WorldNode*, MaxLayers > m_sceneLayers;
-
-			//std::unique_ptr< SceneManager > m_sceneManager;
-			TextureManager m_textureManager;
+			//std::vector< std::unique_ptr< SceneNode > > m_worldObjects;
+			SceneNode m_worldGraph;
+			std::array< SceneNode*, MaxLayers > m_sceneLayers;
 		};
 	}
 }

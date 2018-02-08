@@ -8,11 +8,7 @@ namespace Reflex
 		World::World( sf::RenderTarget& window )
 			: m_window( window )
 			, m_worldView( m_window.getDefaultView() )
-			, m_textureManager( std::make_unique< ResouceManager< sf::Texture > >() )
 		{
-			//m_sceneManager = std::make_unique< SceneManager >();
-			LoadTextures();
-
 			BuildScene();
 		}
 
@@ -27,9 +23,14 @@ namespace Reflex
 			m_window.draw( m_worldGraph );
 		}
 
-		void World::LoadTextures()
+		Reflex::Core::SceneNode* World::GetWorldGraphFromLayer( unsigned short layer ) const
 		{
+			return m_sceneLayers[layer];
+		}
 
+		void World::AddSceneNode( unsigned short layer, std::unique_ptr< SceneNode > node )
+		{
+			m_sceneLayers[layer]->AttachChild( std::move( node ) );
 		}
 
 		void World::BuildScene()
@@ -37,7 +38,7 @@ namespace Reflex
 			// Initialize the different layers
 			for( std::size_t i = 0; i < MaxLayers; ++i )
 			{
-				auto layerNode = std::make_unique< WorldNode >();
+				auto layerNode = std::make_unique< SceneNode >();
 				m_sceneLayers[i] = layerNode.get();
 				m_worldGraph.AttachChild( std::move( layerNode ) );
 			}

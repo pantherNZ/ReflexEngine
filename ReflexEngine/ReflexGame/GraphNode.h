@@ -6,11 +6,13 @@
 class GraphNode : public Reflex::Core::Object
 {
 public:
-	GraphNode();// const Reflex::Core::TextureManager& textureManager );
+	GraphNode( const sf::Font& font, const std::string _text );
+
+	sf::CircleShape m_image;
+	sf::Text m_label;
+	std::vector< GraphNode* > m_connections;
 
 protected:
 	void DrawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const final;
-
-private:
-	sf::Sprite m_sprite;
+	void UpdateCurrent( const sf::Time deltaTime ) final { }
 };
