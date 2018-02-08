@@ -8,16 +8,18 @@ namespace Reflex
 	{
 		Engine::Engine()
 			: m_updateInterval( sf::seconds( 1.0f / 60.f ) )
-			, m_window( sf::VideoMode( 640, 300 ), "ReflexEngine", sf::Style::Default )
-			, m_world( m_window )
+			, m_window( sf::VideoMode::getFullscreenModes()[0], "ReflexEngine", sf::Style::Default )
+			, m_textureManager()
+			, m_fontManager()
+			, m_stateManager( Context( m_window, m_textureManager, m_fontManager ) )
 		{
 			// 2560, 1377
-			//m_window.setPosition( sf::Vector2i( -6, 0 ) );
+			m_window.setPosition( sf::Vector2i( -6, 0 ) );
 
-			m_font.loadFromFile( "arial.ttf" );
+			m_font.loadFromFile( "Data/Fonts/arial.ttf" );
 			m_statisticsText.setFont( m_font );
 			m_statisticsText.setPosition( 5.0f, 5.0f );
-			m_statisticsText.setCharacterSize( 10 );
+			m_statisticsText.setCharacterSize( 15 );
 		}
 
 		Engine::~Engine()
@@ -53,6 +55,8 @@ namespace Reflex
 
 			while( m_window.pollEvent( event ) )
 			{
+				m_stateManager.ProcessEvent( event );
+
 				switch( event.type )
 				{
 				case sf::Event::KeyPressed:
@@ -79,13 +83,13 @@ namespace Reflex
 
 		void Engine::Update( const sf::Time deltaTime )
 		{
-			m_world.Update( deltaTime );
+			m_stateManager.Update( deltaTime );
 		}
 
 		void Engine::Render()
 		{
-			m_window.clear();
-			m_world.Render();
+			m_window.clear( sf::Color::Black );
+			m_stateManager.Render();
 			m_window.setView( m_window.getDefaultView() );
 			m_window.draw( m_statisticsText );
 			m_window.display();

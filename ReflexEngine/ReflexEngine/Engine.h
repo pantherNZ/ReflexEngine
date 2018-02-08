@@ -3,14 +3,13 @@
 // Includes
 #include "Common.h"
 #include "World.h"
+#include "StateManager.h"
+#include "ResourceManager.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		// Forward declarations
-		class SceneManager;
-
 		// Engine class
 		class Engine : private sf::NonCopyable
 		{
@@ -21,11 +20,10 @@ namespace Reflex
 			void Run();
 
 		protected:
-			//virtual SceneId GetStartupScene() const = 0;
-			//virtual void RegisterScenes( std::vector< Scene > scenes() = 0;
-			//virtual void OnPostSetup() { }
+			virtual unsigned GetStartupState() const { return 0;  }
+			virtual void RegisterStates() { }
+			virtual void OnPostSetup() { }
 
-		private:
 			void KeyboardInput( const sf::Keyboard::Key key, const bool isPressed );
 			void ProcessEvents();
 			void Update( const sf::Time deltaTime );
@@ -33,9 +31,11 @@ namespace Reflex
 
 			void UpdateStatistics( const sf::Time deltaTime );
 		
-		private:
+		protected:
 			sf::RenderWindow m_window;
-			World m_world;
+			TextureManager m_textureManager;
+			FontManager m_fontManager;
+			StateManager m_stateManager;
 
 			const sf::Time m_updateInterval;
 			sf::Font m_font;

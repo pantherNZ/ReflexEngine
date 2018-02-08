@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Common.h"
-#include "WorldNode.h"
+#include "SceneNode.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		class Object : public WorldNode
+		class Object : public SceneNode
 		{
 		public:
 			void SetVelocity( sf::Vector2f velocity );
