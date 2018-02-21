@@ -1,27 +1,26 @@
 #include "Object.h"
+#include "World.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		void Object::SetVelocity( sf::Vector2f velocity )
+		Object::Object( World& world )
+			: mWorld( world )
 		{
-			m_velocity = velocity;
+
 		}
 
-		void Object::SetVelocity( float vx, float vy )
+		void Object::Destroy()
 		{
-			m_velocity = sf::Vector2f( vx, vy );
+			mWorld.DestroyObject( *this );
 		}
 
-		sf::Vector2f Object::GetVelocity() const
+		void Object::draw( sf::RenderTarget& target, sf::RenderStates states ) const
 		{
-			return m_velocity;
-		}
+			states.transform *= getTransform();
 
-		void Object::UpdateCurrent( const sf::Time deltaTime )
-		{
-			move( m_velocity * deltaTime.asSeconds() );
+			Draw( target, states );
 		}
 	}
 }

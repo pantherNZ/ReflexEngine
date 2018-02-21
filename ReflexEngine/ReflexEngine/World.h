@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Common.h"
-#include "SceneNode.h"
 #include "ResourceManager.h"
+#include "Object.h"
+#include "ObjectAllocator.h"
 
 // Engine class
 namespace Reflex
@@ -18,11 +19,17 @@ namespace Reflex
 			void Update( const sf::Time deltaTime );
 			void Render();
 
-			SceneNode* GetWorldGraphFromLayer( unsigned short layer ) const;
-			void AddSceneNode( unsigned short layer, std::unique_ptr< SceneNode > node );
+			Object& CreateObject();
+			void DestroyObject( Object& object );
 
 		protected:
-			void BuildScene();
+			//void BuildScene();
+
+		private:
+			// Remove
+			World() = delete;
+			World( const ObjectAllocator& ) = delete;
+			World& operator=( const ObjectAllocator& ) = delete;
 
 		protected:
 			enum Variables
@@ -30,12 +37,12 @@ namespace Reflex
 				MaxLayers = 5,
 			};
 
-			sf::RenderTarget& m_window;
-			sf::View m_worldView;
+			sf::RenderTarget& mWindow;
+			sf::View mWorldView;
 
-			//std::vector< std::unique_ptr< SceneNode > > m_worldObjects;
-			SceneNode m_worldGraph;
-			std::array< SceneNode*, MaxLayers > m_sceneLayers;
+			ObjectAllocator mObjects;
+			std::vector< std::unique_ptr< ObjectAllocator> > mComponents;
+			std::vector< Object& > mMarkedForDeletion;
 		};
 	}
 }

@@ -3,7 +3,7 @@
 #include "..\ReflexEngine\Object.h"
 #include "..\ReflexEngine\Engine.h"
 
-class GraphNode : public Reflex::Core::Object
+class GraphNode
 {
 public:
 	GraphNode( const sf::Font& font, const std::string _text );
@@ -13,6 +13,6 @@ public:
 	std::vector< GraphNode* > m_connections;
 
 protected:
-	void DrawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const final;
-	void UpdateCurrent( const sf::Time deltaTime ) final { }
+	//void DrawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const final;
+	//void UpdateCurrent( const sf::Time deltaTime ) final { }
 };

@@ -1,24 +1,32 @@
 #pragma once
 
 #include "Common.h"
-#include "SceneNode.h"
+#include "Handle.h"
+#include "ComponentTypes.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		class Object : public SceneNode
+		class World;
+
+		class Object : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
 		{
 		public:
-			void SetVelocity( sf::Vector2f velocity );
-			void SetVelocity( float vx, float vy );
-			sf::Vector2f GetVelocity() const;
+			Object( World& world );
+
+			void Destroy();
 
 		protected:
-			virtual void UpdateCurrent( const sf::Time deltaTime ) override;
+			virtual void Draw( sf::RenderTarget& target, sf::RenderStates states ) const { }
 
 		private:
-			sf::Vector2f m_velocity;
+			Object() = delete;
+			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final;
+
+		private:
+			World& mWorld;
+			unsigned mComponents[Reflex::Components::NumComponents];
 		};
 	}
 }

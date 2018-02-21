@@ -1,0 +1,13 @@
+
+mWorld.AddSystem< Game::Systems::VSGraph >(); // Creates a system and adds it to the world
+
+// Each system has a list of components it requires to operate
+
+auto graphObject = mWorld.CreateObject(); // Creates an object and returns a reference to it
+graphObject.AddComponent< Reflex::Components::GraphNode >(); // This will add the graph node component (POD) to the object, it is stored in the world's component list
+															 // Component stores a reference to the owning object & object stores an index to the component in the world's component list (for that type)
+															 // This will also iterate the world's systems to see if it should register this object with any valid systems (in this case the VSGraph)
+															 // The system will then store an index to the component in the world's component list
+mWorld.AddObject( graphObject ); // Adds the object to the world, this 
+
+auto graphNodes = mWorldGetComponentList< Reflex::Components::GraphNode >(); // Returns a reference to the component array which allows for fast iteration 

@@ -10,7 +10,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Math.h"
+#include "ResourceManager.h"
 
 namespace
 {
@@ -25,6 +25,13 @@ namespace
 // Common Utility
 namespace Reflex
 {
+	namespace Core
+	{
+		// Type defs
+		typedef ResouceManager< sf::Texture > TextureManager;
+		typedef ResouceManager< sf::Font > FontManager;
+	}
+
 	enum class ELogType : unsigned char
 	{
 		LOG,
@@ -36,7 +43,6 @@ namespace Reflex
 	{
 		std::cout << logTitle[( int )_type];
 		std::cout << _message << "\n";
-		assert( _type != ELogType::CRIT && _message.c_str() );
 	}
 
 	inline void LOG_CRIT( std::string _message ) { LOG( ELogType::CRIT, _message ); }
@@ -48,20 +54,20 @@ namespace Reflex
 		return rand() / ( RAND_MAX + 1.0f );
 	}
 
-	inline float Rand( const float _fMax )
-	{
-		return Rand( 0.0f, _fMax );
-	}
-
 	inline float Rand( const float _fMin, const float _fMax )
 	{
 		return _fMin + RandomFloat() * ( _fMax - _fMin );
 	}
 
-	inline float Round( float _fVal, float _fAccuracy )
+	inline float Rand( const float _fMax )
 	{
-		_fVal *= _fAccuracy;
-		return( floor( _fVal + 0.5f ) / _fAccuracy );
+		return Rand( 0.0f, _fMax );
+	}
+
+	inline float Round( float _fVal, int _iAccuracy )
+	{
+		_fVal *= _iAccuracy;
+		return( std::floor( _fVal + 0.5f ) / ( float )_iAccuracy );
 	}
 
 	inline std::vector< std::string > Split( const std::string& _strInput, const char _cLetter )
@@ -137,5 +143,23 @@ namespace Reflex
 	inline std::string Trim( const std::string& _strInput )
 	{
 		return TrimStart( TrimEnd( _strInput ) );
+	}
+
+	inline void CenterOrigin( sf::Sprite& sprite )
+	{
+		sf::FloatRect bounds = sprite.getLocalBounds();
+		sprite.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
+	}
+
+	inline void CenterOrigin( sf::Text& text )
+	{
+		sf::FloatRect bounds = text.getLocalBounds();
+		text.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
+	}
+
+	inline void CenterOrigin( sf::CircleShape& circle )
+	{
+		sf::FloatRect bounds = circle.getLocalBounds();
+		circle.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
 	}
 }

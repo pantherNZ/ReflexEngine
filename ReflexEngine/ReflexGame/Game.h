@@ -7,10 +7,10 @@ class Game : public Reflex::Core::Engine
 public:
 	Game();
 
-	enum Scenes : unsigned short
+	enum States : unsigned short
 	{
-		MenuScene,
-		GraphScene,
+		MenuState,
+		GraphState,
 	};
 
 protected:

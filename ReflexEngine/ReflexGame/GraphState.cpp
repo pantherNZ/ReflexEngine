@@ -21,6 +21,9 @@ GraphState::GraphState( Reflex::Core::StateManager& stateManager, Reflex::Core::
 	//context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
 
 	ParseFile( "Data/VirtualStats.cpp" );
+
+	m_world.CreateObject();
+	// CreateObject(
 }
 
 void GraphState::Render()

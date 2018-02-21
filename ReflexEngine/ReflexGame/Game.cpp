@@ -10,13 +10,13 @@ Game::Game() : Engine()
 
 unsigned Game::GetStartupState() const
 {
-	return Scenes::GraphScene;
+	return States::GraphState;
 }
 
 void Game::RegisterStates()
 {
-	//m_stateManager.RegisterState< MenuState >( Scenes::MenuScene );
-	m_stateManager.RegisterState< GraphState >( Scenes::GraphScene );
+	//m_stateManager.RegisterState< MenuState >( States::MenuState );
+	m_stateManager.RegisterState< GraphState >( States::GraphState );
 }
 
 void Game::OnPostSetup()

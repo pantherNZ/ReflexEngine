@@ -9,7 +9,7 @@ GraphNode::GraphNode( const sf::Font& font, const std::string _text )
 
 	m_image.setFillColor( sf::Color::Red );
 }
-
+/*
 void GraphNode::DrawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {
 	const auto thisPosition = GetWorldPosition();
@@ -28,4 +28,4 @@ void GraphNode::DrawCurrent( sf::RenderTarget& target, sf::RenderStates states )
 	
 	target.draw( m_image, states );
 	//target.draw( m_label );
-}
+}*/
