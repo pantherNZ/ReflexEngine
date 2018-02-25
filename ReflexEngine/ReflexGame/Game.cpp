@@ -16,7 +16,7 @@ unsigned Game::GetStartupState() const
 void Game::RegisterStates()
 {
 	//m_stateManager.RegisterState< MenuState >( States::MenuState );
-	m_stateManager.RegisterState< GraphState >( States::GraphState );
+	m_stateManager.RegisterState< GraphState >() States::GraphState );
 }
 
 void Game::OnPostSetup()

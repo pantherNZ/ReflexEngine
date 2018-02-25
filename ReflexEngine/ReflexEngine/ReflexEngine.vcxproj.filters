@@ -1,92 +1,102 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Components">
+      <UniqueIdentifier>{ff0964cc-73b4-4890-b03f-f26017267b84}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Systems">
+      <UniqueIdentifier>{624c61ce-9006-429d-b492-738e3ee080f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{87773af1-8e3b-47aa-9486-0ff87b0b3f37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Components">
-      <UniqueIdentifier>{a0207a89-f36f-4734-9a74-5ded76ad6ec8}</UniqueIdentifier>
+    <Filter Include="Core">
+      <UniqueIdentifier>{181d36c6-0d61-4ecb-8e77-5b3146fefcef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Managers">
-      <UniqueIdentifier>{288526c4-0352-495e-9dfd-6ea4f8d2524b}</UniqueIdentifier>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{7e04923f-a983-4af5-b770-dfe82d3050e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Managers">
-      <UniqueIdentifier>{fde6eef7-2014-419b-900e-765b41966dfe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Components">
-      <UniqueIdentifier>{fc603db4-aad4-43c9-8d2c-096aacda2a45}</UniqueIdentifier>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{c6ed6f96-e8cb-447b-bcf9-34d2e20444c5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ResourceManager.h">
-      <Filter>Header Files\Managers</Filter>
+    <ClInclude Include="System.h">
+      <Filter>Systems</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="World.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneNode.h">
-      <Filter>Header Files</Filter>
+      <Filter>Objects</Filter>
     </ClInclude>
     <ClInclude Include="StateManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>Header Files\Components</Filter>
+      <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentTypes.h">
-      <Filter>Header Files\Components</Filter>
+    <ClInclude Include="World.h">
+      <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Handle.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="SceneNode.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ObjectAllocator.h">
-      <Filter>Header Files</Filter>
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleManager.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectIterator.h">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="World.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="SceneNode.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="StateManager.cpp">
-      <Filter>Source Files\Managers</Filter>
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
-      <Filter>Source Files\Components</Filter>
+      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="ObjectAllocator.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Memory</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ResourceManger.inl">
-      <Filter>Header Files\Managers</Filter>
-    </None>
+    <ClCompile Include="HandleManager.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Handle.cpp">
+      <Filter>Memory</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

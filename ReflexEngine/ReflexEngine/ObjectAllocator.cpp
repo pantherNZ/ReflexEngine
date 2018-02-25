@@ -99,16 +99,20 @@ namespace Reflex
 			GrowInteral();
 		}
 
-		void* ObjectAllocator::operator[]( unsigned index )
+		void* ObjectAllocator::GetData( unsigned index ) const
 		{
 			assert( index < mSize );
 			return ( char* )mArray + index * mObjectSize;
 		}
 
+		void* ObjectAllocator::operator[]( unsigned index )
+		{
+			return GetData( index );
+		}
+
 		const void* ObjectAllocator::operator[]( unsigned index ) const
 		{
-			assert( index < mSize );
-			return ( char* )mArray + index * mObjectSize;
+			return GetData( index );
 		}
 
 		unsigned ObjectAllocator::Size() const

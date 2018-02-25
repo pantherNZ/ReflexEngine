@@ -6,12 +6,15 @@ namespace Reflex
 	namespace Core
 	{
 		World::World( sf::RenderTarget& window )
-			: mWindow( window )
-			, mWorldView( mWindow.getDefaultView() )
-			, mComponents( 10 )
-			, mObjects( sizeof( Object ), 1000 )
+			: m_window( window )
+			, m_worldView( m_window.getDefaultView() )
+			, m_components( 10 )
+			, m_objects( sizeof( Object ), 1000 )
 		{
 			//BuildScene();
+
+			template< class T >
+			Handle< T >::handleManager = &m_handles;
 		}
 
 		void World::Update( const sf::Time deltaTime )
@@ -19,31 +22,61 @@ namespace Reflex
 			//mWorldGraph.Update( deltaTime );
 
 			// Deleting objects
-			if( !mMarkedForDeletion.empty() )
+			if( !m_markedForDeletion.empty() )
 			{
-				for( auto& object : mMarkedForDeletion )
-					mObjects.Release( &object );
+				for( auto& objectHandle : m_markedForDeletion )
+				{
+					objectHandle->m_active = false;
+					auto moved = ( Object* )m_objects.Release( objectHandle.Get() );
 
-				mMarkedForDeletion.clear();
+					if( moved )
+						m_handles.Update( moved, moved->m_self );
+				}
+
+				m_markedForDeletion.clear();
 			}
 		}
 
 		void World::Render()
 		{
-			mWindow.setView( mWorldView );
+			m_window.setView( m_worldView );
 			//mWindow.draw( mWorldGraph );
 		}
 
-		Object& World::CreateObject()
+		ObjectHandle World::CreateObject()
 		{
-			Object* newObject = ( Object* )mObjects.Allocate();
-			new ( newObject ) Object( *this );
-			return *newObject;
+			Object* newObject = ( Object* )m_objects.Allocate();
+			new ( newObject ) Object( *this, m_handles.Insert< Object >( newObject ));
+			newObject->m_active = true;
+
+			SyncHandles< Object >( m_objects );
+
+			return newObject->m_self;
 		}
 
-		void World::DestroyObject( Object& object )
+		void World::DestroyObject( ObjectHandle object )
 		{
-			mMarkedForDeletion.push_back( object );
+			m_markedForDeletion.push_back( object );
+		}
+
+		void World::AddSystem( std::unique_ptr< System > system )
+		{
+			m_systems.push_back( std::move( system ) );
+			system->RegisterComponents();
+		}
+
+		void World::DestroyComponent( ComponentHandle component )
+		{
+			auto* moved = ( Object* )m_objects.Release( component.Get() );
+
+			// Sync handle of potentially moved object
+			if( moved )
+				m_handles.Update( moved, moved->m_self );
+		}
+
+		HandleManager& World::GetHandleManager()
+		{
+			return m_handles;
 		}
 
 		//Reflex::Core::SceneNode* World::GetWorldGraphFromLayer( unsigned short layer ) const

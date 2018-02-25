@@ -1,32 +1,30 @@
 #pragma once
 
-#include "ComponentTypes.h"
+#include "Handle.h"
+#include "Object.h"
 
 namespace Reflex
 {
-	namespace Core { class Object; }
-
 	namespace Components
 	{
-		class Component
+		using Core::Object;
+		using Core::Handle;
+
+		typedef Handle< Component > ComponentHandle;
+
+		class Component : private sf::NonCopyable
 		{
 		public:
-			//Constructors / Destructors
-			Component( Object& object ) : mObject( object ) { }
+			// Constructors / Destructors
+			Component( Object& object );
 			virtual ~Component() { }
 
-			//Called when the object is fully constructed (all other components are available)
-			virtual void OnConstructionComplete() { };
+			Object &GetObject();
+			const Object& GetObject() const;
 
-			Object &GetObject() { return mObject; }
-			const Object& GetObject() const { return mObject; }
-
-		private:
+		protected:
 			Object& mObject;
-
-			//Remove copy and assign
-			Component( const Component& ) = delete;
-			Component& operator=( const Component& ) = delete;
+			ComponentHandle self;
 		};
 	}
 }

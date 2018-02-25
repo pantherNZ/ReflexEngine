@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Common.h"
+#include "ObjectIterator.h"
+
 namespace Reflex
 {
 	namespace Core
 	{
-		class ObjectAllocator
+		class ObjectAllocator : private sf::NonCopyable
 		{
 		public:
 			ObjectAllocator( unsigned objectSize, unsigned numElements );
@@ -30,20 +33,23 @@ namespace Reflex
 			unsigned GetIndex( void* data ) const;
 			bool Grew() const;
 			void ClearGrewFlag();
+			void* GetData( unsigned index ) const;
 
 			// Operator overloads for accessing the data
 			void* operator[]( unsigned index );
 			const void* operator[]( unsigned index ) const;
+
+			template< class T >
+			inline typename ArrayIterator< T > begin() { return ArrayIterator< T >( ( T* )m_array ); }
+			template< class T >
+			inline typename ArrayIterator< T > end() { return ArrayIterator< T >( ( T* )m_array + m_size ); }
 
 		private:
 			void Grow();
 			void GrowInteral();
 			void Move( unsigned a, unsigned b );
 
-			// Remove
 			ObjectAllocator() = delete;
-			ObjectAllocator( const ObjectAllocator& ) = delete;
-			ObjectAllocator& operator=( const ObjectAllocator& ) = delete;
 
 		private:
 			void* mArray;
