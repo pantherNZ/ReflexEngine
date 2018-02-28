@@ -1,5 +1,6 @@
 
 #include "World.h"
+#include <unordered_set>
 
 namespace Reflex
 {
@@ -12,14 +13,15 @@ namespace Reflex
 			, m_objects( sizeof( Object ), 1000 )
 		{
 			//BuildScene();
-
-			template< class T >
-			Handle< T >::handleManager = &m_handles;
+			ObjectHandle::s_handleManager = &m_handles;
+			ComponentHandle::s_handleManager = &m_handles;
 		}
 
 		void World::Update( const sf::Time deltaTime )
 		{
-			//mWorldGraph.Update( deltaTime );
+			// Update systems
+			for( auto& system : m_systems )
+				system.first->Update( deltaTime );
 
 			// Deleting objects
 			if( !m_markedForDeletion.empty() )
@@ -61,8 +63,31 @@ namespace Reflex
 
 		void World::AddSystem( std::unique_ptr< System > system )
 		{
-			m_systems.push_back( std::move( system ) );
+			// Insert the new system
+			auto result = m_systems.insert( std::make_pair( std::move( system ), std::vector< Type >() ) );
+			assert( result.second );
+
+			// Register components (m_last_added_system allows the system to add required component types to the above created vector)
+			m_last_added_system = &result.first->second;
 			system->RegisterComponents();
+			m_last_added_system = nullptr;
+
+			// Look for any existing objects that match what this system requires and add them to the system's list
+			std::unordered_set< Type > found;
+
+			for( auto i = m_objects.begin< Object >(); i != m_objects.end< Object >(); ++i )
+			{
+				//i->
+				//_components.begin(), m_components.end(), [&componentType]( const ComponentHandle& componentHandle )
+				//{
+				//	if( !componentHandle.Get() )
+				//		return false;
+				//
+				//	return componentType == ComponentType( typeid( *componentHandle.Get() ) )
+				//}
+			}
+
+			system->OnSystemStartup();
 		}
 
 		void World::DestroyComponent( ComponentHandle component )

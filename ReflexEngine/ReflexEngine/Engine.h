@@ -19,11 +19,13 @@ namespace Reflex
 
 			void Run();
 
-		protected:
-			virtual unsigned GetStartupState() const { return 0;  }
-			virtual void RegisterStates() { }
-			virtual void OnPostSetup() { }
+			template <typename T>
+			void RegisterState( unsigned stateID )
+			{
+				m_stateManager.RegisterState< T >( stateID );
+			}
 
+		protected:
 			void KeyboardInput( const sf::Keyboard::Key key, const bool isPressed );
 			void ProcessEvents();
 			void Update( const sf::Time deltaTime );

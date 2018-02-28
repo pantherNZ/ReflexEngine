@@ -10,7 +10,7 @@ namespace Reflex
 		// Type defs
 		typedef ResouceManager< sf::Texture > TextureManager;
 		typedef ResouceManager< sf::Font > FontManager;
-		typedef std::type_index ComponentType;
+		typedef std::type_index Type;
 	}
 
 	inline float RandomFloat()

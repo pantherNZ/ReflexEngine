@@ -6,6 +6,8 @@ namespace Reflex
 {
 	namespace Core
 	{
+		class HandleManager;
+
 		template< class T >
 		struct Handle
 		{
@@ -15,6 +17,7 @@ namespace Reflex
 
 			T* Get() const;
 			T* operator ->() const;
+			explicit operator bool() const;
 			operator unsigned() const;
 			bool IsValid() const;
 
@@ -23,7 +26,7 @@ namespace Reflex
 			uint32_t m_counter : 16;
 
 			// Static handle manager which is initialised by the World on startup
-			static class HandleManager* handleManager;
+			static class HandleManager* s_handleManager;
 		};
 	}
 }

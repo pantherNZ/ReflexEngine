@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "Component.h"
 
 namespace Reflex
 {
@@ -27,13 +28,15 @@ namespace Reflex
 			void RequiresComponent();
 
 		protected:
-			World& mWorld;
+			World& m_world;
+			// Iterating this causes a lot of jumping around in memory, it isn't very efficient (if there is more then one required component)
+			std::vector< std::vector< Reflex::Components::ComponentHandle > > m_components;
 		};
 
 		template< class T >
 		void System::RequiresComponent()
 		{
-			mWorld.ForwardRegisterComponent< T >();
+			m_world.ForwardRegisterComponent< T >();
 		}
 	}
 }

@@ -66,6 +66,12 @@
     <ClInclude Include="ObjectIterator.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Context.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="World.cpp">
@@ -94,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="HandleManager.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="State.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Handle.cpp">
       <Filter>Memory</Filter>

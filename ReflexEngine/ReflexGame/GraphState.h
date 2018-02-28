@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\ReflexEngine\StateManager.h"
+#include "..\ReflexEngine\State.h"
 #include "..\ReflexEngine\World.h"
 
 #include "GraphNode.h"

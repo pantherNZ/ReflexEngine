@@ -1,4 +1,5 @@
 #include "Component.h"
+#include "Object.h"
 
 namespace Reflex
 {

@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "Handle.h"
+#include "Component.h"
 
 namespace Reflex
 {
@@ -9,7 +10,7 @@ namespace Reflex
 	{
 		class World;
 
-		typedef Handle< class Component > ComponentHandle;
+		typedef Handle< class Reflex::Components::Component > ComponentHandle;
 		typedef Handle< class Object > ObjectHandle;
 
 		class Object : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
@@ -27,12 +28,20 @@ namespace Reflex
 			template< class T >
 			void RemoveAllComponentsOfType();
 
-			// Removes first components matching the template type
+			// Removes first component matching the template type
 			template< class T >
-			void RemoveFirstComponentOfType();
+			void RemoveComponentOfType();
 
-			// Removes 
+			// Removes component by handle
 			void RemoveComponent( ComponentHandle handle );
+
+			// Checks if this object has a component of template type
+			template< class T >
+			bool HasComponentOfType() const;
+
+			// Returns a component handle of template type if this object has one
+			template< class T >
+			ComponentHandle GetComponentOfType() const;
 
 		protected:
 			virtual void Draw( sf::RenderTarget& target, sf::RenderStates states ) const { }
@@ -77,7 +86,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		void Object::RemoveFirstComponentOfType()
+		void Object::RemoveComponentOfType()
 		{
 			const auto componentType = ComponentType( typeid( T ) );
 
@@ -88,6 +97,29 @@ namespace Reflex
 
 				return componentType == ComponentType( typeid( *componentHandle.Get() ) )
 			} ) );
+		}
+
+		template< class T >
+		bool Object::HasComponentOfType() const
+		{
+			return GetComponentOfType< T >().IsValid();
+		}
+
+		template< class T >
+		ComponentHandle Object::GetComponentOfType() const
+		{
+			const auto componentType = ComponentType( typeid( T ) );
+
+			for( auto& item : m_components )
+			{
+				if( !item.Get() )
+					continue;
+
+				if( componentType == ComponentType( typeid( *componentHandle.Get() ) ) )
+					return item;
+			}
+
+			return ComponentHandle();
 		}
 	}
 }

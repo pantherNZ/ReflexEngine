@@ -2,29 +2,13 @@
 
 // Includes
 #include "Common.h"
-
-#include <functional>
+#include "State.h"
+#include "Context.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		struct Context
-		{
-			Context( sf::RenderWindow& _window, TextureManager& _textureManager, FontManager& _fontManager )
-				: window( &_window )
-				, textureManager( &_textureManager )
-				, fontManager( &_fontManager )
-			{
-			}
-
-			sf::RenderWindow* window;
-			TextureManager* textureManager;
-			FontManager* fontManager;
-		};
-
-		class State;
-
 		class StateManager : private sf::NonCopyable
 		{
 		public:
@@ -37,14 +21,8 @@ namespace Reflex
 
 			explicit StateManager( Context& context );
 
-			template <typename T>
-			void RegisterState( unsigned stateID )
-			{
-				m_stateFactories[stateID] = [this]()
-				{
-					return std::make_unique< T >( *this, m_context );
-				};
-			}
+			template< typename T >
+			void RegisterState( unsigned stateID );
 
 			void Update( const sf::Time deltaTime );
 			void Render();
@@ -73,33 +51,21 @@ namespace Reflex
 				unsigned stateID;
 			};
 
-			std::vector<PendingChange> m_pendingList;
+			std::vector< PendingChange > m_pendingList;
 			std::vector< std::unique_ptr< State > > m_ActiveStates;
 			Context m_context;
 
 			std::map< unsigned, std::function< std::unique_ptr< State >( void ) > > m_stateFactories;
 		};
 
-
-		class State
+		// Template functions
+		template< typename T >
+		void StateManager::RegisterState( unsigned stateID )
 		{
-		public:
-			State( StateManager& stateManager, Context context );
-			virtual ~State() { }
-
-			virtual void Render() = 0;
-			virtual bool Update( const sf::Time deltaTime ) = 0;
-			virtual bool ProcessEvent( const sf::Event& event ) = 0;
-
-		protected:
-			void RequestStackPush( unsigned stateID );
-			void RequestStackPop();
-			void RequestStateClear();
-			const Context& GetContext() const;
-
-		private:
-			StateManager& m_stateManager;
-			Context m_context;
-		};
+			m_stateFactories[stateID] = [this]()
+			{
+				return std::make_unique< T >( *this, m_context );
+			};
+		}
 	}
 };

@@ -1,7 +1,8 @@
 #include "GraphNode.h"
 
-GraphNode::GraphNode( const sf::Font& font, const std::string _text )
-	: m_label( sf::String( _text ), font )
+GraphNode::GraphNode( Reflex::Core::Object& object, const sf::Font& font, const sf::String text )
+	: Component( object )
+	, m_label( text, font )
 	, m_image( 5 )
 {
 	Reflex::CenterOrigin( m_image );
@@ -9,6 +10,7 @@ GraphNode::GraphNode( const sf::Font& font, const std::string _text )
 
 	m_image.setFillColor( sf::Color::Red );
 }
+
 /*
 void GraphNode::DrawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const
 {

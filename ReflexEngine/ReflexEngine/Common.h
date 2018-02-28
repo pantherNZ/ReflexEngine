@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <array>
 #include <typeindex>
+#include <functional>
 
 #include <SFML/Graphics.hpp>
 

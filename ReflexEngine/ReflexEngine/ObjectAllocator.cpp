@@ -9,30 +9,30 @@ namespace Reflex
 	namespace Core
 	{
 		ObjectAllocator::ObjectAllocator( unsigned objectSize, unsigned numElements )
-			: mArray( malloc( objectSize * numElements ) )
-			, mObjectSize( objectSize )
-			, mSize( 0U )
-			, mCapacity( numElements )
-			, mArrayGrew( false )
+			: m_array( malloc( objectSize * numElements ) )
+			, m_objectSize( objectSize )
+			, m_size( 0U )
+			, m_capacity( numElements )
+			, m_arrayGrew( false )
 		{
 
 		}
 
 		void* ObjectAllocator::Allocate()
 		{
-			if( mSize == mCapacity )
+			if( m_size == m_capacity )
 				Grow();
 
-			return ( char * )mArray + mSize++ * mObjectSize;
+			return ( char * )m_array + m_size++ * m_objectSize;
 		}
 
 		void* ObjectAllocator::Release( void* memory )
 		{
-			if( --mSize )
+			if( --m_size )
 			{
 				unsigned index = GetIndex( memory );
-				Move( index, mSize );
-				return ( char * )mArray + index * mObjectSize;
+				Move( index, m_size );
+				return ( char * )m_array + index * m_objectSize;
 			}
 
 			return nullptr;
@@ -40,69 +40,69 @@ namespace Reflex
 
 		void ObjectAllocator::Grow()
 		{
-			mCapacity = mCapacity ? ( mCapacity * 2 + 10 ) : 4;
-			mArrayGrew = true;
+			m_capacity = m_capacity ? ( m_capacity * 2 + 10 ) : 4;
+			m_arrayGrew = true;
 
 			GrowInteral();
 		}
 
 		void ObjectAllocator::GrowInteral()
 		{
-			void* newArray = malloc( mObjectSize * mCapacity );
+			void* newArray = malloc( m_objectSize * m_capacity );
 
-			std::memcpy( newArray, mArray, mSize * mObjectSize );
+			std::memcpy( newArray, m_array, m_size * m_objectSize );
 
-			free( mArray );
+			free( m_array );
 
-			mArray = newArray;
+			m_array = newArray;
 		}
 
 		void ObjectAllocator::Swap( unsigned a, unsigned b )
 		{
-			assert( a < mSize );
-			assert( b < mSize );
+			assert( a < m_size );
+			assert( b < m_size );
 
-			void* t = alloca( mObjectSize );
-			void* A = ( char * )mArray + a * mObjectSize;
-			void* B = ( char * )mArray + b * mObjectSize;
-			std::memcpy( t, A, mObjectSize );
-			std::memcpy( A, B, mObjectSize );
-			std::memcpy( B, t, mObjectSize );
+			void* t = alloca( m_objectSize );
+			void* A = ( char * )m_array + a * m_objectSize;
+			void* B = ( char * )m_array + b * m_objectSize;
+			std::memcpy( t, A, m_objectSize );
+			std::memcpy( A, B, m_objectSize );
+			std::memcpy( B, t, m_objectSize );
 		}
 
 		void ObjectAllocator::Move( unsigned a, unsigned b )
 		{
-			void *A = ( char * )mArray + a * mObjectSize;
-			void *B = ( char * )mArray + b * mObjectSize;
-			std::memcpy( A, B, mObjectSize );
+			void *A = ( char * )m_array + a * m_objectSize;
+			void *B = ( char * )m_array + b * m_objectSize;
+			std::memcpy( A, B, m_objectSize );
 		}
 
 		void ObjectAllocator::Shrink()
 		{
-			mCapacity = mSize;
+			m_capacity = m_size;
 
 			GrowInteral();
 		}
 
 		void ObjectAllocator::ShrinkTo( unsigned numElements )
 		{
-			mCapacity = ( numElements > mSize ? numElements : mSize );
+			m_capacity = ( numElements > m_size ? numElements : m_size );
 
 			GrowInteral();
 		}
 
 		void ObjectAllocator::ShrinkBy( unsigned numElements )
 		{
-			const unsigned diff = mCapacity - numElements;
-			mCapacity = ( diff > mSize ? diff : mSize );
+			const unsigned diff = m_capacity - numElements;
+			m_capacity = ( diff > m_size ? diff : m_size );
 
 			GrowInteral();
 		}
 
 		void* ObjectAllocator::GetData( unsigned index ) const
 		{
-			assert( index < mSize );
-			return ( char* )mArray + index * mObjectSize;
+			assert( index < m_size );
+			return ( char* )m_array + index * m_objectSize;
 		}
 
 		void* ObjectAllocator::operator[]( unsigned index )
@@ -117,27 +117,27 @@ namespace Reflex
 
 		unsigned ObjectAllocator::Size() const
 		{
-			return mSize;
+			return m_size;
 		}
 
 		unsigned ObjectAllocator::Capacity() const
 		{
-			return mCapacity;
+			return m_capacity;
 		}
 
 		unsigned ObjectAllocator::GetIndex( void* data ) const
 		{
-			return ( ( char* )data - ( char* )mArray ) / mObjectSize;
+			return ( ( char* )data - ( char* )m_array ) / m_objectSize;
 		}
 
 		bool ObjectAllocator::Grew( void ) const
 		{
-			return mArrayGrew;
+			return m_arrayGrew;
 		}
 
 		void ObjectAllocator::ClearGrewFlag()
 		{
-			mArrayGrew = false;
+			m_arrayGrew = false;
 		}
 	}
 }

@@ -6,7 +6,7 @@ namespace Reflex
 	namespace Systems
 	{
 		System::System( World& world )
-			: mWorld( world )
+			: m_world( world )
 		{
 
 		}

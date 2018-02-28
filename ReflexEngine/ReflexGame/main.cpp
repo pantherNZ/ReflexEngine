@@ -1,13 +1,20 @@
 // Includes
-#include "Game.h"
+#include "..\ReflexEngine\Engine.h"
+
+#include "GraphState.h"
+#include "MenuState.h"
 
 // Entry point
 int main( int argc, char** argv )
 {
 	try
 	{
-		Game game;
-		game.Run();
+		Reflex::Core::Engine engine;
+
+		engine.RegisterState< GraphState >( 0 );
+		engine.RegisterState< MenuState >( 0 );
+
+		engine.Run();
 	}
 	catch( std::exception& e )
 	{

@@ -52,11 +52,11 @@ namespace Reflex
 			ObjectAllocator() = delete;
 
 		private:
-			void* mArray;
-			unsigned mObjectSize;
-			unsigned mSize;
-			unsigned mCapacity;
-			bool mArrayGrew;
+			void* m_array;
+			unsigned m_objectSize;
+			unsigned m_size;
+			unsigned m_capacity;
+			bool m_arrayGrew;
 		};
 	}
 }

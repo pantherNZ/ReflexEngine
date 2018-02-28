@@ -1,16 +1,18 @@
 #pragma once
 
+#include "Common.h"
 #include "Handle.h"
-#include "Object.h"
 
 namespace Reflex
 {
+	namespace Core { class Object; }
+
 	namespace Components
 	{
 		using Core::Object;
 		using Core::Handle;
 
-		typedef Handle< Component > ComponentHandle;
+		typedef Handle< class Component > ComponentHandle;
 
 		class Component : private sf::NonCopyable
 		{
@@ -21,6 +23,9 @@ namespace Reflex
 
 			Object &GetObject();
 			const Object& GetObject() const;
+
+		private:
+			Component();
 
 		protected:
 			Object& mObject;

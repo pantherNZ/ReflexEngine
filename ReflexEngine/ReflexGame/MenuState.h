@@ -1,15 +1,20 @@
 #pragma once
 
-class TitleState : public State
+#include "..\ReflexEngine\State.h"
+
+class MenuState : public Reflex::Core::State
 {
 public:
-	TitleState( StateStack& stack, Context context );
-	virtual void draw();
-	virtual bool update( sf::Time dt );
-	virtual bool handleEvent( const sf::Event& event );
+	MenuState( Reflex::Core::StateManager& stateManager, Reflex::Core::Context context );
+
+protected:
+	void Render() final;
+	bool Update( const sf::Time deltaTime ) final;
+	bool ProcessEvent( const sf::Event& event ) final;
+
 private:
-	sf::Sprite mBackgroundSprite;
-	sf::Text mText;
-	bool mShowText;
-	sf::Time mTextEffectTime;
+	sf::Sprite m_backgroundSprite;
+	sf::Text m_text;
+	bool m_showText;
+	sf::Time m_textEffectTime;
 };

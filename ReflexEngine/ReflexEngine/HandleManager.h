@@ -18,22 +18,22 @@ namespace Reflex
 			Handle< T > Insert( void* ptr );
 
 			template< class T >
-			void Replace( void* ptr, Handle< T > & handle );
+			void Replace( void* ptr, Handle< T >& handle );
 
 			template< class T >
-			void Update( void* ptr, Handle< T > & handle );
+			void Update( void* ptr, Handle< T >& handle );
 
 			template< class T >
-			void Remove( Handle< T >  handle );
+			void Remove( const Handle< T >& handle );
 
 			template< class T >
-			void* Get( Handle< T >  handle ) const;
+			void* Get( const Handle< T >& handle ) const;
 
 			template< class T >
-			bool IsValid( Handle< T >  handle ) const;
+			bool IsValid( const Handle< T >& handle ) const;
 
 			template< class T >
-			T* GetAs( Handle< T >  handle ) const;
+			T* GetAs( const Handle< T >& handle ) const;
 
 			unsigned FreeSlots() const;
 
@@ -111,7 +111,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		void HandleManager::Remove( Handle< T > handle )
+		void HandleManager::Remove( const Handle< T >& handle )
 		{
 			HandleEntry* entry = m_array.data() + handle.m_index;
 
@@ -129,7 +129,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		void* HandleManager::Get( Handle< T > handle ) const
+		void* HandleManager::Get( const Handle< T >& handle ) const
 		{
 			const HandleEntry* entry = m_array.data() + handle.m_index;
 
@@ -140,7 +140,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		bool HandleManager::IsValid( Handle< T > handle ) const
+		bool HandleManager::IsValid( const Handle< T >& handle ) const
 		{
 			const HandleEntry* entry = m_array.data() + handle.m_index;
 
@@ -151,7 +151,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		T* HandleManager::GetAs( Handle< T > handle ) const
+		T* HandleManager::GetAs( const Handle< T >& handle ) const
 		{
 			const HandleEntry* entry = m_array + handle.m_index;
 
