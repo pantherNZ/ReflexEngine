@@ -22,7 +22,7 @@ namespace Reflex
 				auto* transform = Reflex::Core::Handle< Reflex::Components::TransformComponent >( component.back() ).Get();
 				copied_states.transform = states.transform * transform->getTransform();
 
-				auto* sprite = Reflex::Core::Handle<  Reflex::Components::SpriteComponent >( component.front() ).Get();
+				auto* sprite = Reflex::Core::Handle< Reflex::Components::SpriteComponent >( component.front() ).Get();
 				target.draw( *sprite, copied_states );
 			}
 		}

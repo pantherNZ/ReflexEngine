@@ -17,7 +17,7 @@ namespace Reflex
 	};
 }
 
-GraphState::GraphState( Reflex::Core::StateManager& stateManager, Reflex::Core::Context context )
+GraphState::GraphState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
 	, m_world( *context.window )
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
@@ -25,23 +25,20 @@ GraphState::GraphState( Reflex::Core::StateManager& stateManager, Reflex::Core::
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );
 	context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
 
-	m_world.AddSystem< GeneticAlgorithm >();
-	m_world.AddSystem< Reflex::Systems::RenderSystem >();
-
 	ParseFile( "Data/VirtualStats.cpp" );
 
+	m_world.AddSystem< GeneticAlgorithm >();
 }
 
-void GraphState::CreateGraphObject( sf::Vector2f position )
+Reflex::Core::ObjectHandle GraphState::CreateGraphObject( const sf::Vector2f& position, const std::string& label )
 {
 	auto object = m_world.CreateObject();
-	object->AddComponent< GraphNode >();
-
-	auto sprite = object->AddComponent< Reflex::Components::SpriteComponent >();
-	sprite->setTexture( GetContext().textureManager->GetResource( Reflex::ResourceID::GraphNodeTextureID ) );
+	object->AddComponent< GraphNode >( sf::Color::Red, 10.0f, label, GetContext().fontManager->GetResource( Reflex::ResourceID::ArialFontID ) );
 
 	auto transform = object->AddComponent< Reflex::Components::TransformComponent >();
 	transform->setPosition( position );
+
+	return object;
 }
 
 void GraphState::Render()
@@ -63,14 +60,13 @@ bool GraphState::ProcessEvent( const sf::Event& event )
 
 void GraphState::ParseFile( const std::string& fileName )
 {
-	/*std::map< std::string, GraphNode* > hashMap;
-	auto* baseNode = m_world.GetWorldGraphFromLayer( 0 );
+	std::map< std::string, ObjectHandle > hashMap;
 
 	std::ifstream input( fileName );
 
 	const std::string strVirtual = "VIRTUAL_STAT(";
 	std::string strLine;
-	int iCurrentNodeIndex = 0;
+	ObjectHandle lastAdded;
 
 	bool bHaveCurrentNode = false;
 
@@ -80,25 +76,23 @@ void GraphState::ParseFile( const std::string& fileName )
 		std::getline( input, strLine );
 
 		// Trim
-		strLine = Reflex::Trim( strLine );
+		Reflex::Trim( strLine );
 
 		// Check for a virtual stat line
 		if( strLine.substr( 0, strVirtual.size() ) == strVirtual )
 		{
 			// Narrow down to find the stat name
 			std::string strStatName = strLine.substr( strVirtual.size(), strLine.size() - strVirtual.size() );
-			int uiCounter = Reflex::IndexOf( strLine, ',' );
-			strStatName = strStatName.substr( 0, ( uiCounter == -1 ? strStatName.size() : uiCounter ) );
-			strStatName = Reflex::Trim( strStatName );
+			int uiCounter = strStatName.find_first_of( ',' );
+			strStatName = strStatName.substr( 0, ( uiCounter == std::string::npos ? strStatName.size() : uiCounter ) );
+			Reflex::Trim( strStatName );
 
 			// Add the virtual stat to the list of initial nodes (if it doesn't already exist)
 			if( hashMap.find( strStatName ) == hashMap.end())
 			{
-				iCurrentNodeIndex = baseNode->GetChildrenCount();
-				auto pNewNode = std::make_unique< GraphNode >( GetContext().fontManager->GetResource( Reflex::ResourceID::ArialFontID ), strStatName );
-				pNewNode->setPosition( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height );
-				hashMap.insert( std::make_pair( strStatName, pNewNode.get() ) );
-				baseNode->AttachChild( std::move( pNewNode ) );
+				auto object = CreateGraphObject( sf::Vector2f( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height ), strStatName );
+				hashMap.insert( std::make_pair( strStatName, object ) );
+				lastAdded = object;
 				bHaveCurrentNode = true;
 			}
 		}
@@ -112,7 +106,8 @@ void GraphState::ParseFile( const std::string& fileName )
 			for( auto strStat : strStatsArray )
 			{
 				// Trim space
-				auto strStatTrimmed = Reflex::Trim( strStat );
+				auto strStatTrimmed( strStat );
+				Reflex::Trim( strStatTrimmed );
 
 				if( strStatTrimmed.size() == 0 )
 					continue;
@@ -121,26 +116,22 @@ void GraphState::ParseFile( const std::string& fileName )
 				{
 					bVirtualStatComplete = true;
 					strStatTrimmed.pop_back();
-					strStatTrimmed = Reflex::Trim( strStatTrimmed );
+					Reflex::Trim( strStatTrimmed );
 				}
 
 				// Find a matching stat in our list
-				const auto found = hashMap.find( strStatTrimmed );
+				auto found = hashMap.find( strStatTrimmed );
 
-				if( found != hashMap.end() )
-				{
-					// Add to connection list
-					found->second->m_connections.push_back( static_cast< GraphNode* >( baseNode->GetChild( iCurrentNodeIndex ) ) );
-				}
-				else
+				if( found == hashMap.end() )
 				{
 					// If we didn't find a matching stat, create a new one
-					auto pNewNode = std::make_unique< GraphNode >( GetContext().fontManager->GetResource( Reflex::ResourceID::ArialFontID ), strStatTrimmed );
-					pNewNode->setPosition( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height );
-					pNewNode->m_connections.push_back( static_cast< GraphNode* >( baseNode->GetChild( baseNode->GetChildrenCount() - 1 ) ) );
-					hashMap.insert( std::make_pair( strStatTrimmed, pNewNode.get() ) );
-					baseNode->AttachChild( std::move( pNewNode ) );
+					auto object = CreateGraphObject( sf::Vector2f( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height ), strStatTrimmed );
+					found = hashMap.insert( std::make_pair( strStatTrimmed, object ) ).first;
 				}
+
+				// Add to connection list
+				auto graphNode = found->second->GetComponent< GraphNode >();
+				graphNode->m_connections.push_back( lastAdded->GetComponent< Reflex::Components::TransformComponent >() );
 			}
 
 			if( bVirtualStatComplete )
@@ -148,7 +139,7 @@ void GraphState::ParseFile( const std::string& fileName )
 		}
 	}
 
-	input.close();*/
+	input.close();
 }
 
 void GraphState::GenerateGraphNodes()

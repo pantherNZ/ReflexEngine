@@ -73,7 +73,6 @@ namespace Reflex
 		template< class T >
 		T* HandleManager::GetAs( const Handle< T >& handle ) const
 		{
-			const auto test = handle.m_index;
 			const HandleEntry* entry = m_array.data() + handle.m_index;
 			
 			if( entry->m_counter == handle.m_counter && entry->m_allocated )

@@ -22,7 +22,7 @@ namespace Reflex
 			}
 		}
 
-		BaseHandle Object::GetComponentOfType( Type componentType ) const
+		BaseHandle Object::GetComponent( Type componentType ) const
 		{
 			for( auto& componentHandle : m_components )
 			{

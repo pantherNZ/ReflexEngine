@@ -11,9 +11,30 @@ namespace Reflex
 			: m_window( window )
 			, m_worldView( m_window.getDefaultView() )
 			, m_components( 10 )
-			, m_objects( sizeof( Object ), 1000 )
+			, m_objects( sizeof( Object ), 100 )
 		{
 			BaseHandle::s_handleManager = &m_handles;
+		}
+
+		World::~World()
+		{
+			//for( unsigned i = 0; i < m_objects.Size(); ++i )
+			//{
+			//	auto* object = ( Object* )m_objects[i];
+			//	if( !object )
+			//	{
+			//		for( unsigned j = 0; j < ecount_Component - 1; ++j )
+			//		{
+			//			EComponent type = ( EComponent )j;
+			//			if( o->HasComponent( type ) )
+			//			{
+			//				Component *c = o->GetComponent( type );
+			//				c->Remove();
+			//				Component *moved = ( Component * )GetComponents( type )->Free( c );
+			//				if( moved )
+			//					m_handles.Update( moved, moved->self );
+			//			}
+			//		}
 		}
 
 		void World::Update( const sf::Time deltaTime )
@@ -63,7 +84,7 @@ namespace Reflex
 			return ObjectHandle( newObject->m_self );
 		}
 
-		void World::DestroyObject( BaseHandle object )
+		void World::DestroyObject( ObjectHandle object )
 		{
 			m_markedForDeletion.push_back( object );
 		}
@@ -84,7 +105,7 @@ namespace Reflex
 
 				for( auto& requiredType : *m_newSystemRequiredComponents )
 				{
-					const auto handle = object->GetComponentOfType( requiredType );
+					const auto handle = object->GetComponent( requiredType );
 
 					if( !handle )
 						break;

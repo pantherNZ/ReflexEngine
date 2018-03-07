@@ -18,6 +18,11 @@ namespace Reflex
 
 		}
 
+		ObjectAllocator::~ObjectAllocator()
+		{
+			free( m_array );
+		}
+
 		void* ObjectAllocator::Allocate()
 		{
 			if( m_size == m_capacity )
@@ -72,8 +77,8 @@ namespace Reflex
 
 		void ObjectAllocator::Move( unsigned a, unsigned b )
 		{
-			void *A = ( char * )m_array + a * m_objectSize;
-			void *B = ( char * )m_array + b * m_objectSize;
+			void* A = ( char * )m_array + a * m_objectSize;
+			void* B = ( char * )m_array + b * m_objectSize;
 			std::memcpy( A, B, m_objectSize );
 		}
 

@@ -119,8 +119,8 @@ namespace Reflex
 				const auto ms_per_frame = m_statisticsUpdateTime.asMilliseconds() / m_statisticsNumFrames;
 				m_statisticsText.setString(
 					"FPS: " + std::to_string( m_statisticsNumFrames ) + "\n" +
-					"Frame Time: " + ( ms_per_frame > 0 ? std::to_string( ms_per_frame ) + "ms" :
-					std::to_string( m_statisticsUpdateTime.asMicroseconds() / m_statisticsNumFrames ) + "us" ) );
+					"Frame Time: " + //( ms_per_frame > 0 ? std::to_string( ms_per_frame ) + "ms" :
+					std::to_string( m_statisticsUpdateTime.asMicroseconds() / m_statisticsNumFrames ) + "us" );// );
 
 				m_statisticsUpdateTime -= sf::seconds( 1.0f );
 				m_statisticsNumFrames = 0;

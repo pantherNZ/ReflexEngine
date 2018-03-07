@@ -6,10 +6,12 @@
 
 #include "GraphNode.h"
 
-class GraphState : public Reflex::Core::State
+using namespace Reflex::Core;
+
+class GraphState : public State
 {
 public:
-	GraphState( Reflex::Core::StateManager& stateManager, Reflex::Core::Context context );
+	GraphState( StateManager& stateManager, Context context );
 
 protected:
 	void Render() final;
@@ -19,9 +21,9 @@ protected:
 private:
 	void ParseFile( const std::string& fileName );
 	void GenerateGraphNodes();
-	void CreateGraphObject( sf::Vector2f position );
+	ObjectHandle CreateGraphObject( const sf::Vector2f& position, const std::string& label );
 
 private:
-	Reflex::Core::World m_world;
+	World m_world;
 	sf::FloatRect m_bounds;
 };

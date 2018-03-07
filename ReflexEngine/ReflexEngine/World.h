@@ -22,12 +22,13 @@ namespace Reflex
 		{
 		public:
 			explicit World( sf::RenderTarget& window );
+			~World();
 
 			void Update( const sf::Time deltaTime );
 			void Render();
 
 			ObjectHandle CreateObject();
-			void DestroyObject( BaseHandle object );
+			void DestroyObject( ObjectHandle object );
 
 			void AddSystem( std::unique_ptr< System > system );
 			
@@ -43,8 +44,8 @@ namespace Reflex
 			template< class T >
 			void ForwardRegisterComponent();
 
-			template< class T >
-			Handle< T > CreateComponent( Object& owner );
+			template< class T, typename... Args >
+			Handle< T > CreateComponent( ObjectHandle& owner, Args&&... args );
 
 			template< class T >
 			void DestroyComponent( Handle< T > component );
@@ -100,12 +101,6 @@ namespace Reflex
 			AddSystem( std::move( std::make_unique< T >( *this, std::forward< Args >( args )... ) ) );
 		}
 
-		/*template<typename T, typename... Args>
-		std::unique_ptr<T> make_unique(Args&&... args)
-		{
-			return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-		}*/
-
 		template< class T >
 		void World::RemoveSystem()
 		{
@@ -151,8 +146,8 @@ namespace Reflex
 				m_newSystemRequiredComponents->push_back( componentType );
 		}
 
-		template< class T >
-		Handle< T > World::CreateComponent( Object& owner )
+		template< class T, typename... Args >
+		Handle< T > World::CreateComponent( ObjectHandle& owner, Args&&... args )
 		{
 			const auto componentType = Type( typeid( T ) );
 
@@ -177,7 +172,9 @@ namespace Reflex
 			// Create handle
 			const auto componentHandle = m_handles.Insert< T >( component );
 
-			new ( component ) T( owner, componentHandle );
+			new ( component ) T( owner, componentHandle, std::forward< Args >( args )... );
+
+			SyncHandles< T >( *found->second.get() );
 
 			// Here we want to check if we should add this component to any systems
 			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
@@ -194,9 +191,9 @@ namespace Reflex
 				// This looks through the required types and sees if the object has one of each of them
 				for( auto& requiredType : iter->second )
 				{
-					const auto handle = ( requiredType == componentType ? componentHandle : owner.GetComponentOfType( requiredType ) );
+					const auto handle = ( requiredType == componentType ? componentHandle : owner->GetComponent( requiredType ) );
 
-					if( !handle ) //if( !handle.IsValid() )
+					if( !handle.IsValid() )
 						break;
 
 					if( handle == componentHandle )
@@ -219,6 +216,7 @@ namespace Reflex
 		void World::DestroyComponent( Handle< T > component )
 		{
 			const auto componentType = Type( typeid( *component.Get() ) );
+			component.Get()->~T();
 			auto moved = ( Entity* )m_components[componentType]->Release( component->Get() );
 
 			// Sync handle of potentially moved object

@@ -10,8 +10,9 @@ namespace Reflex
 		class Entity : private sf::NonCopyable
 		{
 		public:
-			explicit Entity( const BaseHandle& handle ) : m_self( handle ) { }
+			explicit Entity( const BaseHandle& handle ) : m_self( handle ), m_active( true ) { }
 			BaseHandle m_self;
+			bool m_active = false;
 		};
 	}
 }

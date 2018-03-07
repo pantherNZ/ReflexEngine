@@ -9,10 +9,7 @@ namespace Reflex
 		class SpriteComponent : public Component, public sf::Sprite
 		{
 		public:
-			SpriteComponent( Object& object, BaseHandle handle ) : Component( object, handle ) { Reflex::CenterOrigin( *this ); }
-
-		private:
-			//void draw( sf::RenderTarget& target, sf::RenderStates states ) const final { target.draw( *this ); }
+			SpriteComponent( ObjectHandle object, BaseHandle handle ) : Component( object, handle ) { Reflex::CenterOrigin( *this ); }
 		};
 	}
 }

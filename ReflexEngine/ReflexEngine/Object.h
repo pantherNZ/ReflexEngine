@@ -21,16 +21,16 @@ namespace Reflex
 			void Destroy();
 
 			// Creates and adds a new component of the template type and returns a handle to it
-			template< class T >
-			Handle< T > AddComponent();
+			template< class T, typename... Args >
+			Handle< T > AddComponent( Args&&... args );
 
 			// Removes all components matching the template type
 			template< class T >
-			void RemoveAllComponentsOfType();
+			void RemoveComponents();
 
 			// Removes first component matching the template type
 			template< class T >
-			void RemoveComponentOfType();
+			void RemoveComponent();
 
 			// Removes component by handle
 			template< class T >
@@ -38,13 +38,13 @@ namespace Reflex
 
 			// Checks if this object has a component of template type
 			template< class T >
-			bool HasComponentOfType() const;
+			bool HasComponent() const;
 
 			// Returns a component handle of template type if this object has one
 			template< class T >
-			Handle< T > GetComponentOfType() const;
+			Handle< T > GetComponent() const;
 
-			BaseHandle Object::GetComponentOfType( Type componentType ) const;
+			BaseHandle Object::GetComponent( Type componentType ) const;
 
 			World& GetWorld() const;
 
@@ -58,16 +58,16 @@ namespace Reflex
 		};
 
 		// Template definitions
-		template< class T >
-		Handle< T > Object::AddComponent()
+		template< class T, typename... Args >
+		Handle< T > Object::AddComponent( Args&&... args )
 		{
-			auto component = m_world.CreateComponent< T >( *this );
+			auto component = m_world.CreateComponent< T >( ObjectHandle( m_self ), std::forward< Args >( args )... );
 			m_components.emplace_back( Type( typeid( T ) ), std::move( component ) );
 			return component;
 		}
 
 		template< class T >
-		void Object::RemoveAllComponentsOfType()
+		void Object::RemoveComponents()
 		{
 			const auto componentType = Type( typeid( T ) );
 
@@ -102,13 +102,13 @@ namespace Reflex
 		}
 
 		template< class T >
-		void Object::RemoveComponentOfType()
+		void Object::RemoveComponent()
 		{
 			const auto componentType = Type( typeid( T ) );
 
-			const auto found = std::find_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >&  componentHandle )
+			const auto found = std::find_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >& componentHandle )
 			{
-				if( !componentHandle.Get() )
+				if( !componentHandle.second.IsValid() )
 					return false;
 
 				return componentType == componentHandle.first;
@@ -122,19 +122,19 @@ namespace Reflex
 		}
 
 		template< class T >
-		bool Object::HasComponentOfType() const
+		bool Object::HasComponent() const
 		{
 			return GetComponentOfType< T >().IsValid();
 		}
 
 		template< class T >
-		Handle< T > Object::GetComponentOfType() const
+		Handle< T > Object::GetComponent() const
 		{
-			const auto componentType = ComponentType( typeid( T ) );
+			const auto componentType = Type( typeid( T ) );
 
 			for( auto& componentHandle : m_components )
 			{
-				if( !componentHandle.Get() )
+				if( !componentHandle.second.IsValid() )
 					continue;
 
 				if( componentType == componentHandle.first )

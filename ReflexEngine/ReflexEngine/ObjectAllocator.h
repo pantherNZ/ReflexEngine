@@ -11,6 +11,7 @@ namespace Reflex
 		{
 		public:
 			ObjectAllocator( unsigned objectSize, unsigned numElements );
+			~ObjectAllocator();
 
 			// Allocate space and return index
 			void* Allocate();
