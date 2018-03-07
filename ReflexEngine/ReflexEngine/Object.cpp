@@ -6,37 +6,39 @@ namespace Reflex
 {
 	namespace Core
 	{
-		Object::Object( World& world, ObjectHandle handle )
-			: m_world( world )
-			, m_self( handle )
+		Object::Object( World& world, BaseHandle handle )
+			: Entity( handle )
+			, m_world( world )
 		{
 
 		}
 
 		void Object::Destroy()
 		{
-			if( !m_destroyed && !m_active )
+			if( !m_destroyed )
 			{
 				m_world.DestroyObject( m_self );
 				m_destroyed = true;
 			}
 		}
 
-		void Object::RemoveComponent( ComponentHandle handle )
+		BaseHandle Object::GetComponentOfType( Type componentType ) const
 		{
-			m_components.erase( std::find_if( m_components.begin(), m_components.end(), [&]( const ComponentHandle& componentHandle )
+			for( auto& componentHandle : m_components )
 			{
-				if( handle == componentHandle )
-					m_world.DestroyComponent( handle );
-				return handle == componentHandle;
-			} ) );
+				if( !componentHandle.second.IsValid() )
+					continue;
+
+				if( componentType == componentHandle.first )
+					return componentHandle.second;
+			}
+
+			return BaseHandle();
 		}
 
-		void Object::draw( sf::RenderTarget& target, sf::RenderStates states ) const
+		World& Object::GetWorld() const
 		{
-			states.transform *= getTransform();
-
-			Draw( target, states );
+			return m_world;
 		}
 	}
 }

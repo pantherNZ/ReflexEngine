@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Handle.h"
+#include "Entity.h"
 
 namespace Reflex
 {
@@ -10,26 +10,24 @@ namespace Reflex
 	namespace Components
 	{
 		using Core::Object;
-		using Core::Handle;
-
-		typedef Handle< class Component > ComponentHandle;
-
-		class Component : private sf::NonCopyable
+		using Core::BaseHandle;
+		using Core::Entity;
+		
+		class Component : public Entity
 		{
 		public:
 			// Constructors / Destructors
-			Component( Object& object );
+			Component( Object& object, BaseHandle handle );
 			virtual ~Component() { }
 
-			Object &GetObject();
+			Object& GetObject();
 			const Object& GetObject() const;
 
 		private:
-			Component();
+			Component() = delete;
 
 		protected:
-			Object& mObject;
-			ComponentHandle self;
+			Object& m_object;
 		};
 	}
 }

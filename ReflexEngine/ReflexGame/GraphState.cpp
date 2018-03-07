@@ -1,7 +1,12 @@
 #include "GraphState.h"
+#include "GraphNode.h"
+#include "GeneticAlgorithm.h"
+
+#include "..\ReflexEngine\TransformComponent.h"
+#include "..\ReflexEngine\SpriteComponent.h"
+#include "..\ReflexEngine\RenderSystem.h"
 
 #include <fstream>
-#include <set>
 
 namespace Reflex
 {
@@ -18,12 +23,25 @@ GraphState::GraphState( Reflex::Core::StateManager& stateManager, Reflex::Core::
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
 {
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );
-	//context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
+	context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
+
+	m_world.AddSystem< GeneticAlgorithm >();
+	m_world.AddSystem< Reflex::Systems::RenderSystem >();
 
 	ParseFile( "Data/VirtualStats.cpp" );
 
-	m_world.CreateObject();
-	// CreateObject(
+}
+
+void GraphState::CreateGraphObject( sf::Vector2f position )
+{
+	auto object = m_world.CreateObject();
+	object->AddComponent< GraphNode >();
+
+	auto sprite = object->AddComponent< Reflex::Components::SpriteComponent >();
+	sprite->setTexture( GetContext().textureManager->GetResource( Reflex::ResourceID::GraphNodeTextureID ) );
+
+	auto transform = object->AddComponent< Reflex::Components::TransformComponent >();
+	transform->setPosition( position );
 }
 
 void GraphState::Render()
@@ -45,7 +63,7 @@ bool GraphState::ProcessEvent( const sf::Event& event )
 
 void GraphState::ParseFile( const std::string& fileName )
 {
-	std::map< std::string, GraphNode* > hashMap;
+	/*std::map< std::string, GraphNode* > hashMap;
 	auto* baseNode = m_world.GetWorldGraphFromLayer( 0 );
 
 	std::ifstream input( fileName );
@@ -130,7 +148,7 @@ void GraphState::ParseFile( const std::string& fileName )
 		}
 	}
 
-	input.close();
+	input.close();*/
 }
 
 void GraphState::GenerateGraphNodes()

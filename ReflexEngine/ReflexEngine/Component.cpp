@@ -5,20 +5,21 @@ namespace Reflex
 {
 	namespace Components
 	{
-		Component::Component( Object& object )
-			: mObject( object ) 
+		Component::Component( Object& object, BaseHandle handle )
+			: Entity( handle )
+			, m_object( object )
 		{
 
 		}
 
-		Object& Component::GetObject() 
-		{ 
-			return mObject; 
+		Reflex::Core::Object& Component::GetObject()
+		{
+			return m_object;
 		}
 
 		const Object& Component::GetObject() const 
 		{ 
-			return mObject; 
+			return m_object;
 		}
 	}
 }

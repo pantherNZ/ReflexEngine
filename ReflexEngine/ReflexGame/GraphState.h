@@ -2,6 +2,7 @@
 
 #include "..\ReflexEngine\State.h"
 #include "..\ReflexEngine\World.h"
+#include <SFML\System\Vector2.hpp>
 
 #include "GraphNode.h"
 
@@ -18,6 +19,7 @@ protected:
 private:
 	void ParseFile( const std::string& fileName );
 	void GenerateGraphNodes();
+	void CreateGraphObject( sf::Vector2f position );
 
 private:
 	Reflex::Core::World m_world;

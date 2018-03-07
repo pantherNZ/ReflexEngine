@@ -13,6 +13,11 @@ namespace Reflex
 		typedef std::type_index Type;
 	}
 
+	#define STRINGIFY( x ) #x
+	#define TOSTRING( x ) STRINGIFY( x )
+	#define TODO( Msg ) \
+		__pragma( message( __FILE__ "(" TOSTRING( __LINE__ ) ") : TODO [ " Msg " ]" ) )
+
 	inline float RandomFloat()
 	{
 		return rand() / ( RAND_MAX + 1.0f );
@@ -34,7 +39,7 @@ namespace Reflex
 		return( std::floor( _fVal + 0.5f ) / ( float )_iAccuracy );
 	}
 
-	inline std::vector< std::string > Split( const std::string& _strInput, const char _cLetter )
+	static inline std::vector< std::string > Split( const std::string& _strInput, const char _cLetter )
 	{
 		std::vector< std::string > vecReturn;
 		std::string strWriter;
@@ -58,72 +63,41 @@ namespace Reflex
 		return std::move( vecReturn );
 	}
 
-	inline int IndexOf( const std::string& _strInput, const char _cLetter )
+	static inline bool IsSpace( const char c )
 	{
-		for( unsigned i = 0; i < _strInput.size(); ++i )
-			if( _strInput[i] == _cLetter )
-				return i;
-
-		return -1;
+		return c == ' ' || c == '\t';
 	}
 
-	inline bool IsSpace( const char& _cLetter )
+	// Trim from start (in place)
+	static inline void TrimLeft( std::string& str )
 	{
-		return _cLetter == ' ' || _cLetter == '\t';
+		str.erase( str.begin(), std::find_if( str.begin(), str.end(), []( char ch )
+		{
+			return !IsSpace( ch );
+		} ) );
 	}
 
-	inline std::string TrimEnd( const std::string& _strInput )
+	// trim from end (in place)
+	static inline void TrimRight( std::string& str )
 	{
-		if( _strInput.size() == 0 || !IsSpace( _strInput.back() ) )
-			return _strInput;
-
-		auto strReturn( _strInput );
-		unsigned int uiCounter = 0;
-
-		for( uiCounter = strReturn.size() - 1; uiCounter >= 0; uiCounter++ )
-			if( !IsSpace( strReturn[uiCounter] ) )
-				break;
-
-		strReturn.erase( strReturn.begin() + uiCounter, strReturn.end() );
-		return strReturn;
+		str.erase( std::find_if( str.rbegin(), str.rend(), []( char ch )
+		{
+			return !IsSpace( ch );
+		} ).base(), str.end() );
 	}
 
-	inline std::string TrimStart( const std::string& _strInput )
+	// trim from both ends (in place)
+	static inline void Trim( std::string &str )
 	{
-		if( _strInput.size() == 0 || !IsSpace( _strInput.front() ) )
-			return _strInput;
-
-		auto strReturn( _strInput );
-		unsigned int uiCounter = 0;
-
-		for( uiCounter = 0; uiCounter < strReturn.size(); uiCounter++ )
-			if( !IsSpace( strReturn[uiCounter] ) )
-				break;
-
-		strReturn.erase( strReturn.begin(), strReturn.begin() + uiCounter );
-		return strReturn;
+		TrimLeft( str );
+		TrimRight( str );
 	}
 
-	inline std::string Trim( const std::string& _strInput )
+	// Centre the origin of an SFML object (such as Sprite, Text, Shape etc.)
+	template< class T >
+	static inline void CenterOrigin( T& object )
 	{
-		return TrimStart( TrimEnd( _strInput ) );
-	}
-
-	inline void CenterOrigin( sf::Sprite& sprite )
-	{
-		sf::FloatRect bounds = sprite.getLocalBounds();
-		sprite.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
-	}
-
-	inline void CenterOrigin( sf::Text& text )
-	{
-		sf::FloatRect bounds = text.getLocalBounds();
-		text.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
-	}
-
-	inline void CenterOrigin( sf::CircleShape& circle )
-	{
-		sf::FloatRect bounds = circle.getLocalBounds();
-		circle.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
+		sf::FloatRect bounds = object.getLocalBounds();
+		object.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
 	}
 }

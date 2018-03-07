@@ -1,6 +1,7 @@
 
 #include "World.h"
-#include <unordered_set>
+#include "Object.h"
+
 
 namespace Reflex
 {
@@ -12,9 +13,7 @@ namespace Reflex
 			, m_components( 10 )
 			, m_objects( sizeof( Object ), 1000 )
 		{
-			//BuildScene();
-			ObjectHandle::s_handleManager = &m_handles;
-			ComponentHandle::s_handleManager = &m_handles;
+			BaseHandle::s_handleManager = &m_handles;
 		}
 
 		void World::Update( const sf::Time deltaTime )
@@ -24,15 +23,20 @@ namespace Reflex
 				system.first->Update( deltaTime );
 
 			// Deleting objects
+			DeletePendingItems();
+		}
+
+		void World::DeletePendingItems()
+		{
 			if( !m_markedForDeletion.empty() )
 			{
-				for( auto& objectHandle : m_markedForDeletion )
+				for( auto& entityHandle : m_markedForDeletion )
 				{
-					objectHandle->m_active = false;
-					auto moved = ( Object* )m_objects.Release( objectHandle.Get() );
+					auto moved = ( Entity* )m_objects.Release( m_handles.Get( entityHandle ) );
 
+					// Sync handle of potentially moved object
 					if( moved )
-						m_handles.Update( moved, moved->m_self );
+						m_handles.Update( moved );
 				}
 
 				m_markedForDeletion.clear();
@@ -42,21 +46,24 @@ namespace Reflex
 		void World::Render()
 		{
 			m_window.setView( m_worldView );
-			//mWindow.draw( mWorldGraph );
+
+			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
+			{
+				m_window.draw( *iter->first );
+			}
 		}
 
 		ObjectHandle World::CreateObject()
 		{
 			Object* newObject = ( Object* )m_objects.Allocate();
-			new ( newObject ) Object( *this, m_handles.Insert< Object >( newObject ));
-			newObject->m_active = true;
+			new ( newObject ) Object( *this, m_handles.Insert( newObject ) );
 
 			SyncHandles< Object >( m_objects );
 
-			return newObject->m_self;
+			return ObjectHandle( newObject->m_self );
 		}
 
-		void World::DestroyObject( ObjectHandle object )
+		void World::DestroyObject( BaseHandle object )
 		{
 			m_markedForDeletion.push_back( object );
 		}
@@ -64,39 +71,39 @@ namespace Reflex
 		void World::AddSystem( std::unique_ptr< System > system )
 		{
 			// Insert the new system
-			auto result = m_systems.insert( std::make_pair( std::move( system ), std::vector< Type >() ) );
-			assert( result.second );
+			std::vector< Type > requiredComponentTypes;
 
-			// Register components (m_last_added_system allows the system to add required component types to the above created vector)
-			m_last_added_system = &result.first->second;
+			// Register components (m_newSystemRequiredComponents allows the system to add required component types to the above created vector)
+			m_newSystemRequiredComponents = &requiredComponentTypes;
 			system->RegisterComponents();
-			m_last_added_system = nullptr;
 
 			// Look for any existing objects that match what this system requires and add them to the system's list
-			std::unordered_set< Type > found;
-
-			for( auto i = m_objects.begin< Object >(); i != m_objects.end< Object >(); ++i )
+			for( auto object = m_objects.begin< Object >(); object != m_objects.end< Object >(); ++object )
 			{
-				//i->
-				//_components.begin(), m_components.end(), [&componentType]( const ComponentHandle& componentHandle )
-				//{
-				//	if( !componentHandle.Get() )
-				//		return false;
-				//
-				//	return componentType == ComponentType( typeid( *componentHandle.Get() ) )
-				//}
+				std::vector< BaseHandle > tempList;
+
+				for( auto& requiredType : *m_newSystemRequiredComponents )
+				{
+					const auto handle = object->GetComponentOfType( requiredType );
+
+					if( !handle )
+						break;
+					
+					tempList.push_back( handle );
+				}
+
+				if( tempList.size() < m_newSystemRequiredComponents->size() )
+					continue;
+
+				system->m_components.push_back( std::move( tempList ) );
 			}
 
-			system->OnSystemStartup();
-		}
+			m_newSystemRequiredComponents = nullptr;
 
-		void World::DestroyComponent( ComponentHandle component )
-		{
-			auto* moved = ( Object* )m_objects.Release( component.Get() );
+			auto result = m_systems.insert( std::make_pair( std::move( system ), std::move( requiredComponentTypes ) ) );
+			assert( result.second );
 
-			// Sync handle of potentially moved object
-			if( moved )
-				m_handles.Update( moved, moved->m_self );
+			result.first->first->OnSystemStartup();
 		}
 
 		HandleManager& World::GetHandleManager()
@@ -104,6 +111,10 @@ namespace Reflex
 			return m_handles;
 		}
 
+		sf::RenderTarget& World::GetWindow()
+		{
+			return m_window;
+		}
 		//Reflex::Core::SceneNode* World::GetWorldGraphFromLayer( unsigned short layer ) const
 		//{
 		//	return mSceneLayers[layer];

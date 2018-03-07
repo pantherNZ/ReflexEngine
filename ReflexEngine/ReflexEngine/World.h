@@ -5,9 +5,9 @@
 #include "Object.h"
 #include "ObjectAllocator.h"
 #include "System.h"
+#include "HandleManager.h"
 
 #include <unordered_map>
-#include "HandleManager.h"
 
 // Engine class
 namespace Reflex
@@ -15,6 +15,7 @@ namespace Reflex
 	namespace Core
 	{
 		using Systems::System;
+		using Reflex::Components::Component;
 
 		// World class
 		class World : private sf::NonCopyable
@@ -26,7 +27,7 @@ namespace Reflex
 			void Render();
 
 			ObjectHandle CreateObject();
-			void DestroyObject( ObjectHandle object );
+			void DestroyObject( BaseHandle object );
 
 			void AddSystem( std::unique_ptr< System > system );
 			
@@ -34,7 +35,7 @@ namespace Reflex
 			void AddSystem( Args&&... args );
 
 			template< class T >
-			std::unique_ptr< System > GetSystem();
+			System* GetSystem();
 
 			template< class T >
 			void RemoveSystem();
@@ -43,12 +44,10 @@ namespace Reflex
 			void ForwardRegisterComponent();
 
 			template< class T >
-			ComponentHandle CreateComponent();
+			Handle< T > CreateComponent( Object& owner );
 
-			//template< class T >
-			//void DestroyComponent();
-
-			void DestroyComponent( ComponentHandle component );
+			template< class T >
+			void DestroyComponent( Handle< T > component );
 
 			template< class T >
 			void SyncHandles( ObjectAllocator& m_array );
@@ -57,9 +56,11 @@ namespace Reflex
 			void SyncHandlesForce( ObjectAllocator& m_array );
 
 			HandleManager& GetHandleManager();
+			sf::RenderTarget& GetWindow();
 
 		protected:
 			//void BuildScene();
+			void DeletePendingItems();
 
 		private:
 			World() = delete;
@@ -73,21 +74,30 @@ namespace Reflex
 			sf::RenderTarget& m_window;
 			sf::View m_worldView;
 
+			// Storage for all objects in the game
 			ObjectAllocator m_objects;
+
+			// Handle manager which maps a handle to a void* in memory (such as in the above object allocator or a component allocator)
 			HandleManager m_handles;
 
+			// List of components, indexed by their type (EG. Sprite), this is what holds the memory of all components in the engine
 			std::unordered_map< Type, std::unique_ptr< ObjectAllocator > > m_components;
+
+			// List of systems, indexed by their pointer, which grants access to the vector storing the component types it requires
 			std::unordered_map< std::unique_ptr< System >, std::vector< Type > > m_systems;
 
-			std::vector< Type >* m_last_added_system = nullptr;
-			std::vector< ObjectHandle > m_markedForDeletion;
+			// Internal pointer, used to add required component types to the last added system (in AddSystem call)
+			std::vector< Type >* m_newSystemRequiredComponents = nullptr;
+
+			// Removes objects / components on frame move instead of during sometime dangerous
+			std::vector< BaseHandle > m_markedForDeletion;
 		};
 
 		// Template functions
 		template< class T, typename... Args >
 		void World::AddSystem( Args&&... args )
 		{
-			AddSystem( std::move( std::make_unique< T >( std::forward< Args >( args )... ) ) );
+			AddSystem( std::move( std::make_unique< T >( *this, std::forward< Args >( args )... ) ) );
 		}
 
 		/*template<typename T, typename... Args>
@@ -114,7 +124,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		std::unique_ptr< System > World::GetSystem()
+		System* World::GetSystem()
 		{
 			const auto systemType = Type( typeid( T ) );
 
@@ -122,9 +132,7 @@ namespace Reflex
 			{
 				if( systemType == Type( typeid( iter->first.get() ) ) )
 				{
-					auto system = std::move( iter->first );
-					m_systems.erase( iter );
-					return std::move( system );
+					return iter->first.get();
 				}
 			}
 
@@ -134,43 +142,103 @@ namespace Reflex
 		template< class T >
 		void World::ForwardRegisterComponent()
 		{
-			const auto componentType = ComponentType( typeid( T ) );
+			const auto componentType = Type( typeid( T ) );
 
 			if( m_components.find( componentType ) == m_components.end() )
-				m_components.insert( componentType, std::make_unique< ObjectAllocator >( sizeof( T ), 10 ) );
+				m_components.insert( std::make_pair( componentType, std::make_unique< ObjectAllocator >( sizeof( T ), 10 ) ) );
 
-			if( m_last_added_system )
-				m_last_added_system->push_back( componentType );
+			if( m_newSystemRequiredComponents )
+				m_newSystemRequiredComponents->push_back( componentType );
 		}
 
 		template< class T >
-		ComponentHandle World::CreateComponent()
+		Handle< T > World::CreateComponent( Object& owner )
 		{
-			const auto componentType = ComponentType( typeid( T ) );
+			const auto componentType = Type( typeid( T ) );
 
+			// Create an allocator for this type if one doesn't already exist
 			auto found = m_components.find( componentType );
 
 			if( found == m_components.end() )
-				found = m_components.insert( componentType, std::make_unique< ObjectAllocator >( sizeof( T ), 10 ) );
+			{
+				const auto result = m_components.insert( std::make_pair( componentType, std::make_unique< ObjectAllocator >( sizeof( T ), 10 ) ) );
+				found = result.first;
+			
+				if( !result.second )
+				{
+					LOG_CRIT( Stream( "Failed to allocate memory for component allocator of type: " << componentType.name() ) );
+					return Handle< T >();
+				}
+			}
 
-			auto* component = ( T* )found->second.Allocate();
-			new ( component ) T( *this );
+			// Allocate the object from the allocator
+			auto* component = ( T* )found->second->Allocate();
 
-			return m_handles.Insert< Component >( component );
+			// Create handle
+			const auto componentHandle = m_handles.Insert< T >( component );
+
+			new ( component ) T( owner, componentHandle );
+
+			// Here we want to check if we should add this component to any systems
+			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
+			{
+				// If the system doesn't care about this type, skip it
+				if( std::find( iter->second.begin(), iter->second.end(), componentType ) == iter->second.end() )
+					continue;
+
+				auto& componentsPerObject = iter->first->m_components;
+
+				std::vector< BaseHandle > tempList;
+				bool canAddDueToNewComponent = false;
+
+				// This looks through the required types and sees if the object has one of each of them
+				for( auto& requiredType : iter->second )
+				{
+					const auto handle = ( requiredType == componentType ? componentHandle : owner.GetComponentOfType( requiredType ) );
+
+					if( !handle ) //if( !handle.IsValid() )
+						break;
+
+					if( handle == componentHandle )
+						canAddDueToNewComponent = true;
+
+					tempList.push_back( handle );
+				}
+
+				// Escape if the object didn't have the components required OR if our new component isn't even the one that is now allowing it to be a part of the system
+				if( tempList.size() < iter->second.size() || !canAddDueToNewComponent )
+					continue;
+
+				iter->first->m_components.push_back( std::move( tempList ) );
+			}
+
+			return componentHandle;
 		}
 
-		/*template< class T >
-		void World::DestroyComponent()
+		template< class T >
+		void World::DestroyComponent( Handle< T > component )
 		{
-			const auto componentType = ComponentType( typeid( T ) );
+			const auto componentType = Type( typeid( *component.Get() ) );
+			auto moved = ( Entity* )m_components[componentType]->Release( component->Get() );
 
-			auto found = m_components.find( componentType );
+			// Sync handle of potentially moved object
+			if( moved )
+				m_handles.Update( moved );
 
-			if( found == m_components.end() )
-				return; // This is weird, duno how this could ever happen
+			// Remove this component from any systems
+			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
+			{
+				if( std::find( iter->second.begin(), iter->second.end(), componentType ) == iter->second.end() )
+					continue;
 
-			found->second.Release( Handle.Get() );
-		}*/
+				auto& componentsPerObject = iter->first->m_components;
+
+				std::remove_if( componentsPerObject.begin(), componentsPerObject.end(), [&component]( std::vector< BaseHandle >& components )
+				{
+					return std::find( components.begin(), components.end(), component ) != components.end();
+				} );
+			}
+		}
 
 		template< class T >
 		void World::SyncHandles( ObjectAllocator& m_array )

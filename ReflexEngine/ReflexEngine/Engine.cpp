@@ -28,25 +28,39 @@ namespace Reflex
 
 		void Engine::Run()
 		{
-			sf::Clock clock;
-			sf::Time accumlatedTime = sf::Time::Zero;
-
-			while( m_window.isOpen() )
+			try
 			{
-				ProcessEvents();
-				sf::Time deltaTime = clock.restart();
-				accumlatedTime += deltaTime;
+				sf::Clock clock;
+				sf::Time accumlatedTime = sf::Time::Zero;
 
-				while( accumlatedTime > m_updateInterval )
+				while( m_window.isOpen() )
 				{
-					accumlatedTime -= m_updateInterval;
 					ProcessEvents();
-					Update( m_updateInterval );
-				}
+					sf::Time deltaTime = clock.restart();
+					accumlatedTime += deltaTime;
+					bool updated = false;
 
-				UpdateStatistics( deltaTime );
-				Render();
+					while( accumlatedTime > m_updateInterval )
+					{
+						accumlatedTime -= m_updateInterval;
+						ProcessEvents();
+						Update( m_updateInterval );
+						updated = true;
+					}
+
+					UpdateStatistics( deltaTime );
+					Render();
+				}
 			}
+			catch( std::exception& e )
+			{
+				Reflex::LOG_CRIT( Stream( "EXCEPTION: " << *e.what() << "\n" ) );
+			}
+		}
+
+		void Engine::SetStartupState( const unsigned stateID )
+		{
+			m_stateManager.PushState( stateID );
 		}
 
 		void Engine::ProcessEvents()
@@ -102,9 +116,11 @@ namespace Reflex
 
 			if( m_statisticsUpdateTime >= sf::seconds( 1.0f ) )
 			{
+				const auto ms_per_frame = m_statisticsUpdateTime.asMilliseconds() / m_statisticsNumFrames;
 				m_statisticsText.setString(
-					"Frames / Second = " + std::to_string( m_statisticsNumFrames ) + "\n" +
-					"Time / Update = " + std::to_string( m_statisticsUpdateTime.asMicroseconds() / m_statisticsNumFrames ) + "us" );
+					"FPS: " + std::to_string( m_statisticsNumFrames ) + "\n" +
+					"Frame Time: " + ( ms_per_frame > 0 ? std::to_string( ms_per_frame ) + "ms" :
+					std::to_string( m_statisticsUpdateTime.asMicroseconds() / m_statisticsNumFrames ) + "us" ) );
 
 				m_statisticsUpdateTime -= sf::seconds( 1.0f );
 				m_statisticsNumFrames = 0;

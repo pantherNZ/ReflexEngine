@@ -9,6 +9,7 @@
 #include <array>
 #include <typeindex>
 #include <functional>
+#include <unordered_map>
 
 #include <SFML/Graphics.hpp>
 

@@ -16,7 +16,7 @@ namespace Reflex
 			for( auto itr = m_ActiveStates.rbegin(); itr != m_ActiveStates.rend(); ++itr )
 			{
 				if( !( *itr )->Update( deltaTime ) )
-					break;;
+					break;
 			}
 
 			ApplyPendingChanges();
@@ -33,7 +33,7 @@ namespace Reflex
 			for( auto itr = m_ActiveStates.rbegin(); itr != m_ActiveStates.rend(); ++itr )
 			{
 				if( !( *itr )->ProcessEvent( event ) )
-					break;;
+					break;
 			}
 
 			ApplyPendingChanges();

@@ -2,12 +2,9 @@
 
 #include "..\ReflexEngine\Component.h"
 
-class GraphNode : Reflex::Components::Component
+class GraphNode : public Reflex::Components::Component
 {
 public:
-	GraphNode( Reflex::Core::Object& object, const sf::Font& font, const sf::String text );
-
-	sf::CircleShape m_image;
-	sf::Text m_label;
+	using Component::Component;
 	std::vector< GraphNode* > m_connections;
 };

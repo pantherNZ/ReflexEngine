@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Common.h"
-#include "Handle.h"
 #include "Component.h"
+#include "Entity.h"
 
 namespace Reflex
 {
@@ -10,19 +10,19 @@ namespace Reflex
 	{
 		class World;
 
-		typedef Handle< class Reflex::Components::Component > ComponentHandle;
 		typedef Handle< class Object > ObjectHandle;
 
-		class Object : public sf::Transformable, public sf::Drawable, private sf::NonCopyable
+		class Object : public Entity
 		{
 		public:
-			Object( World& world, ObjectHandle handle );
+			Object( World& world, BaseHandle handle );
+			virtual ~Object() { }
 
 			void Destroy();
 
 			// Creates and adds a new component of the template type and returns a handle to it
 			template< class T >
-			ComponentHandle AddComponent();
+			Handle< T > AddComponent();
 
 			// Removes all components matching the template type
 			template< class T >
@@ -33,7 +33,8 @@ namespace Reflex
 			void RemoveComponentOfType();
 
 			// Removes component by handle
-			void RemoveComponent( ComponentHandle handle );
+			template< class T >
+			void RemoveComponent( Handle< T > handle );
 
 			// Checks if this object has a component of template type
 			template< class T >
@@ -41,62 +42,83 @@ namespace Reflex
 
 			// Returns a component handle of template type if this object has one
 			template< class T >
-			ComponentHandle GetComponentOfType() const;
+			Handle< T > GetComponentOfType() const;
 
-		protected:
-			virtual void Draw( sf::RenderTarget& target, sf::RenderStates states ) const { }
+			BaseHandle Object::GetComponentOfType( Type componentType ) const;
+
+			World& GetWorld() const;
 
 		private:
-			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final;
-
 			Object() = delete;
-
-		public:
-			bool m_active = false;
-			ObjectHandle m_self;
 
 		protected:
 			World& m_world;
 			bool m_destroyed = false;
-			std::vector< ComponentHandle > m_components;
+			std::vector< std::pair< Type, BaseHandle > > m_components;
 		};
 
 		// Template definitions
 		template< class T >
-		ComponentHandle Object::AddComponent()
+		Handle< T > Object::AddComponent()
 		{
-			auto component = m_world.CreateComponent< T >();
-			m_components.push_back( std::move( component ) );
+			auto component = m_world.CreateComponent< T >( *this );
+			m_components.emplace_back( Type( typeid( T ) ), std::move( component ) );
 			return component;
 		}
 
 		template< class T >
 		void Object::RemoveAllComponentsOfType()
 		{
-			const auto componentType = ComponentType( typeid( T ) );
+			const auto componentType = Type( typeid( T ) );
 
-			m_components.erase( std::remove_if( m_components.begin(), m_components.end(), [&componentType]( const ComponentHandle& componentHandle )
+			m_components.erase( std::remove_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >& component )
 			{ 
-				if( !componentHandle.Get() )
+				if( !component.second.IsValid() )
 					return false;
 
-				return componentType == ComponentType( typeid( *componentHandle.Get() ) )
+				if( componentType != component.first )
+					return false;
+				
+				m_world.DestroyComponent( component.second );
+
+				return true;
 			} 
 			), m_components.end() );
 		}
 
 		template< class T >
+		void Object::RemoveComponent( Handle< T > handle )
+		{
+			const auto found = std::find_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >& component )
+			{
+				return component.second == handle;
+			} );
+
+			if( found != m_components.end() )
+			{
+				m_world.DestroyComponent( *found );
+				m_components.erase( found );
+			}
+		}
+
+		template< class T >
 		void Object::RemoveComponentOfType()
 		{
-			const auto componentType = ComponentType( typeid( T ) );
+			const auto componentType = Type( typeid( T ) );
 
-			m_components.erase( std::find_if( m_components.begin(), m_components.end(), [&ComponentHandle]( const Handle& componentHandle )
+			const auto found = std::find_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >&  componentHandle )
 			{
 				if( !componentHandle.Get() )
 					return false;
 
-				return componentType == ComponentType( typeid( *componentHandle.Get() ) )
-			} ) );
+				return componentType == componentHandle.first;
+			} );
+
+			if( found != m_components.end() )
+			{
+				m_world.DestroyComponent( *found );
+				m_components.erase( found );
+			}
 		}
 
 		template< class T >
@@ -106,20 +128,20 @@ namespace Reflex
 		}
 
 		template< class T >
-		ComponentHandle Object::GetComponentOfType() const
+		Handle< T > Object::GetComponentOfType() const
 		{
 			const auto componentType = ComponentType( typeid( T ) );
 
-			for( auto& item : m_components )
+			for( auto& componentHandle : m_components )
 			{
-				if( !item.Get() )
+				if( !componentHandle.Get() )
 					continue;
 
-				if( componentType == ComponentType( typeid( *componentHandle.Get() ) ) )
-					return item;
+				if( componentType == componentHandle.first )
+					return Handle< T >( componentHandle.second );
 			}
 
-			return ComponentHandle();
+			return Handle< T >();
 		}
 	}
 }

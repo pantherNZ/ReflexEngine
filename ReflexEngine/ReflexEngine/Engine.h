@@ -19,11 +19,10 @@ namespace Reflex
 
 			void Run();
 
-			template <typename T>
-			void RegisterState( unsigned stateID )
-			{
-				m_stateManager.RegisterState< T >( stateID );
-			}
+			template< typename T >
+			void RegisterState( const unsigned stateID, const bool isStartingState = false );
+
+			void SetStartupState( const unsigned stateID );
 
 		protected:
 			void KeyboardInput( const sf::Keyboard::Key key, const bool isPressed );
@@ -45,5 +44,14 @@ namespace Reflex
 			sf::Time m_statisticsUpdateTime;
 			unsigned int m_statisticsNumFrames = 0U;
 		};
+
+		template< typename T >
+		void Engine::RegisterState( const unsigned stateID, const bool isStartingState )
+		{
+			m_stateManager.RegisterState< T >( stateID );
+
+			if( isStartingState )
+				SetStartupState( stateID );
+		}
 	}
 }

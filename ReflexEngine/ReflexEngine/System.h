@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "Component.h"
+#include "Handle.h"
 
 namespace Reflex
 {
@@ -11,32 +11,30 @@ namespace Reflex
 	{
 		using Core::World;
 
-		class System : private sf::NonCopyable
+#define RequiresComponent m_world.ForwardRegisterComponent
+
+		class System : private sf::NonCopyable, public sf::Drawable
 		{
+			friend class World;
+
 		public:
 			//Constructors / Destructors
-			System( World& mWorld );
+			System( World& world ) : m_world( world ) { }
 			virtual ~System() { }
 
 			virtual void RegisterComponents() = 0;
 			virtual void Update( const sf::Time deltaTime ) { }
+			virtual void Render( sf::RenderTarget& target, sf::RenderStates states ) const { }
 			virtual void OnSystemStartup() { }
 			virtual void OnSystemShutdown() { }
 
 		protected:
-			template< class T >
-			void RequiresComponent();
+			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final { Render( target, states ); }
 
 		protected:
 			World& m_world;
 			// Iterating this causes a lot of jumping around in memory, it isn't very efficient (if there is more then one required component)
-			std::vector< std::vector< Reflex::Components::ComponentHandle > > m_components;
+			std::vector< std::vector< Reflex::Core::BaseHandle > > m_components;
 		};
-
-		template< class T >
-		void System::RequiresComponent()
-		{
-			m_world.ForwardRegisterComponent< T >();
-		}
 	}
 }

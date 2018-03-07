@@ -15,10 +15,10 @@ void MenuState::Render()
 
 bool MenuState::Update( const sf::Time deltaTime )
 {
-
+	return false;
 }
 
 bool MenuState::ProcessEvent( const sf::Event& event )
 {
-
+	return false;
 }

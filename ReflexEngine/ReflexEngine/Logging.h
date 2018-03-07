@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 namespace
 {
 	const std::string logTitle[3] =
@@ -24,6 +26,8 @@ namespace Reflex
 		std::cout << logTitle[( int )_type];
 		std::cout << _message << "\n";
 	}
+
+#	define Stream( message ) [&](){ std::stringstream s; s << message; return s.str( ); }()
 
 	inline void LOG_CRIT( std::string _message ) { LOG( ELogType::CRIT, _message ); }
 	inline void LOG_WARN( std::string _message ) { LOG( ELogType::WARN, _message ); }
