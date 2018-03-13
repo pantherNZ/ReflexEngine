@@ -24,6 +24,9 @@ namespace Reflex
 			template< class T, typename... Args >
 			Handle< T > AddComponent( Args&&... args );
 
+			// Removes all components
+			void RemoveAllComponents();
+
 			// Removes all components matching the template type
 			template< class T >
 			void RemoveComponents();
@@ -96,7 +99,7 @@ namespace Reflex
 
 			if( found != m_components.end() )
 			{
-				m_world.DestroyComponent( *found );
+				m_world.DestroyComponent( found->second );
 				m_components.erase( found );
 			}
 		}

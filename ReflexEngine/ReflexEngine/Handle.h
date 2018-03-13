@@ -20,6 +20,7 @@ namespace Reflex
 			// Members
 			uint32_t m_index : 16;
 			uint32_t m_counter : 16;
+			bool markedForDeletion = false;
 
 			static BaseHandle null;
 			static class HandleManager* s_handleManager;

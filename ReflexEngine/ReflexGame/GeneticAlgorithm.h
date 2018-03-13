@@ -1,21 +1,64 @@
 #pragma once
 
-#include "..\ReflexEngine\System.h"
+#include <SFML\System\Vector2.hpp>
+#include <SFML\Graphics\Rect.hpp>
 
-using namespace Reflex::Core;
+#include <string>
+#include <set>
+#include <vector>
 
-class GeneticAlgorithm : public Reflex::Systems::System
+// https://www.emis.de/journals/DM/v92/art5.pdf
+
+class GeneticAlgorithm
 {
 public:
-	using System::System;
+	GeneticAlgorithm( const std::string& fileName, const sf::FloatRect& bounds );
+
+	struct Node
+	{
+		Node( sf::Vector2f pos, std::string str ) : position( pos ), label( str ) {}
+		sf::Vector2f position;
+		std::string label;
+		std::set< unsigned > connections;
+	};
+
+	struct Connection
+	{
+		Connection( unsigned a, unsigned b ) : from( a ), to( b ) { }
+		unsigned from;
+		unsigned to;
+	};
+
+	struct Graph
+	{
+		std::vector< Node > nodes;
+		std::vector< Connection > connections;
+		float score = 0.0f;
+	};
+
+	typedef std::vector< Graph > Population;
+
+	const Graph& GetBestGraph();
+	const float GetAverageScore();
+	void IteratePopulation();
 
 protected:
-	void RegisterComponents() final;
-	void Update( const sf::Time deltaTime ) final;
-	void Render( sf::RenderTarget& target, sf::RenderStates states ) const final;
-	void OnSystemStartup() final;
-	void OnSystemShutdown() final { }
+	void ParseFile( const std::string& fileName );
+	void ScoreGraph( Graph& graph );
+	void CrossOver( const Graph& a, const Graph& b, const unsigned replaceIndex );
+	void CrossOver( Graph& child, const Graph& parent2 );
+	void Mutate( Graph& graph );
 
-private:
-	sf::VertexArray m_connections;
+protected:
+	enum Variables
+	{
+		GA_Population = 10,
+		GA_Iterations = 100,
+		GA_CrossOverCount = 2,
+		GA_MutationChance = 5,
+		GA_OptimalDistance = 300,
+	};
+
+	Population m_population;
+	sf::FloatRect m_bounds;
 };

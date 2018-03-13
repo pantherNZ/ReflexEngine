@@ -18,30 +18,14 @@ namespace Reflex
 
 		World::~World()
 		{
-			//for( unsigned i = 0; i < m_objects.Size(); ++i )
-			//{
-			//	auto* object = ( Object* )m_objects[i];
-			//	if( !object )
-			//	{
-			//		for( unsigned j = 0; j < ecount_Component - 1; ++j )
-			//		{
-			//			EComponent type = ( EComponent )j;
-			//			if( o->HasComponent( type ) )
-			//			{
-			//				Component *c = o->GetComponent( type );
-			//				c->Remove();
-			//				Component *moved = ( Component * )GetComponents( type )->Free( c );
-			//				if( moved )
-			//					m_handles.Update( moved, moved->self );
-			//			}
-			//		}
+			DestroyAllObjects();
 		}
 
 		void World::Update( const sf::Time deltaTime )
 		{
 			// Update systems
 			for( auto& system : m_systems )
-				system.first->Update( deltaTime );
+				system.second->Update( deltaTime );
 
 			// Deleting objects
 			DeletePendingItems();
@@ -53,7 +37,10 @@ namespace Reflex
 			{
 				for( auto& entityHandle : m_markedForDeletion )
 				{
-					auto moved = ( Entity* )m_objects.Release( m_handles.Get( entityHandle ) );
+					Entity* entity = m_handles.GetAs< Entity >( entityHandle );
+					m_handles.Remove( entityHandle );
+					entity->~Entity();
+					auto moved = ( Entity* )m_objects.Release( entity );
 
 					// Sync handle of potentially moved object
 					if( moved )
@@ -64,13 +51,30 @@ namespace Reflex
 			}
 		}
 
+		void World::ResetAllocator( ObjectAllocator& allocator )
+		{
+			while( allocator.Size() )
+			{
+				auto* component = ( Entity* )allocator[0];
+
+				Entity* entity = m_handles.GetAs< Entity >( component->m_self );
+				m_handles.Remove( component->m_self );
+				entity->~Entity();
+				auto moved = ( Entity* )allocator.Release( entity );
+
+				// Sync handle of potentially moved object
+				if( moved )
+					m_handles.Update( moved );
+			}
+		}
+
 		void World::Render()
 		{
 			m_window.setView( m_worldView );
 
 			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
 			{
-				m_window.draw( *iter->first );
+				m_window.draw( *iter->second );
 			}
 		}
 
@@ -86,45 +90,61 @@ namespace Reflex
 
 		void World::DestroyObject( ObjectHandle object )
 		{
-			m_markedForDeletion.push_back( object );
+			assert( !object.markedForDeletion );
+			if( !object.markedForDeletion )
+			{
+				m_markedForDeletion.push_back( object );
+				object.markedForDeletion = true;
+			}
 		}
 
-		void World::AddSystem( std::unique_ptr< System > system )
+		void World::DestroyAllObjects()
 		{
-			// Insert the new system
-			std::vector< Type > requiredComponentTypes;
+			ResetAllocator( m_objects );
+			//while( m_objects.Size() )
+			//{
+			//	auto* object = ( Object* )m_objects[0];
+			//	object->Destroy();
+			//}
 
-			// Register components (m_newSystemRequiredComponents allows the system to add required component types to the above created vector)
-			m_newSystemRequiredComponents = &requiredComponentTypes;
-			system->RegisterComponents();
+			for( auto& allocator : m_components )
+				ResetAllocator( *allocator.second.get() );
 
-			// Look for any existing objects that match what this system requires and add them to the system's list
-			for( auto object = m_objects.begin< Object >(); object != m_objects.end< Object >(); ++object )
+			for( auto& system : m_systems )
+				system.second->m_components.clear();
+		}
+
+		void World::DestroyComponent( Type componentType, BaseHandle component )
+		{
+			//assert( !component.markedForDeletion );
+			//if( !component.markedForDeletion )
+			//{
+			//	m_markedForDeletion.push_back( component );
+			//	component.markedForDeletion = true;
+			//
+			Entity* entity = m_handles.GetAs< Entity >( component );
+			entity->~Entity();
+			auto moved = ( Entity* )m_components[componentType]->Release( entity );
+
+			// Sync handle of potentially moved object
+			if( moved )
+				m_handles.Update( moved );
+
+			// Remove this component from any systems
+			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
 			{
-				std::vector< BaseHandle > tempList;
-
-				for( auto& requiredType : *m_newSystemRequiredComponents )
-				{
-					const auto handle = object->GetComponent( requiredType );
-
-					if( !handle )
-						break;
-					
-					tempList.push_back( handle );
-				}
-
-				if( tempList.size() < m_newSystemRequiredComponents->size() )
+				const auto& requiredComponents = iter->second->m_requiredComponentTypes;
+				if( std::find( requiredComponents.begin(), requiredComponents.end(), componentType ) == requiredComponents.end() )
 					continue;
 
-				system->m_components.push_back( std::move( tempList ) );
+				auto& componentsPerObject = iter->second->m_components;
+
+				componentsPerObject.erase( std::remove_if( componentsPerObject.begin(), componentsPerObject.end(), [&component]( std::vector< BaseHandle >& components )
+				{
+					return std::find( components.begin(), components.end(), component ) != components.end();
+				} 
+				), componentsPerObject.end() );
 			}
-
-			m_newSystemRequiredComponents = nullptr;
-
-			auto result = m_systems.insert( std::make_pair( std::move( system ), std::move( requiredComponentTypes ) ) );
-			assert( result.second );
-
-			result.first->first->OnSystemStartup();
 		}
 
 		HandleManager& World::GetHandleManager()

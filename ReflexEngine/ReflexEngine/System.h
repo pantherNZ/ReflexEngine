@@ -9,9 +9,9 @@ namespace Reflex
 
 	namespace Systems
 	{
-		using Core::World;
+		using namespace Reflex::Core;
 
-#define RequiresComponent m_world.ForwardRegisterComponent
+#define RequiresComponent( T ) m_world.ForwardRegisterComponent< T >(); m_requiredComponentTypes.push_back( Type( typeid( T ) ) );
 
 		class System : private sf::NonCopyable, public sf::Drawable
 		{
@@ -28,13 +28,16 @@ namespace Reflex
 			virtual void OnSystemStartup() { }
 			virtual void OnSystemShutdown() { }
 
-		protected:
+			const std::vector< Type >& GetRequiredComponentTypes() const { return m_requiredComponentTypes; }
+
+		private:
 			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final { Render( target, states ); }
 
 		protected:
 			World& m_world;
 			// Iterating this causes a lot of jumping around in memory, it isn't very efficient (if there is more then one required component)
 			std::vector< std::vector< Reflex::Core::BaseHandle > > m_components;
+			std::vector< Type > m_requiredComponentTypes;
 		};
 	}
 }

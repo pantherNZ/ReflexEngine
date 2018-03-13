@@ -22,6 +22,16 @@ namespace Reflex
 			}
 		}
 
+		void Object::RemoveAllComponents()
+		{
+			std::for_each( m_components.begin(), m_components.end(), [&]( const std::pair< Type, BaseHandle >& component )
+			{
+				m_world.DestroyComponent( component.first, component.second );
+			} );
+
+			m_components.clear();
+		}
+
 		BaseHandle Object::GetComponent( Type componentType ) const
 		{
 			for( auto& componentHandle : m_components )

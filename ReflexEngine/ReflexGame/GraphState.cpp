@@ -1,6 +1,6 @@
 #include "GraphState.h"
 #include "GraphNode.h"
-#include "GeneticAlgorithm.h"
+#include "GraphRenderer.h"
 
 #include "..\ReflexEngine\TransformComponent.h"
 #include "..\ReflexEngine\SpriteComponent.h"
@@ -21,13 +21,15 @@ GraphState::GraphState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
 	, m_world( *context.window )
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
+	, m_ga( "Data/VirtualStats.cpp", m_bounds )
 {
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );
 	context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
 
-	ParseFile( "Data/VirtualStats.cpp" );
+	m_gaInfo.setFont( context.fontManager->GetResource( Reflex::ResourceID::ArialFontID ) );
+	m_gaInfo.setPosition( 5.0f, 50.0f );
 
-	m_world.AddSystem< GeneticAlgorithm >();
+	m_world.AddSystem< GraphRenderer >();
 }
 
 Reflex::Core::ObjectHandle GraphState::CreateGraphObject( const sf::Vector2f& position, const std::string& label )
@@ -44,105 +46,67 @@ Reflex::Core::ObjectHandle GraphState::CreateGraphObject( const sf::Vector2f& po
 void GraphState::Render()
 {
 	m_world.Render();
+
+	m_gaInfo.setString( sf::String( Reflex::ToString( 
+		"Best GA Score: ", m_ga.GetBestGraph().score, 
+		"\nAverage GA Score: ", m_ga.GetAverageScore() ) ) );
+	
+	GetContext().window->draw( m_gaInfo );
 }
 
 bool GraphState::Update( const sf::Time deltaTime )
 {
 	m_world.Update( deltaTime );
 
+	m_gaUpdateTimer -= deltaTime.asSeconds();
+	m_gaRenderTimer -= deltaTime.asSeconds();
+
+	if( m_gaUpdateTimer <= 0.0f )
+	{
+		m_gaUpdateTimer += GA_UpdateIntervalMS / 1000.0f;
+		m_ga.IteratePopulation();
+	}
+
+	if( m_gaRenderTimer <= 0.0f )
+	{
+		m_gaRenderTimer += GA_RenderIntervalMS / 1000.0f;
+		UpdateGeneticAlgorithm();
+	}
+
 	return true;
 }
 
 bool GraphState::ProcessEvent( const sf::Event& event )
 {
-	return true;
-}
-
-void GraphState::ParseFile( const std::string& fileName )
-{
-	std::map< std::string, ObjectHandle > hashMap;
-
-	std::ifstream input( fileName );
-
-	const std::string strVirtual = "VIRTUAL_STAT(";
-	std::string strLine;
-	ObjectHandle lastAdded;
-
-	bool bHaveCurrentNode = false;
-
-	while( !input.eof() )
+	if( event.type == sf::Event::KeyReleased )
 	{
-		// Process each line
-		std::getline( input, strLine );
-
-		// Trim
-		Reflex::Trim( strLine );
-
-		// Check for a virtual stat line
-		if( strLine.substr( 0, strVirtual.size() ) == strVirtual )
+		if( event.key.code == sf::Keyboard::Space )
 		{
-			// Narrow down to find the stat name
-			std::string strStatName = strLine.substr( strVirtual.size(), strLine.size() - strVirtual.size() );
-			int uiCounter = strStatName.find_first_of( ',' );
-			strStatName = strStatName.substr( 0, ( uiCounter == std::string::npos ? strStatName.size() : uiCounter ) );
-			Reflex::Trim( strStatName );
-
-			// Add the virtual stat to the list of initial nodes (if it doesn't already exist)
-			if( hashMap.find( strStatName ) == hashMap.end())
-			{
-				auto object = CreateGraphObject( sf::Vector2f( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height ), strStatName );
-				hashMap.insert( std::make_pair( strStatName, object ) );
-				lastAdded = object;
-				bHaveCurrentNode = true;
-			}
-		}
-		else if( bHaveCurrentNode )
-		{
-			// Split the line incase there is multiple stats on a line
-			std::vector< std::string > strStatsArray = Reflex::Split( strLine, ',' );
-			bool bVirtualStatComplete = false;
-
-			// For eachstat
-			for( auto strStat : strStatsArray )
-			{
-				// Trim space
-				auto strStatTrimmed( strStat );
-				Reflex::Trim( strStatTrimmed );
-
-				if( strStatTrimmed.size() == 0 )
-					continue;
-
-				if( strStatTrimmed.back() == ')' )
-				{
-					bVirtualStatComplete = true;
-					strStatTrimmed.pop_back();
-					Reflex::Trim( strStatTrimmed );
-				}
-
-				// Find a matching stat in our list
-				auto found = hashMap.find( strStatTrimmed );
-
-				if( found == hashMap.end() )
-				{
-					// If we didn't find a matching stat, create a new one
-					auto object = CreateGraphObject( sf::Vector2f( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height ), strStatTrimmed );
-					found = hashMap.insert( std::make_pair( strStatTrimmed, object ) ).first;
-				}
-
-				// Add to connection list
-				auto graphNode = found->second->GetComponent< GraphNode >();
-				graphNode->m_connections.push_back( lastAdded->GetComponent< Reflex::Components::TransformComponent >() );
-			}
-
-			if( bVirtualStatComplete )
-				bHaveCurrentNode = false;
+			UpdateGeneticAlgorithm();
 		}
 	}
 
-	input.close();
+	return true;
 }
 
-void GraphState::GenerateGraphNodes()
+void GraphState::UpdateGeneticAlgorithm()
 {
+	const auto graph = m_ga.GetBestGraph();
 
+	std::vector< std::pair< Handle< GraphNode >, Handle< Reflex::Components::TransformComponent > > > nodes;
+
+	m_world.DestroyAllObjects();
+
+	// Copy / create objects
+	for( auto& node : graph.nodes )
+	{
+		const auto obj = CreateGraphObject( node.position, node.label );
+		nodes.emplace_back( obj->GetComponent< GraphNode >(), obj->GetComponent< Reflex::Components::TransformComponent >() );
+	}
+
+	// Copy / create connections
+	for( auto connection : graph.connections )
+		nodes[connection.from].first->m_connections.push_back( nodes[connection.to].second );
+
+	m_world.GetSystem< GraphRenderer >()->RebuildVertexArray();
 }

@@ -178,6 +178,7 @@
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateManager.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="SceneNode.cpp" />
   </ItemGroup>

@@ -9,8 +9,8 @@ namespace Reflex
 	{
 		void RenderSystem::RegisterComponents()
 		{
-			RequiresComponent< Reflex::Components::SpriteComponent >();
-			RequiresComponent< Reflex::Components::TransformComponent >();
+			RequiresComponent( Reflex::Components::SpriteComponent );
+			RequiresComponent( Reflex::Components::TransformComponent );
 		}
 
 		void RenderSystem::Render( sf::RenderTarget& target, sf::RenderStates states ) const

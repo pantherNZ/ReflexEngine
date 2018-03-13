@@ -14,6 +14,8 @@ enum StateTypes : unsigned
 // Entry point
 int main( int argc, char** argv )
 {
+	srand( 5 );
+
 	Reflex::Core::Engine engine;
 
 	engine.RegisterState< GraphState >( GraphStateType );

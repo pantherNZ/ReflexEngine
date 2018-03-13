@@ -159,12 +159,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GeneticAlgorithm.cpp" />
+    <ClCompile Include="GraphRenderer.cpp" />
     <ClCompile Include="GraphState.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneticAlgorithm.h" />
+    <ClInclude Include="GraphRenderer.h" />
     <ClInclude Include="GraphNode.h" />
     <ClInclude Include="GraphState.h" />
     <ClInclude Include="MenuState.h" />
