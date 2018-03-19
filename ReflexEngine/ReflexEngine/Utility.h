@@ -121,16 +121,24 @@ namespace Reflex
 		return a.x * b.x + a.y * b.y;
 	}
 
+	inline float GetDistanceSq( const sf::Vector2f& a )
+	{
+		return float( a.x * a.x + a.y * a.y );
+	}
+
+	inline float GetDistance( const sf::Vector2f& a )
+	{
+		return sqrtf( GetDistanceSq( a ) );
+	}
+
 	inline float GetDistanceSq( const sf::Vector2f& a, const sf::Vector2f& b )
 	{
-		const auto dx = b.x - a.x;
-		const auto dy = b.y - a.y;
-		return float( dx * dx + dy * dy );
+		return float( GetDistanceSq( a - b ) );
 	}
 
 	inline float GetDistance( const sf::Vector2f& a, const sf::Vector2f& b )
 	{
-		return sqrtf( GetDistanceSq( a, b ) );
+		return GetDistance( a - b );
 	}
 
 	inline sf::Vector2f VectorFromAngle( const float orientation, const float distance )

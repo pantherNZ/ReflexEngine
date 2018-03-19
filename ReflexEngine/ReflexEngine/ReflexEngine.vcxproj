@@ -70,12 +70,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\dependencies\SFML-2.4.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\dependencies\SFML-2.4.2\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\..\dependencies\SFML-2.4.2\include;..\..\dependencies\Box2D\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\dependencies\SFML-2.4.2\lib;..\..\dependencies\Box2D\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\..\dependencies\SFML-2.4.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\dependencies\SFML-2.4.2\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\..\dependencies\SFML-2.4.2\include;..\..\dependencies\Box2D\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\..\dependencies\SFML-2.4.2\lib;..\..\dependencies\Box2D\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>..\..\dependencies\SFML-2.4.2\include;$(IncludePath)</IncludePath>

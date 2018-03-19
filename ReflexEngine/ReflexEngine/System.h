@@ -30,8 +30,27 @@ namespace Reflex
 
 			const std::vector< Type >& GetRequiredComponentTypes() const { return m_requiredComponentTypes; }
 
+		protected:
+			//template< typename Func, typename... Args >
+			//void ForEachComponent( Func f )
+			//{
+			//	for( auto& component : m_components )
+			//	{
+			//		f( 
+			//
+			//		for( unsigned index = 0U; index < component.size(); ++index )
+			//			CastComponent< Func, Args... >( f, component[index] );
+			//	}
+			//}
+
 		private:
 			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final { Render( target, states ); }
+
+			//template< typename Func, typename T, typename... Args >
+			//Args... CastComponent( Func f, BaseHandle& handle )
+			//{
+			//	return Handle< T >( handle );
+			//}
 
 		protected:
 			World& m_world;

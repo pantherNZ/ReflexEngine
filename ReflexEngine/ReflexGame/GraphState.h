@@ -21,7 +21,7 @@ protected:
 
 private:	
 	ObjectHandle CreateGraphObject( const sf::Vector2f& position, const std::string& label );
-	void UpdateGeneticAlgorithm();
+	void RebuildRenderGraph();
 
 private:
 	World m_world;

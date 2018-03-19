@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "..\ReflexEngine\Utility.h"
+#include <unordered_set>
 
 GeneticAlgorithm::GeneticAlgorithm( const std::string& fileName, const sf::FloatRect& bounds )
 	: m_bounds( bounds )
@@ -108,13 +109,15 @@ void GeneticAlgorithm::ParseFile( const std::string& fileName )
 					const auto index = m_population.back().nodes.size() - 1;
 					hashMap.insert( std::make_pair( strStatTrimmed, index ) );
 					m_population.back().connections.push_back( Connection( index, lastAdded ) );
-					m_population.back().nodes.back().connections.insert( lastAdded );
+					m_population.back().nodes.back().connections.push_back( std::make_pair( lastAdded, true ) );
+					m_population.back().nodes[lastAdded].connections.push_back( std::make_pair( index, false ) );
 				}
 				else
 				{
 					// Add to connection list
 					m_population.back().connections.push_back( Connection( found->second, lastAdded ) );
-					m_population.back().nodes[found->second].connections.insert( lastAdded );
+					m_population.back().nodes[found->second].connections.push_back( std::make_pair( lastAdded, true ) );
+					m_population.back().nodes[lastAdded].connections.push_back( std::make_pair( found->second, false ) );
 				}
 			}
 
@@ -218,20 +221,25 @@ void GeneticAlgorithm::ScoreGraph( Graph& graph )
 
 void GeneticAlgorithm::CrossOver( const Graph& a, const Graph& b, const unsigned replaceIndex )
 {
-	//if( Reflex::RandomBool() )
+	Graph newChildA( a );
+	Graph newChildB( b );
+
+	if( Reflex::RandomBool() )
 	{
-		Graph newChildA( a );
-		Graph newChildB( b );
-
-		CrossOver( newChildA, b );
-		CrossOver( newChildB, a );
-
-		m_population[replaceIndex] = newChildA;
-		m_population[replaceIndex - 1] = newChildB;
+		CrossOverA( newChildA, b );
+		CrossOverA( newChildB, a );
 	}
+	else
+	{
+		CrossOverB( newChildA, b );
+		CrossOverB( newChildB, a );
+	}
+
+	m_population[replaceIndex] = newChildA;
+	m_population[replaceIndex - 1] = newChildB;
 }
 
-void GeneticAlgorithm::CrossOver( Graph& child, const Graph& parent2 )
+void GeneticAlgorithm::CrossOverA( Graph& child, const Graph& parent2 )
 {
 	const unsigned nodesToSwap = Reflex::RandomInt( 5, parent2.nodes.size() / 4 );
 	unsigned last = parent2.connections[Reflex::RandomInt( parent2.connections.size() - 1 )].from;
@@ -256,11 +264,32 @@ void GeneticAlgorithm::CrossOver( Graph& child, const Graph& parent2 )
 	}
 }
 
+void GeneticAlgorithm::CrossOverB( Graph& child, const Graph& parent2 )
+{
+	unsigned nodeIndex = 0U;
+	unsigned connections = std::numeric_limits< unsigned >::max();
+
+	for( unsigned i = 0U; i < 5; ++i )
+	{
+		const auto index = Reflex::RandomInt( parent2.nodes.size() - 1 );
+		const auto node = parent2.nodes[index];
+
+		if( node.connections.size() >= connections )
+		{
+			connections = node.connections.size();
+			nodeIndex = index;
+		}
+	}
+
+	for( const auto& connection : parent2.nodes[nodeIndex].connections )
+		child.nodes[connection.first].position = parent2.nodes[connection.first].position;
+}
+
 void GeneticAlgorithm::Mutate( Graph& graph )
 {
 	const auto roll = Reflex::RandomInt( 100 );
 
-	if( roll >= 60 )
+	if( roll >= 75 )
 	{
 		// Randomly move a node by a small amount
 		const auto offsetValue = 10.0f;
@@ -268,18 +297,105 @@ void GeneticAlgorithm::Mutate( Graph& graph )
 		position.x = Reflex::Clamp( position.x + ( Reflex::RandomFloat() - 0.5f ) * offsetValue, m_bounds.left, m_bounds.width );
 		position.y = Reflex::Clamp( position.y + ( Reflex::RandomFloat() - 0.5f ) * offsetValue, m_bounds.top, m_bounds.height );
 	}
-	else if( roll >= 30 )
+	else if( roll >= 50 )
 	{
 		// Convert position to 80% to 120% of it's current value
 		auto& position = graph.nodes[Reflex::RandomInt( graph.nodes.size() - 1 )].position;
 		position.x = Reflex::Clamp( position.x * ( 0.8f + Reflex::RandomFloat() * 0.4f ), m_bounds.left, m_bounds.width );
 		position.y = Reflex::Clamp( position.y * ( 0.8f + Reflex::RandomFloat() * 0.4f ), m_bounds.top, m_bounds.height );
 	}
-	else
+	else if( roll >= 25)
 	{
 		// Randomly move a node
 		const auto position = sf::Vector2f( m_bounds.left + Reflex::RandomFloat() * m_bounds.width, m_bounds.top + Reflex::RandomFloat() * m_bounds.height );
 		graph.nodes[Reflex::RandomInt( graph.nodes.size() - 1 )].position = position;
 	}
-	
+	else
+	{
+		// Resize a connection
+		const auto connection = Reflex::RandomInt( graph.connections.size() - 1 );
+		const auto direction = graph.nodes[graph.connections[connection].from].position - graph.nodes[graph.connections[connection].to].position;
+		const auto length = Reflex::GetDistance( direction );
+		const auto directionNorm = direction / length;
+		const auto correctionDist = GA_OptimalDistance - length;
+		graph.nodes[graph.connections[connection].from].position += directionNorm * correctionDist / 2.0f;
+		graph.nodes[graph.connections[connection].to].position -= directionNorm * correctionDist / 2.0f;
+	}
+}
+
+void GeneticAlgorithm::AlgorithmicLayout()
+{
+	// Sort by number of connections
+	auto& graph = m_population.front();
+	graph.score = 0.0f;
+
+	auto copy( graph );
+
+	Sort( graph );
+
+	const auto graphNodes = graph.nodes.size();
+	const float boundary = 80.0f;
+
+	for( unsigned i = 0U; i < graphNodes; ++i )
+	{
+		if( i < graphNodes / 4 )
+		{
+			const auto interp = i / ( graphNodes / 4.0f );
+			graph.nodes[i].position = sf::Vector2f( boundary + ( m_bounds.width - boundary * 2.0f ) * interp, boundary );
+		}
+		else if( i < graphNodes / 2 )
+		{
+			const auto interp = ( i - ( graphNodes / 4 ) ) / ( graphNodes / 4.0f );
+			graph.nodes[i].position = sf::Vector2f( m_bounds.width - boundary, boundary + ( m_bounds.height - boundary * 2.0f ) * interp );
+
+		}
+		else if( i < ( graphNodes * 3 ) / 4 )
+		{
+			const auto interp = ( i - ( graphNodes / 2 ) ) / ( graphNodes / 4.0f );
+			graph.nodes[i].position = sf::Vector2f( boundary + ( m_bounds.width - boundary * 2.0f ) * interp, m_bounds.height - boundary );
+		}
+		else
+		{
+			const auto interp = ( i - ( graphNodes * 3 ) / 4 ) / ( graphNodes / 4.0f );
+			graph.nodes[i].position = sf::Vector2f( boundary, boundary + ( m_bounds.height - boundary * 2.0f ) * interp );
+		}
+	}
+
+	const auto centre = sf::Vector2f( m_bounds.width / 2.0f, m_bounds.height / 2.0f );
+	graph.nodes[0].position = centre;
+
+	const auto size = graph.nodes[0].connections.size();
+	const auto angle = PI2 / size;
+
+	for( unsigned i = 0U; i < size; ++i )
+	{
+		auto& connection = graph.nodes[0].connections[i];
+		graph.nodes[connection.first].position = centre + Reflex::VectorFromAngle( angle * i, GA_OptimalDistance - 20.0f + graph.nodes[connection.first].connections.size() * 20.0f );
+	}
+}
+
+void GeneticAlgorithm::Sort( Graph& graph )
+{
+	std::sort( m_population.back().nodes.begin(), m_population.back().nodes.end(), []( const Node& left, const Node& right )
+	{
+		return left.connections.size() > right.connections.size();
+	} );
+
+	graph.connections.clear();
+
+	for( unsigned i = 0U; i < m_population.back().nodes.size(); ++i )
+	{
+		for( unsigned j = 0U; j < m_population.back().nodes[i].connections.size(); ++j )
+		{
+			Connection con( i, m_population.back().nodes[i].connections[j].first );
+
+			if( std::find_if( graph.connections.begin(), graph.connections.end(), [&con]( const Connection& connection )
+			{
+				return con.from == connection.from && con.to == connection.to;
+			} ) == graph.connections.end() )
+			{
+				graph.connections.push_back( con );
+			}
+		}
+	}
 }

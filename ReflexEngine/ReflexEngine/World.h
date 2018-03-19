@@ -33,7 +33,7 @@ namespace Reflex
 			void DestroyAllObjects();
 
 			template< class T, typename... Args >
-			void AddSystem( Args&&... args );
+			T* AddSystem( Args&&... args );
 
 			template< class T >
 			T* GetSystem();
@@ -99,7 +99,7 @@ namespace Reflex
 
 		// Template functions
 		template< class T, typename... Args >
-		void World::AddSystem( Args&&... args )
+		T* World::AddSystem( Args&&... args )
 		{
 			auto system = std::make_unique< T >( *this, std::forward< Args >( args )... );
 
@@ -133,6 +133,8 @@ namespace Reflex
 			assert( result.second );
 
 			result.first->second->OnSystemStartup();
+
+			return ( T* )result.first->second.get();
 		}
 
 		template< class T >

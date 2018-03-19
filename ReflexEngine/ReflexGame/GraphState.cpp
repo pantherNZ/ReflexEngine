@@ -4,9 +4,9 @@
 
 #include "..\ReflexEngine\TransformComponent.h"
 #include "..\ReflexEngine\SpriteComponent.h"
-#include "..\ReflexEngine\RenderSystem.h"
 
 #include <fstream>
+#include "GraphPhysics.h"
 
 namespace Reflex
 {
@@ -29,13 +29,17 @@ GraphState::GraphState( StateManager& stateManager, Context context )
 	m_gaInfo.setFont( context.fontManager->GetResource( Reflex::ResourceID::ArialFontID ) );
 	m_gaInfo.setPosition( 5.0f, 50.0f );
 
+	//m_ga.AlgorithmicLayout();
+
 	m_world.AddSystem< GraphRenderer >();
+	m_world.AddSystem< GraphPhysics >();
+	RebuildRenderGraph();
 }
 
 Reflex::Core::ObjectHandle GraphState::CreateGraphObject( const sf::Vector2f& position, const std::string& label )
 {
 	auto object = m_world.CreateObject();
-	object->AddComponent< GraphNode >( sf::Color::Red, 10.0f, label, GetContext().fontManager->GetResource( Reflex::ResourceID::ArialFontID ) );
+	object->AddComponent< GraphNode >( sf::Color::Red, 5.0f, label, GetContext().fontManager->GetResource( Reflex::ResourceID::ArialFontID ) );
 
 	auto transform = object->AddComponent< Reflex::Components::TransformComponent >();
 	transform->setPosition( position );
@@ -58,6 +62,7 @@ bool GraphState::Update( const sf::Time deltaTime )
 {
 	m_world.Update( deltaTime );
 
+	/*
 	m_gaUpdateTimer -= deltaTime.asSeconds();
 	m_gaRenderTimer -= deltaTime.asSeconds();
 
@@ -71,7 +76,7 @@ bool GraphState::Update( const sf::Time deltaTime )
 	{
 		m_gaRenderTimer += GA_RenderIntervalMS / 1000.0f;
 		UpdateGeneticAlgorithm();
-	}
+	}*/
 
 	return true;
 }
@@ -82,14 +87,14 @@ bool GraphState::ProcessEvent( const sf::Event& event )
 	{
 		if( event.key.code == sf::Keyboard::Space )
 		{
-			UpdateGeneticAlgorithm();
+			RebuildRenderGraph();
 		}
 	}
 
 	return true;
 }
 
-void GraphState::UpdateGeneticAlgorithm()
+void GraphState::RebuildRenderGraph()
 {
 	const auto graph = m_ga.GetBestGraph();
 
