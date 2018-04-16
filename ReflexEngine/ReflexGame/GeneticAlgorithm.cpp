@@ -315,7 +315,7 @@ void GeneticAlgorithm::Mutate( Graph& graph )
 		// Resize a connection
 		const auto connection = Reflex::RandomInt( graph.connections.size() - 1 );
 		const auto direction = graph.nodes[graph.connections[connection].from].position - graph.nodes[graph.connections[connection].to].position;
-		const auto length = Reflex::GetDistance( direction );
+		const auto length = Reflex::GetMagnitude( direction );
 		const auto directionNorm = direction / length;
 		const auto correctionDist = GA_OptimalDistance - length;
 		graph.nodes[graph.connections[connection].from].position += directionNorm * correctionDist / 2.0f;

@@ -38,6 +38,16 @@ namespace Reflex
 			return m_counter << 16 | m_index;
 		}
 
+		bool BaseHandle::operator==( const BaseHandle& other ) const
+		{
+			return m_counter == other.m_counter && m_index == other.m_index;
+		}
+
+		bool BaseHandle::operator!=( const BaseHandle& other ) const
+		{
+			return !( *this == other );
+		}
+
 		bool BaseHandle::IsValid() const
 		{
 			return m_index != null.m_index && m_counter != null.m_counter;

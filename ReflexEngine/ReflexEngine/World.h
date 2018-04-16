@@ -6,8 +6,7 @@
 #include "ObjectAllocator.h"
 #include "System.h"
 #include "HandleManager.h"
-
-#include <unordered_map>
+#include "TileMap.h"
 
 // Engine class
 namespace Reflex
@@ -21,13 +20,13 @@ namespace Reflex
 		class World : private sf::NonCopyable
 		{
 		public:
-			explicit World( sf::RenderTarget& window );
+			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapGridSize, const unsigned tileMapGridSize = 0U );
 			~World();
 
 			void Update( const sf::Time deltaTime );
 			void Render();
 
-			ObjectHandle CreateObject();
+			ObjectHandle CreateObject( const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
 			void DestroyObject( ObjectHandle object );
 
 			void DestroyAllObjects();
@@ -63,6 +62,8 @@ namespace Reflex
 
 			HandleManager& GetHandleManager();
 			sf::RenderTarget& GetWindow();
+			TileMap& GetTileMap();
+			const sf::FloatRect GetBounds() const;
 
 		protected:
 			//void BuildScene();
@@ -80,6 +81,9 @@ namespace Reflex
 
 			sf::RenderTarget& m_window;
 			sf::View m_worldView;
+			sf::FloatRect m_worldBounds;
+
+			//b2World m_box2DWorld;
 
 			// Storage for all objects in the game
 			ObjectAllocator m_objects;
@@ -92,6 +96,9 @@ namespace Reflex
 
 			// List of systems, indexed by their pointer, which grants access to the vector storing the component types it requires
 			std::unordered_map< Type, std::unique_ptr< System > > m_systems;
+
+			// Tilemap which stores object handles in the world in an efficient spacial hash map
+			TileMap m_tileMap;
 
 			// Removes objects / components on frame move instead of during sometime dangerous
 			std::vector< BaseHandle > m_markedForDeletion;
@@ -219,7 +226,7 @@ namespace Reflex
 				bool canAddDueToNewComponent = false;
 
 				// This looks through the required types and sees if the object has one of each of them
-				for( auto& requiredType : iter->second->m_requiredComponentTypes )
+				for( auto& requiredType : requiredTypes )
 				{
 					const auto handle = ( requiredType == componentType ? componentHandle : owner->GetComponent( requiredType ) );
 
@@ -233,7 +240,7 @@ namespace Reflex
 				}
 
 				// Escape if the object didn't have the components required OR if our new component isn't even the one that is now allowing it to be a part of the system
-				if( tempList.size() < iter->second->m_requiredComponentTypes.size() || !canAddDueToNewComponent )
+				if( tempList.size() < requiredTypes.size() || !canAddDueToNewComponent )
 					continue;
 
 				iter->second->m_components.push_back( std::move( tempList ) );

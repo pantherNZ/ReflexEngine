@@ -84,6 +84,15 @@
     <ClInclude Include="Entity.h">
       <Filter>Objects</Filter>
     </ClInclude>
+    <ClInclude Include="TileMap.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorSet.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="HandleFwd.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="World.cpp">
@@ -121,6 +130,12 @@
     </ClCompile>
     <ClCompile Include="Utility.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

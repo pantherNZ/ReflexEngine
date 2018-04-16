@@ -33,7 +33,7 @@ private:
 	enum
 	{
 		GA_UpdateIntervalMS = 0,
-		GA_RenderIntervalMS = 1000,
+		GA_RenderIntervalMS = 100,
 	};
 
 	float m_gaUpdateTimer = 0.0f;

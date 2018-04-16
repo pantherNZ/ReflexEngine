@@ -1,17 +1,20 @@
 
 #include "World.h"
 #include "Object.h"
-
+#include "TransformComponent.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		World::World( sf::RenderTarget& window )
+		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapGridSize, const unsigned tileMapGridSize )
 			: m_window( window )
 			, m_worldView( m_window.getDefaultView() )
+			, m_worldBounds( worldBounds )
+			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_components( 10 )
 			, m_objects( sizeof( Object ), 100 )
+			, m_tileMap( m_worldBounds, spacialHashMapGridSize, tileMapGridSize )
 		{
 			BaseHandle::s_handleManager = &m_handles;
 		}
@@ -78,14 +81,16 @@ namespace Reflex
 			}
 		}
 
-		ObjectHandle World::CreateObject()
+		ObjectHandle World::CreateObject( const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
 		{
 			Object* newObject = ( Object* )m_objects.Allocate();
 			new ( newObject ) Object( *this, m_handles.Insert( newObject ) );
 
 			SyncHandles< Object >( m_objects );
 
-			return ObjectHandle( newObject->m_self );
+			auto newHandle = ObjectHandle( newObject->m_self );
+			newHandle->AddComponent< Reflex::Components::TransformComponent >( position, rotation, scale );
+			return newHandle;
 		}
 
 		void World::DestroyObject( ObjectHandle object )
@@ -134,6 +139,7 @@ namespace Reflex
 			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
 			{
 				const auto& requiredComponents = iter->second->m_requiredComponentTypes;
+				
 				if( std::find( requiredComponents.begin(), requiredComponents.end(), componentType ) == requiredComponents.end() )
 					continue;
 
@@ -156,6 +162,17 @@ namespace Reflex
 		{
 			return m_window;
 		}
+
+		Reflex::Core::TileMap& World::GetTileMap()
+		{
+			return m_tileMap;
+		}
+
+		const sf::FloatRect World::GetBounds() const
+		{
+			return m_worldBounds;
+		}
+
 		//Reflex::Core::SceneNode* World::GetWorldGraphFromLayer( unsigned short layer ) const
 		//{
 		//	return mSceneLayers[layer];

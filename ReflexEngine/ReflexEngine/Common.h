@@ -6,16 +6,17 @@
 #include <iostream>
 #include <assert.h>
 #include <stdexcept>
-#include <array>
 #include <typeindex>
 #include <functional>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <SFML/Graphics.hpp>
 #include <Box2D.h>
 
 #include "Utility.h"
 #include "Logging.h"
+#include "VectorSet.h"
 
 // Math common
 #define PI					3.141592654f

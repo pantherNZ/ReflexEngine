@@ -10,8 +10,6 @@ namespace Reflex
 	{
 		class World;
 
-		typedef Handle< class Object > ObjectHandle;
-
 		class Object : public Entity
 		{
 		public:
@@ -47,7 +45,11 @@ namespace Reflex
 			template< class T >
 			Handle< T > GetComponent() const;
 
-			BaseHandle Object::GetComponent( Type componentType ) const;
+			template< class T >
+			Handle< T > GetComponent( const unsigned index ) const;
+
+			BaseHandle GetComponent( Type componentType ) const;
+			BaseHandle GetComponent( const unsigned index ) const;
 
 			World& GetWorld() const;
 
@@ -58,6 +60,9 @@ namespace Reflex
 			World& m_world;
 			bool m_destroyed = false;
 			std::vector< std::pair< Type, BaseHandle > > m_components;
+
+		private:
+			Type m_cachedTransformType;
 		};
 
 		// Template definitions
@@ -127,13 +132,16 @@ namespace Reflex
 		template< class T >
 		bool Object::HasComponent() const
 		{
-			return GetComponentOfType< T >().IsValid();
+			return GetComponent< T >().IsValid();
 		}
 
 		template< class T >
 		Handle< T > Object::GetComponent() const
 		{
 			const auto componentType = Type( typeid( T ) );
+
+			if( componentType == m_cachedTransformType )
+				return m_components[0].second;
 
 			for( auto& componentHandle : m_components )
 			{
@@ -145,6 +153,15 @@ namespace Reflex
 			}
 
 			return Handle< T >();
+		}
+
+		template< class T >
+		Handle< T > Object::GetComponent( const unsigned index ) const
+		{
+			if( index >= m_components.size() )
+				return Handle< T >();
+
+			return Handle< T >( m_components[index].second );
 		}
 	}
 }

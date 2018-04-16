@@ -14,7 +14,7 @@ enum StateTypes : unsigned
 // Entry point
 int main( int argc, char** argv )
 {
-	srand( 5 );
+	srand( 0 );// time( 0 ) );
 
 	Reflex::Core::Engine engine;
 

@@ -5,8 +5,6 @@
 
 namespace Reflex
 {
-	namespace Core { typedef Handle< class Object > ObjectHandle; }
-
 	using namespace Reflex::Core;
 
 	namespace Components

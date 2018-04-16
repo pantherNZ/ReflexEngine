@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "Handle.h"
 
+#include <array>
+
 namespace Reflex
 {
 	namespace Core

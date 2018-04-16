@@ -19,10 +19,11 @@ namespace Reflex
 
 GraphState::GraphState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
-	, m_world( *context.window )
-	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
-	, m_ga( "Data/VirtualStats.cpp", m_bounds )
+	, m_world( *context.window, sf::FloatRect( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y ), 3000U, 0U )
+	, m_ga( "Data/VirtualStats.cpp", sf::FloatRect( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y ) )
 {
+	m_bounds = m_world.GetBounds();
+
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );
 	context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
 
@@ -32,17 +33,15 @@ GraphState::GraphState( StateManager& stateManager, Context context )
 	//m_ga.AlgorithmicLayout();
 
 	m_world.AddSystem< GraphRenderer >();
-	m_world.AddSystem< GraphPhysics >();
+	m_world.AddSystem< GraphPhysics >( m_bounds );
+
 	RebuildRenderGraph();
 }
 
 Reflex::Core::ObjectHandle GraphState::CreateGraphObject( const sf::Vector2f& position, const std::string& label )
 {
-	auto object = m_world.CreateObject();
+	auto object = m_world.CreateObject( position );
 	object->AddComponent< GraphNode >( sf::Color::Red, 5.0f, label, GetContext().fontManager->GetResource( Reflex::ResourceID::ArialFontID ) );
-
-	auto transform = object->AddComponent< Reflex::Components::TransformComponent >();
-	transform->setPosition( position );
 
 	return object;
 }
@@ -55,28 +54,27 @@ void GraphState::Render()
 		"Best GA Score: ", m_ga.GetBestGraph().score, 
 		"\nAverage GA Score: ", m_ga.GetAverageScore() ) ) );
 	
-	GetContext().window->draw( m_gaInfo );
+	//GetContext().window->draw( m_gaInfo );
 }
 
 bool GraphState::Update( const sf::Time deltaTime )
 {
 	m_world.Update( deltaTime );
 
-	/*
-	m_gaUpdateTimer -= deltaTime.asSeconds();
-	m_gaRenderTimer -= deltaTime.asSeconds();
-
-	if( m_gaUpdateTimer <= 0.0f )
-	{
-		m_gaUpdateTimer += GA_UpdateIntervalMS / 1000.0f;
-		m_ga.IteratePopulation();
-	}
-
-	if( m_gaRenderTimer <= 0.0f )
-	{
-		m_gaRenderTimer += GA_RenderIntervalMS / 1000.0f;
-		UpdateGeneticAlgorithm();
-	}*/
+	//m_gaUpdateTimer -= deltaTime.asSeconds();
+	//m_gaRenderTimer -= deltaTime.asSeconds();
+	//
+	//if( m_gaUpdateTimer <= 0.0f )
+	//{
+	//	m_gaUpdateTimer += GA_UpdateIntervalMS / 1000.0f;
+	//	//m_ga.IteratePopulation();
+	//}
+	//
+	//if( m_gaRenderTimer <= 0.0f )
+	//{
+	//	m_gaRenderTimer += GA_RenderIntervalMS / 1000.0f;
+	//	//RebuildRenderGraph();
+	//}
 
 	return true;
 }

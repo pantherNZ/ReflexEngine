@@ -21,4 +21,5 @@ public:
 	sf::RectangleShape m_shape;
 	sf::Text m_label;
 	std::vector< Handle< Reflex::Components::TransformComponent > > m_connections;
+	std::vector< unsigned > m_vertexArrayIndices;
 };
