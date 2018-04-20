@@ -1,7 +1,7 @@
 #pragma once
 
 // Includes
-#include "Common.h"
+#include "Precompiled.h"
 #include "State.h"
 #include "Context.h"
 
@@ -24,7 +24,7 @@ namespace Reflex
 			template< typename T >
 			void RegisterState( unsigned stateID );
 
-			void Update( const sf::Time deltaTime );
+			void Update( const float deltaTime );
 			void Render();
 			void ProcessEvent( const sf::Event& event );
 

@@ -1,7 +1,7 @@
 #pragma once
 
 // Includes
-#include "Common.h"
+#include "Precompiled.h"
 #include "World.h"
 #include "StateManager.h"
 #include "ResourceManager.h"
@@ -27,10 +27,10 @@ namespace Reflex
 		protected:
 			void KeyboardInput( const sf::Keyboard::Key key, const bool isPressed );
 			void ProcessEvents();
-			void Update( const sf::Time deltaTime );
+			void Update( const float deltaTime );
 			void Render();
 
-			void UpdateStatistics( const sf::Time deltaTime );
+			void UpdateStatistics( const float deltaTime );
 		
 		protected:
 			sf::RenderWindow m_window;

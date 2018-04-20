@@ -3,7 +3,6 @@
 #include "GraphRenderer.h"
 
 #include "..\ReflexEngine\TransformComponent.h"
-#include "..\ReflexEngine\SpriteComponent.h"
 
 #include <fstream>
 #include "GraphPhysics.h"
@@ -19,11 +18,10 @@ namespace Reflex
 
 GraphState::GraphState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
-	, m_world( *context.window, sf::FloatRect( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y ), 3000U, 0U )
-	, m_ga( "Data/VirtualStats.cpp", sf::FloatRect( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y ) )
+	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
+	, m_world( *context.window, m_bounds, SpacialHashMap, 3000U )
+	, m_ga( "Data/VirtualStats.cpp", m_bounds )
 {
-	m_bounds = m_world.GetBounds();
-
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );
 	context.textureManager->LoadResource( Reflex::ResourceID::GraphNodeTextureID, "Data/Textures/GraphNode.png" );
 
@@ -57,7 +55,7 @@ void GraphState::Render()
 	//GetContext().window->draw( m_gaInfo );
 }
 
-bool GraphState::Update( const sf::Time deltaTime )
+bool GraphState::Update( const float deltaTime )
 {
 	m_world.Update( deltaTime );
 
@@ -96,7 +94,7 @@ void GraphState::RebuildRenderGraph()
 {
 	const auto graph = m_ga.GetBestGraph();
 
-	std::vector< std::pair< Handle< GraphNode >, Handle< Reflex::Components::TransformComponent > > > nodes;
+	std::vector< std::pair< Handle< GraphNode >, Handle< Reflex::Components::Transform > > > nodes;
 
 	m_world.DestroyAllObjects();
 
@@ -104,7 +102,7 @@ void GraphState::RebuildRenderGraph()
 	for( auto& node : graph.nodes )
 	{
 		const auto obj = CreateGraphObject( node.position, node.label );
-		nodes.emplace_back( obj->GetComponent< GraphNode >(), obj->GetComponent< Reflex::Components::TransformComponent >() );
+		nodes.emplace_back( obj->GetComponent< GraphNode >(), obj->GetComponent< Reflex::Components::Transform >() );
 	}
 
 	// Copy / create connections

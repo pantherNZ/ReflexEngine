@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Precompiled.h"
 #include "Component.h"
 #include "Entity.h"
 

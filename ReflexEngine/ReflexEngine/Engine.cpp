@@ -20,6 +20,8 @@ namespace Reflex
 			m_statisticsText.setFont( m_font );
 			m_statisticsText.setPosition( 5.0f, 5.0f );
 			m_statisticsText.setCharacterSize( 15 );
+
+			Profiler::GetProfiler();
 		}
 
 		Engine::~Engine()
@@ -35,8 +37,10 @@ namespace Reflex
 
 				while( m_window.isOpen() )
 				{
-					ProcessEvents();
 					sf::Time deltaTime = clock.restart();
+					Profiler::GetProfiler().FrameTick( deltaTime.asMicroseconds() );
+					ProcessEvents();
+
 					accumlatedTime += deltaTime;
 					bool updated = false;
 
@@ -44,17 +48,19 @@ namespace Reflex
 					{
 						accumlatedTime -= m_updateInterval;
 						ProcessEvents();
-						Update( m_updateInterval );
+						Update( m_updateInterval.asSeconds() );
 						updated = true;
 					}
 
-					UpdateStatistics( deltaTime );
+					UpdateStatistics( deltaTime.asSeconds() );
 					Render();
 				}
+
+				Profiler::GetProfiler().OutputResults( "Performance_Results.txt" );
 			}
 			catch( std::exception& e )
 			{
-				Reflex::LOG_CRIT( Stream( "EXCEPTION: " << *e.what() << "\n" ) );
+				LOG_CRIT( Stream( "EXCEPTION: " << *e.what() << "\n" ) );
 			}
 		}
 
@@ -95,7 +101,7 @@ namespace Reflex
 				m_window.close();
 		}
 
-		void Engine::Update( const sf::Time deltaTime )
+		void Engine::Update( const float deltaTime )
 		{
 			m_stateManager.Update( deltaTime );
 		}
@@ -109,9 +115,9 @@ namespace Reflex
 			m_window.display();
 		}
 
-		void Engine::UpdateStatistics( const sf::Time deltaTime )
+		void Engine::UpdateStatistics( const float deltaTime )
 		{
-			m_statisticsUpdateTime += deltaTime;
+			m_statisticsUpdateTime += sf::seconds( deltaTime );
 			m_statisticsNumFrames += 1;
 
 			if( m_statisticsUpdateTime >= sf::seconds( 1.0f ) )

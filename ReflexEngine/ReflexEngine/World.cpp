@@ -2,21 +2,38 @@
 #include "World.h"
 #include "Object.h"
 #include "TransformComponent.h"
+#include "RenderSystem.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapGridSize, const unsigned tileMapGridSize )
+		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned tileMapGridSize /*= 0U*/ )
 			: m_window( window )
 			, m_worldView( m_window.getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_components( 10 )
 			, m_objects( sizeof( Object ), 100 )
-			, m_tileMap( m_worldBounds, spacialHashMapGridSize, tileMapGridSize )
+			, m_tileMap( m_worldBounds, tileMapGridSize )
 		{
 			BaseHandle::s_handleManager = &m_handles;
+
+			AddSystem< Reflex::Systems::RenderSystem >();
+		}
+
+		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const SpacialStorageType type, const unsigned storageSize, const unsigned tileMapGridSize /*= 0U*/ )
+			: m_window( window )
+			, m_worldView( m_window.getDefaultView() )
+			, m_worldBounds( worldBounds )
+			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
+			, m_components( 10 )
+			, m_objects( sizeof( Object ), 100 )
+			, m_tileMap( m_worldBounds, type, storageSize, tileMapGridSize )
+		{
+			BaseHandle::s_handleManager = &m_handles;
+
+			AddSystem< Reflex::Systems::RenderSystem >();
 		}
 
 		World::~World()
@@ -24,7 +41,7 @@ namespace Reflex
 			DestroyAllObjects();
 		}
 
-		void World::Update( const sf::Time deltaTime )
+		void World::Update( const float deltaTime )
 		{
 			// Update systems
 			for( auto& system : m_systems )
@@ -89,7 +106,7 @@ namespace Reflex
 			SyncHandles< Object >( m_objects );
 
 			auto newHandle = ObjectHandle( newObject->m_self );
-			newHandle->AddComponent< Reflex::Components::TransformComponent >( position, rotation, scale );
+			newHandle->AddComponent< Reflex::Components::Transform >( position, rotation, scale );
 			return newHandle;
 		}
 

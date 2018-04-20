@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Precompiled.h"
 
 namespace Reflex
 {
@@ -13,7 +13,7 @@ namespace Reflex
 
 			void AttachChild( std::unique_ptr< SceneNode > child );
 			std::unique_ptr< SceneNode > DetachChild( const SceneNode& node );
-			void Update( const sf::Time deltaTime );
+			void Update( const float deltaTime );
 
 			sf::Transform GetWorldTransform() const;
 			sf::Vector2f GetWorldPosition() const;
@@ -28,7 +28,7 @@ namespace Reflex
 			SceneNode* GetChild( const unsigned index );
 
 		private:
-			virtual void UpdateCurrent( const sf::Time deltaTime ) { }
+			virtual void UpdateCurrent( const float deltaTime ) { }
 			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final;
 			virtual void DrawCurrent( sf::RenderTarget& target, sf::RenderStates states ) const { }
 

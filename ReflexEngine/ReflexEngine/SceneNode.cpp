@@ -33,7 +33,7 @@ namespace Reflex
 			return found_node;
 		}
 
-		void SceneNode::Update( const sf::Time deltaTime )
+		void SceneNode::Update( const float deltaTime )
 		{
 			UpdateCurrent( deltaTime );
 

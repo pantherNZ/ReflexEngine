@@ -12,7 +12,7 @@ namespace Reflex
 			using System::System;
 
 			void RegisterComponents() final;
-			void Update( const sf::Time deltaTime ) final { }
+			void Update( const float deltaTime ) final { }
 			void Render( sf::RenderTarget& target, sf::RenderStates states ) const final;
 			void OnSystemStartup() final {}
 			void OnSystemShutdown() final { }

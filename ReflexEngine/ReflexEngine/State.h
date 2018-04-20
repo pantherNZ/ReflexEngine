@@ -15,7 +15,7 @@ namespace Reflex
 			virtual ~State() { }
 
 			virtual void Render() = 0;
-			virtual bool Update( const sf::Time deltaTime ) = 0;
+			virtual bool Update( const float deltaTime ) = 0;
 			virtual bool ProcessEvent( const sf::Event& event ) = 0;
 
 		protected:

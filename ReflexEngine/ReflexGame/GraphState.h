@@ -16,7 +16,7 @@ public:
 
 protected:
 	void Render() final;
-	bool Update( const sf::Time deltaTime ) final;
+	bool Update( const float deltaTime ) final;
 	bool ProcessEvent( const sf::Event& event ) final;
 
 private:	
@@ -24,8 +24,8 @@ private:
 	void RebuildRenderGraph();
 
 private:
-	World m_world;
 	sf::FloatRect m_bounds;
+	World m_world;
 
 	GeneticAlgorithm m_ga;
 	sf::Text m_gaInfo;

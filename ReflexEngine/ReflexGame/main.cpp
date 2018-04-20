@@ -3,11 +3,13 @@
 
 #include "GraphState.h"
 #include "MenuState.h"
+#include "SpacialHashMapDemo.h"
 
 enum StateTypes : unsigned
 {
 	MenuStateType,
 	GraphStateType,
+	SpacialHashMapState,
 	NumStateTypes,
 };
 
@@ -18,11 +20,11 @@ int main( int argc, char** argv )
 
 	Reflex::Core::Engine engine;
 
+	engine.RegisterState< SpacialHashMapDemo >( SpacialHashMapState, true );
 	engine.RegisterState< GraphState >( GraphStateType );
 	engine.RegisterState< MenuState >( MenuStateType );
-	engine.SetStartupState( GraphStateType );
 
 	engine.Run();
 
-	return 0;
+	return 0; 
 }

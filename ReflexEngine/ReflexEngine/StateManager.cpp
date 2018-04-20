@@ -11,7 +11,7 @@ namespace Reflex
 
 		}
 
-		void StateManager::Update( const sf::Time deltaTime )
+		void StateManager::Update( const float deltaTime )
 		{
 			for( auto itr = m_ActiveStates.rbegin(); itr != m_ActiveStates.rend(); ++itr )
 			{

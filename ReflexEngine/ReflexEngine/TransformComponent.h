@@ -6,10 +6,10 @@ namespace Reflex
 {
 	namespace Components
 	{
-		class TransformComponent : public Component, public sf::Transformable
+		class Transform : public Component, public sf::Transformable
 		{
 		public:
-			TransformComponent( ObjectHandle object, BaseHandle handle, 
+			Transform( ObjectHandle object, BaseHandle handle, 
 				const sf::Vector2f& position = sf::Vector2f(), 
 				const float rotation = 0.0f, 
 				const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );

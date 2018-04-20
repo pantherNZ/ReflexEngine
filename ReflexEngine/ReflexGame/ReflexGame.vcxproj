@@ -164,6 +164,7 @@
     <ClCompile Include="GraphState.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuState.cpp" />
+    <ClCompile Include="SpacialHashMapDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneticAlgorithm.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="GraphNode.h" />
     <ClInclude Include="GraphState.h" />
     <ClInclude Include="MenuState.h" />
+    <ClInclude Include="SpacialHashMapDemo.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ReflexEngine\ReflexEngine.vcxproj">

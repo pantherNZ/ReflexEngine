@@ -9,7 +9,7 @@ public:
 
 protected:
 	void Render() final;
-	bool Update( const sf::Time deltaTime ) final;
+	bool Update( const float deltaTime ) final;
 	bool ProcessEvent( const sf::Event& event ) final;
 
 private:

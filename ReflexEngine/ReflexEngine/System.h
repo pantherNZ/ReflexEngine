@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Precompiled.h"
 #include "Handle.h"
 
 namespace Reflex
@@ -24,7 +24,7 @@ namespace Reflex
 			virtual ~System() { }
 
 			virtual void RegisterComponents() = 0;
-			virtual void Update( const sf::Time deltaTime ) { }
+			virtual void Update( const float deltaTime ) { }
 			virtual void Render( sf::RenderTarget& target, sf::RenderStates states ) const { }
 			virtual void OnSystemStartup() { }
 			virtual void OnSystemShutdown() { }

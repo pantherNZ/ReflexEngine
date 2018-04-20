@@ -13,10 +13,19 @@ namespace Reflex
 		typedef std::type_index Type;
 	}
 
+	// Math common
+	#define PI					3.141592654f
+	#define PI2					6.283185307f
+	#define PIDIV2				1.570796327f
+	#define PIDIV4				0.785398163f
+	#define TORADIANS( deg )	( deg ) * PI / 180.0f
+	#define TODEGREES( rad )	( rad ) / PI * 180.0f
+
+	// String common
 	#define STRINGIFY( x ) #x
 	#define STRINGIFY2( x ) STRINGIFY( x )
-	#define TODO( Msg ) \
-		__pragma( message( __FILE__ "(" STRINGIFY2( __LINE__ ) ") : TODO [ " Msg " ]" ) )
+	#define TODO( Msg ) __pragma( message( __FILE__ "(" STRINGIFY2( __LINE__ ) ") : TODO [ " Msg " ]" ) )
+	#define Stream( message ) [&](){ std::stringstream s; s << message; return s.str(); }()
 
 	inline int RandomInt( const int max )
 	{
@@ -38,20 +47,25 @@ namespace Reflex
 		return rand() / ( RAND_MAX + 1.0f );
 	}
 
-	inline float Random( const float _fMin, const float _fMax )
+	inline float RandomFloat( const float min, const float max )
 	{
-		return _fMin + RandomFloat() * ( _fMax - _fMin );
+		return min + RandomFloat() * ( max - min );
 	}
 
-	inline float Random( const float _fMax )
+	inline float RandomFloat( const float max )
 	{
-		return Random( 0.0f, _fMax );
+		return RandomFloat( 0.0f, max );
 	}
 
-	inline float Round( float _fVal, int _iAccuracy )
+	inline float Round( float value )
 	{
-		_fVal *= _iAccuracy;
-		return( std::floor( _fVal + 0.5f ) / ( float )_iAccuracy );
+		return std::floor( value + 0.5f );
+	}
+
+	inline float Round( float value, int accuracy )
+	{
+		value *= accuracy;
+		return( std::floor( value + 0.5f ) / ( float )accuracy );
 	}
 
 	template< typename T >
@@ -157,6 +171,16 @@ namespace Reflex
 		const float sinR = sin( radians );
 		const float cosR = cos( radians );
 		return sf::Vector2f( vector.x * cosR - vector.y * sinR, vector.y * cosR + vector.x * sinR );
+	}
+
+	inline sf::Vector2i ToVector2i( const sf::Vector2f convert )
+	{
+		return sf::Vector2i( ( int )Round( convert.x ), ( int )Round( convert.y ) );
+	}
+
+	inline sf::Vector2f ToVector2f( const sf::Vector2i convert )
+	{
+		return sf::Vector2f( ( float )convert.x, ( float )convert.y );
 	}
 
 	bool IntersectPolygonCircle( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& circlePosition, const float radius );

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.h"
+#include "Precompiled.h"
 #include "ResourceManager.h"
 #include "Object.h"
 #include "ObjectAllocator.h"
@@ -20,10 +20,13 @@ namespace Reflex
 		class World : private sf::NonCopyable
 		{
 		public:
-			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapGridSize, const unsigned tileMapGridSize = 0U );
+			friend class Object;
+
+			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned tileMapGridSize = 0U );
+			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const SpacialStorageType type, const unsigned storageSize, const unsigned tileMapGridSize = 0U );
 			~World();
 
-			void Update( const sf::Time deltaTime );
+			void Update( const float deltaTime );
 			void Render();
 
 			ObjectHandle CreateObject( const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
@@ -43,14 +46,6 @@ namespace Reflex
 			template< class T >
 			void ForwardRegisterComponent();
 
-			template< class T, typename... Args >
-			Handle< T > CreateComponent( ObjectHandle& owner, Args&&... args );
-
-			void DestroyComponent( Type componentType, BaseHandle component );
-
-			template< class T >
-			void DestroyComponent( Handle< T > component );
-
 			template< class T >
 			void SyncHandles( ObjectAllocator& m_array );
 
@@ -66,12 +61,19 @@ namespace Reflex
 			const sf::FloatRect GetBounds() const;
 
 		protected:
-			//void BuildScene();
-			void DeletePendingItems();
-			void ResetAllocator( ObjectAllocator& allocator );
+			template< class T, typename... Args >
+			Handle< T > CreateComponent( ObjectHandle& owner, Args&&... args );
+
+			void DestroyComponent( Type componentType, BaseHandle component );
+
+			template< class T >
+			void DestroyComponent( Handle< T > component );
 
 		private:
 			World() = delete;
+
+			void DeletePendingItems();
+			void ResetAllocator( ObjectAllocator& allocator );
 
 		protected:
 			enum Variables
@@ -108,6 +110,14 @@ namespace Reflex
 		template< class T, typename... Args >
 		T* World::AddSystem( Args&&... args )
 		{
+			const auto type = Type( typeid( T ) );
+
+			if( m_systems.find( type ) != m_systems.end() )
+			{
+				LOG_CRIT( "Trying to add a system that has already been added!" );
+				return nullptr;
+			}
+
 			auto system = std::make_unique< T >( *this, std::forward< Args >( args )... );
 
 			std::vector< Type > requiredComponentTypes;
@@ -136,7 +146,7 @@ namespace Reflex
 				system->m_components.push_back( std::move( tempList ) );
 			}
 
-			auto result = m_systems.insert( std::make_pair( Type( typeid( T ) ), std::move( system ) ) );
+			auto result = m_systems.insert( std::make_pair( type, std::move( system ) ) );
 			assert( result.second );
 
 			result.first->second->OnSystemStartup();
@@ -278,7 +288,7 @@ namespace Reflex
 		void World::ForEachObject( Func function )
 		{
 			for( unsigned i = 0; i < m_objects.Size(); ++i )
-				function( *( Object* )m_objects[i] );
+				function( ( Object* )m_objects[i] );
 		}
 	}
 }

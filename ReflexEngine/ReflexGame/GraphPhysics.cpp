@@ -10,10 +10,10 @@ using namespace Reflex::Components;
 void GraphPhysics::RegisterComponents()
 {
 	RequiresComponent( GraphNode );
-	RequiresComponent( TransformComponent );
+	RequiresComponent( Transform );
 }
 
-void GraphPhysics::Update( const sf::Time deltaTime )
+void GraphPhysics::Update( const float deltaTime )
 {
 	const auto k = std::sqrt( ( m_bounds.width * m_bounds.height ) / m_components.size() );
 	const float mult = 2.0f, gravity = 5.0f;
@@ -24,20 +24,16 @@ void GraphPhysics::Update( const sf::Time deltaTime )
 
 		for( auto& component : m_components )
 		{
-			auto transform = GetSystemComponent< TransformComponent >( component );
+			auto transform = GetSystemComponent< Transform >( component );
 			auto node = GetSystemComponent< GraphNode >( component );
 
-			temperature = std::max( 0.0f, temperature - deltaTime.asSeconds() / 10.0f );
+			temperature = std::max( 0.0f, temperature - deltaTime / 10.0f );
 			sf::Vector2f force( 0.0f, 0.0f );
-
-			const auto pos = transform->getPosition();
-			const int i = 5;
-			const auto other = transform->GetObject();
 
 			// Repulsive forces
 			//GetWorld().GetTileMap().ForEachNearby( transform->GetObject(), [&]( const ObjectHandle& obj )
 			//{
-			//	auto otherTransform = obj->GetComponent< Reflex::Components::TransformComponent >();
+			//	auto otherTransform = obj->GetComponent< Reflex::Components::Transform >();
 			//	const auto test = otherTransform->getPosition();
 			//	auto springDirection = pos - test;
 			//	const float dist = Reflex::GetMagnitude( springDirection );
@@ -50,7 +46,7 @@ void GraphPhysics::Update( const sf::Time deltaTime )
 			{
 				if( component != otherComponent )
 				{
-					auto otherTransform = GetSystemComponent< TransformComponent >( otherComponent );
+					auto otherTransform = GetSystemComponent< Transform >( otherComponent );
 					auto springDirection = transform->getPosition() - otherTransform->getPosition();
 					const float dist = Reflex::GetMagnitude( springDirection );
 					springDirection /= dist;
@@ -72,7 +68,7 @@ void GraphPhysics::Update( const sf::Time deltaTime )
 			const float mag = Reflex::GetMagnitude( force );
 			if( mag >= temperature )
 				force *= ( temperature / mag );
-			transform->move( force * deltaTime.asSeconds() * mult );
+			transform->move( force * deltaTime * mult );
 			transform->setPosition( std::min( m_bounds.width, std::max( m_bounds.left, transform->getPosition().x ) ), std::min( m_bounds.height, std::max( m_bounds.top, transform->getPosition().y ) ) );
 
 			for( auto index : node->m_vertexArrayIndices )

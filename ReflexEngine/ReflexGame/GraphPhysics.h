@@ -14,7 +14,7 @@ public:
 	GraphPhysics( World& world, sf::FloatRect bounds ) : Reflex::Systems::System( world ), m_bounds( bounds ) { }
 
 	void RegisterComponents() final;
-	void Update( const sf::Time deltaTime ) final;
+	void Update( const float deltaTime ) final;
 	void OnSystemStartup() final {}
 	void OnSystemShutdown() final {}
 

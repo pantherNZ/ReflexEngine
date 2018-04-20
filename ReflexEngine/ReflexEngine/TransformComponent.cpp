@@ -6,8 +6,7 @@ namespace Reflex
 {
 	namespace Components
 	{
-
-		TransformComponent::TransformComponent( ObjectHandle object, BaseHandle handle, 
+		Transform::Transform( ObjectHandle object, BaseHandle handle, 
 			const sf::Vector2f& position /*= sf::Vector2f()*/, 
 			const float rotation /*= 0.0f*/, 
 			const sf::Vector2f& scale /*= sf::Vector2f( 1.0f, 1.0f ) */ )
@@ -19,28 +18,35 @@ namespace Reflex
 			setScale( scale );
 		}
 
-		void TransformComponent::setPosition( float x, float y )
+		void Transform::setPosition( float x, float y )
 		{
-			TransformComponent::setPosition( sf::Vector2f( x, y ) );
+			Transform::setPosition( sf::Vector2f( x, y ) );
 		}
 
-		void TransformComponent::setPosition( const sf::Vector2f& position )
+		void Transform::setPosition( const sf::Vector2f& position )
 		{
-			m_object->GetWorld().GetTileMap().Remove( m_object );
+			auto& tileMap = m_object->GetWorld().GetTileMap();
+			const auto previousID = tileMap.GetID( m_object );
+
 			sf::Transformable::setPosition( position );
-			m_object->GetWorld().GetTileMap().Insert( m_object );
+
+			const auto newID = tileMap.GetID( m_object );
+
+			if( previousID != newID )
+			{
+				tileMap.RemoveByID( m_object, previousID );
+				tileMap.Insert( m_object );
+			}
 		}
 
-		void TransformComponent::move( float offsetX, float offsetY )
+		void Transform::move( float offsetX, float offsetY )
 		{
-			TransformComponent::move( sf::Vector2f( offsetX, offsetY ) );
+			Transform::move( sf::Vector2f( offsetX, offsetY ) );
 		}
 
-		void TransformComponent::move( const sf::Vector2f& offset )
+		void Transform::move( const sf::Vector2f& offset )
 		{
-			m_object->GetWorld().GetTileMap().Remove( m_object );
-			sf::Transformable::move( offset );
-			m_object->GetWorld().GetTileMap().Insert( m_object );
+			setPosition( getPosition() + offset );
 		}
 	}
 }

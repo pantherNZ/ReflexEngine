@@ -10,7 +10,7 @@ namespace Reflex
 		Object::Object( World& world, BaseHandle handle )
 			: Entity( handle )
 			, m_world( world )
-			, m_cachedTransformType( Type( typeid( Reflex::Components::TransformComponent ) ) )
+			, m_cachedTransformType( Type( typeid( Reflex::Components::Transform ) ) )
 		{
 
 		}

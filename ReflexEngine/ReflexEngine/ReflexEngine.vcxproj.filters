@@ -45,9 +45,6 @@
     <ClInclude Include="Engine.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Common.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectAllocator.h">
       <Filter>Memory</Filter>
     </ClInclude>
@@ -75,9 +72,6 @@
     <ClInclude Include="RenderSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteComponent.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
@@ -91,6 +85,15 @@
       <Filter>Memory</Filter>
     </ClInclude>
     <ClInclude Include="HandleFwd.hpp">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="SFMLObjectComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Precompiled.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorMap.h">
       <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
@@ -136,6 +139,12 @@
     </ClCompile>
     <ClCompile Include="TransformComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SFMLObjectComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,10 +9,10 @@ using namespace Reflex::Components;
 void GraphRenderer::RegisterComponents()
 {
 	RequiresComponent( GraphNode );
-	RequiresComponent( TransformComponent );
+	RequiresComponent( Transform );
 }
 
-void GraphRenderer::Update( const sf::Time deltaTime )
+void GraphRenderer::Update( const float deltaTime )
 {
 	
 }
@@ -25,7 +25,7 @@ void GraphRenderer::Render( sf::RenderTarget& target, sf::RenderStates states ) 
 
 	for( auto& component : m_components )
 	{
-		auto transform = GetSystemComponent< TransformComponent >( component );
+		auto transform = GetSystemComponent< Transform >( component );
 		copied_states.transform = states.transform * transform->getTransform();
 
 		auto node = GetSystemComponent< GraphNode >( component );
@@ -41,7 +41,7 @@ void GraphRenderer::RebuildVertexArray()
 	// Create vertex array for graph nodes
 	for( auto& component : m_components )
 	{
-		auto transform = GetSystemComponent< TransformComponent >( component );
+		auto transform = GetSystemComponent< Transform >( component );
 		auto node = GetSystemComponent< GraphNode >( component );
 
 		for( unsigned i = 0U; i < node->m_connections.size(); ++i )

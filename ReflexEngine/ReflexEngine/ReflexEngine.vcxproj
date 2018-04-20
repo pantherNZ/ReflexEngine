@@ -121,6 +121,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,12 +147,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Common.h" />
+    <ClInclude Include="Precompiled.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="HandleFwd.hpp" />
+    <ClInclude Include="SFMLObjectComponent.h" />
+    <ClInclude Include="VectorMap.h" />
     <ClInclude Include="VectorSet.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="HandleManager.h" />
@@ -163,7 +166,6 @@
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="ResourceManager.h" />
-    <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="System.h" />
@@ -176,9 +178,11 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="HandleManager.cpp" />
+    <ClCompile Include="Logging.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectAllocator.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="SFMLObjectComponent.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TileMap.cpp" />
