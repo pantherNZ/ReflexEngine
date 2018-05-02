@@ -7,7 +7,7 @@
 SpacialHashMapDemo::SpacialHashMapDemo( Reflex::Core::StateManager& stateManager, Reflex::Core::Context context )
 	: State( stateManager, context )
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
-	, m_world( *context.window, m_bounds, SpacialHashMap, 250U )
+	, m_world( *context.window, m_bounds, 250U )
 	, m_objectCount( 500 )
 {
 	for( unsigned i = 0U; i < m_objectCount; ++i )

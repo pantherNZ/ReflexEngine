@@ -35,7 +35,6 @@ namespace Reflex
 			struct ProfileData
 			{
 				sf::Clock timer;
-				sf::Int64 averageFrame = 0;
 				sf::Int64 currentFrame = 0;
 				sf::Int64 shortestFrame = std::numeric_limits< int >::infinity();
 				sf::Int64 longestFrame = 0;

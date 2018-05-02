@@ -7,13 +7,20 @@ namespace Reflex
 {
 	using namespace Reflex::Core;
 
+	namespace Components { class Component; }
+
+	namespace Core
+	{
+		typedef Handle< class Reflex::Components::Component > ComponentHandle;
+	}
+
 	namespace Components
 	{
 		class Component : public Entity
 		{
 		public:
 			// Constructors / Destructors
-			Component( ObjectHandle object, BaseHandle handle );
+			Component( const ObjectHandle& object, const BaseHandle& handle );
 			virtual ~Component() { }
 
 			ObjectHandle GetObject() const;

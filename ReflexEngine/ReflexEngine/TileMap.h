@@ -8,51 +8,46 @@ namespace Reflex
 {
 	namespace Core
 	{
-		enum SpacialStorageType
-		{
-			SpacialHashMap,
-			QuadTree,
-		};
-
 		class TileMap : sf::NonCopyable
 		{
 			friend class Reflex::Components::Transform;
 
 		public:
-			explicit TileMap( const sf::FloatRect& worldBounds, const unsigned tileMapGridSize = 0U );
-			explicit TileMap( const sf::FloatRect& worldBounds, const SpacialStorageType type, const unsigned storageSize, const unsigned tileMapGridSize = 0U );
+			explicit TileMap( const sf::FloatRect& worldBounds );
+			explicit TileMap( const sf::FloatRect& worldBounds, const unsigned spacialHashMapSize );
 
-			void Insert( ObjectHandle obj );
-			void Insert( ObjectHandle obj, const sf::Vector2f& topLeft, const sf::Vector2f& botRight );
-			void Remove( ObjectHandle obj );
+			void Insert( const ObjectHandle& obj );
+			void Insert( const ObjectHandle& obj,  const AABB& boundary );
+			void Remove( const ObjectHandle& obj );
 
-			void GetNearby( ObjectHandle obj, std::vector< ObjectHandle >& out ) const;
+			void GetNearby( const ObjectHandle& obj, std::vector< ObjectHandle >& out ) const;
 			void GetNearby( const sf::Vector2f& position, std::vector< ObjectHandle >& out ) const;
-			void GetNearby( ObjectHandle obj, const sf::Vector2f& topLeft, const sf::Vector2f& botRight, std::vector< ObjectHandle >& out ) const;
+			void GetNearby( const ObjectHandle& obj, const AABB& boundary, std::vector< ObjectHandle >& out ) const;
 
 			template< typename Func >
-			void ForEachNearby( ObjectHandle obj, Func f ) const;
+			void ForEachNearby( const ObjectHandle& obj, Func f ) const;
 
 			template< typename Func >
 			void ForEachNearby( const sf::Vector2f& position, Func f ) const;
 
 			template< typename Func >
-			void ForEachNearby( ObjectHandle obj, const sf::Vector2f& topLeft, const sf::Vector2f& botRight, Func f ) const;
+			void ForEachNearby( const ObjectHandle& obj, const AABB& boundary, Func f ) const;
 
 			void Reset( const bool shouldRePopulate = false );
-			void Reset( const unsigned spacialHashMapGridSize, const bool shouldRePopulate = false );
+			void Reset( const unsigned spacialHashMapSize, const bool shouldRePopulate = false );
 
 		protected:
-			void RemoveByID( ObjectHandle obj, const unsigned id );
-			unsigned GetID( const ObjectHandle obj ) const;
+			void RemoveByID( const ObjectHandle& obj, const unsigned id );
+			unsigned GetID( const ObjectHandle& obj ) const;
 			unsigned GetID( const sf::Vector2f& position ) const;
-			std::vector< unsigned > GetID( const sf::Vector2f& topLeft, const sf::Vector2f& botRight ) const;
+			std::vector< unsigned > GetID( const AABB& boundary ) const;
 			sf::Vector2i Hash( const sf::Vector2f& position ) const;
 
 		private:
 			const sf::FloatRect m_worldBounds;
-			unsigned m_storageSize = 0U;
-			unsigned m_tileMapGridSize = 0U;
+			unsigned m_spacialHashMapSize = 0U;
+
+			// Spacial hash map data
 			unsigned m_spacialHashMapWidth = 0U;
 			unsigned m_spacialHashMapHeight = 0U;
 			std::vector< std::unordered_set< ObjectHandle > > m_spacialHashMap;
@@ -60,44 +55,58 @@ namespace Reflex
 
 		// Template function definitions
 		template< typename Func >
-		void TileMap::ForEachNearby( ObjectHandle obj, Func f ) const
+		void TileMap::ForEachNearby( const ObjectHandle& obj, Func f ) const
 		{
-			if( !obj )
-				return;
-
-			const auto id = GetID( obj );
-			auto& bucket = m_spacialHashMap[id];
-
-			for( auto& item : bucket )
-				if( item != obj )
-					f( item );
-		}
-
-		template< typename Func >
-		void TileMap::ForEachNearby( const sf::Vector2f& position, Func f ) const
-		{
-			const auto id = GetID( position );
-			auto& bucket = m_spacialHashMap[id];
-
-			for( auto& item : bucket )
-				f( item );
-		}
-
-		template< typename Func >
-		void TileMap::ForEachNearby( ObjectHandle obj, const sf::Vector2f& topLeft, const sf::Vector2f& botRight, Func f ) const
-		{
-			if( !obj )
-				return;
-
-			const auto ids = GetID( topLeft, botRight );
-
-			for( auto& id : ids )
+			if( obj && m_spacialHashMapSize )
 			{
+				const auto id = GetID( obj );
+
+				if( id == -1 )
+					return;
+
 				auto& bucket = m_spacialHashMap[id];
 
 				for( auto& item : bucket )
 					if( item != obj )
 						f( item );
+			}
+		}
+
+		template< typename Func >
+		void TileMap::ForEachNearby( const sf::Vector2f& position, Func f ) const
+		{
+			if( m_spacialHashMapSize )
+			{
+				const auto id = GetID( position );
+
+				if( id == -1 )
+					return;
+
+				auto& bucket = m_spacialHashMap[id];
+
+				for( auto& item : bucket )
+					f( item );
+			}
+		}
+
+		template< typename Func >
+		void TileMap::ForEachNearby( const ObjectHandle& obj, const AABB& boundary, Func f ) const
+		{
+			if( obj && m_spacialHashMapSize )
+			{
+				const auto ids = GetID( boundary );
+
+				for( auto& id : ids )
+				{
+					if( id == -1 )
+						continue;
+
+					auto& bucket = m_spacialHashMap[id];
+
+					for( auto& item : bucket )
+						if( item != obj )
+							f( item );
+				}
 			}
 		}
 	}

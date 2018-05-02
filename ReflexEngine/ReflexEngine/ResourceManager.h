@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Precompiled.h"
+#include <string>
+#include <memory>
+#include <map>
 
 namespace Reflex
 {

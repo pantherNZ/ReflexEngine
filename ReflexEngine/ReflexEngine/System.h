@@ -43,6 +43,27 @@ namespace Reflex
 				return Handle< T >();
 			}
 
+			template< typename T, typename Func >
+			void ForEachSystemComponent( const Func& f ) const
+			{
+				for( auto& comp : m_components )
+					f( Handle< T >( comp[0] ) );
+			}
+
+			template< typename A, typename B, typename Func >
+			void ForEachSystemComponent( const Func& f ) const
+			{
+				for( auto& comp : m_components )
+					f( Handle< A >( comp[0] ), Handle< B >( comp[1] ) );
+			}
+
+			template< typename A, typename B, typename C, typename Func >
+			void ForEachSystemComponent( const Func& f ) const
+			{
+				for( auto& comp : m_components )
+					f( Handle< A >( comp[0] ), Handle< B >( comp[1] ), Handle< C >( comp[2] ) );
+			}
+
 		private:
 			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final { Render( target, states ); }
 

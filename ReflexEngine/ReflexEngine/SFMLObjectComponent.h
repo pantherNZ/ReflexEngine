@@ -6,6 +6,16 @@ namespace Reflex
 {
 	namespace Components
 	{
+		class SFMLObject;
+	}
+
+	namespace Core
+	{
+		typedef Handle< class Reflex::Components::SFMLObject > SFMLObjectHandle;
+	}
+
+	namespace Components
+	{
 		enum SFMLObjectType
 		{
 			Circle,
@@ -14,20 +24,21 @@ namespace Reflex
 			Sprite,
 		};
 
+		// Class definition
 		class SFMLObject : public Component
 		{
 		public:
 			// Initialise by circle shape
-			SFMLObject( ObjectHandle object, BaseHandle handle, sf::CircleShape shape );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::CircleShape& shape );
 
 			// Initialise by convex shape
-			SFMLObject( ObjectHandle object, BaseHandle handle, sf::ConvexShape shape );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::ConvexShape& shape );
 
 			// Initialise by rectangle shape
-			SFMLObject( ObjectHandle object, BaseHandle handle, sf::RectangleShape shape );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::RectangleShape& shape );
 
 			// Initialise by sprite
-			SFMLObject( ObjectHandle object, BaseHandle handle, sf::Sprite sprite );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::Sprite& sprite );
 
 			// Get functions
 			sf::CircleShape& GetCircleShape();

@@ -187,4 +187,46 @@ namespace Reflex
 		//The circle is on the right of every line. It is inside the polygon.
 		return true;
 	}
+
+	AABB::AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize )
+		: centre( centre ), halfSize( halfSize ) 
+	{
+
+	}
+
+	void AABB::Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize )
+	{
+		centre = _centre;
+		halfSize = _halfSize;
+	}
+
+	bool AABB::Contains( const sf::Vector2f& position ) const
+	{
+		return position.x >= centre.x - halfSize.x && 
+			position.x <= centre.x + halfSize.x &&
+			position.y >= centre.y - halfSize.y &&
+			position.y <= centre.y + halfSize.y;
+	}
+
+	bool AABB::Intersects( const AABB& other ) const
+	{
+		return centre.x + halfSize.x >= other.centre.x - other.halfSize.x &&
+			centre.x - halfSize.x <= other.centre.x + other.halfSize.x &&
+			centre.y + halfSize.y >= other.centre.y - other.halfSize.y &&
+			centre.y - halfSize.y <= other.centre.y + other.halfSize.y;
+	}
+
+	Reflex::AABB ToAABB( const sf::Vector2f& topLeft, const sf::Vector2f& botRight )
+	{
+		AABB result;
+		result.centre = ( topLeft + botRight ) / 2.0f;
+		result.halfSize = sf::Vector2f( abs( botRight.x - result.centre.x ), abs( botRight.y - result.centre.y ) );
+		return std::move( result );
+	}
+
+	Reflex::AABB ToAABB( const sf::FloatRect& bounds )
+	{
+		return ToAABB( sf::Vector2f( bounds.left, bounds.top ), sf::Vector2f( bounds.left + bounds.width, bounds.top + bounds.height ) );
+	}
+
 }

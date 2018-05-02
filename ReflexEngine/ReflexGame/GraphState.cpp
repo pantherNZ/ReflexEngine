@@ -19,7 +19,7 @@ namespace Reflex
 GraphState::GraphState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
-	, m_world( *context.window, m_bounds, SpacialHashMap, 3000U )
+	, m_world( *context.window, m_bounds, 300U )
 	, m_ga( "Data/VirtualStats.cpp", m_bounds )
 {
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );

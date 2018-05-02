@@ -5,7 +5,7 @@ namespace Reflex
 {
 	namespace Components
 	{
-		Component::Component( ObjectHandle object, BaseHandle handle )
+		Component::Component( const ObjectHandle& object, const BaseHandle& handle )
 			: Entity( handle )
 			, m_object( object )
 		{

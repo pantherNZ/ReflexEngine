@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflexGame", "ReflexGame\ReflexGame.vcxproj", "{B67A6C1B-28D8-4897-AC65-B67A4B21324F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReflexEngine", "ReflexEngine\ReflexEngine.vcxproj", "{21E5AB50-28B8-44C0-B20E-01637BED9F76}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pentago", "Pentago\Pentago.vcxproj", "{DEA06480-744E-4382-A68A-F7266F1802C3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{21E5AB50-28B8-44C0-B20E-01637BED9F76} = {21E5AB50-28B8-44C0-B20E-01637BED9F76}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +36,19 @@ Global
 		{21E5AB50-28B8-44C0-B20E-01637BED9F76}.Release|x64.Build.0 = Release|x64
 		{21E5AB50-28B8-44C0-B20E-01637BED9F76}.Release|x86.ActiveCfg = Release|Win32
 		{21E5AB50-28B8-44C0-B20E-01637BED9F76}.Release|x86.Build.0 = Release|Win32
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Debug|x64.ActiveCfg = Debug|x64
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Debug|x64.Build.0 = Debug|x64
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Debug|x86.ActiveCfg = Debug|Win32
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Debug|x86.Build.0 = Debug|Win32
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Release|x64.ActiveCfg = Release|x64
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Release|x64.Build.0 = Release|x64
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Release|x86.ActiveCfg = Release|Win32
+		{DEA06480-744E-4382-A68A-F7266F1802C3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3D343F3D-66CD-409F-8532-0DE21FCA4E12}
 	EndGlobalSection
 EndGlobal

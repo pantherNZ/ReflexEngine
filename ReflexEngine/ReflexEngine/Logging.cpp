@@ -67,15 +67,6 @@ namespace Reflex
 				data.second.shortestFrame = std::min( data.second.shortestFrame, data.second.currentFrame );
 				data.second.longestFrame = std::max( data.second.longestFrame, data.second.currentFrame );
 				data.second.totalDuration += data.second.currentFrame;
-
-				if( data.second.averageFrame == 0 )
-					data.second.averageFrame = data.second.currentFrame;
-				else
-				{
-					const unsigned totalSamples = data.second.totalSamples;
-					data.second.averageFrame = data.second.averageFrame * ( totalSamples - 1 ) / totalSamples + data.second.currentFrame / totalSamples;
-				}
-
 				data.second.currentFrame = 0;
 			}
 		}
@@ -94,7 +85,7 @@ namespace Reflex
 			for( auto& data : m_profileData )
 			{
 				stream << std::setprecision( 2 ) << std::fixed << std::setiosflags( std::ios::left ) << std::setw( 40 ) << data.first << std::resetiosflags( std::ios::left )
-					<< std::setw( width ) << "Average: " << ( data.second.averageFrame / 1000.0f ) << "ms"
+					<< std::setw( width ) << "Average: " << ( ( data.second.totalDuration / data.second.totalSamples ) / 1000.0f ) << "ms"
 					<< std::setw( width ) << "Min: " << ( data.second.shortestFrame / 1000.0f ) << "ms"
 					<< std::setw( width ) << "Max: " << ( data.second.longestFrame / 1000.0f ) << "ms"
 					<< std::setw( width ) << "% of Total: " << ( ( data.second.totalDuration / 1000.0f ) / ( m_totalDuration / 1000.0f ) ) << "%"

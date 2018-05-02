@@ -8,37 +8,45 @@ namespace Reflex
 {
 	namespace Core
 	{
-		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned tileMapGridSize /*= 0U*/ )
+		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned initialMaxObjects )
 			: m_window( window )
 			, m_worldView( m_window.getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_components( 10 )
-			, m_objects( sizeof( Object ), 100 )
-			, m_tileMap( m_worldBounds, tileMapGridSize )
+			, m_objects( sizeof( Object ), initialMaxObjects )
+			, m_tileMap( m_worldBounds )
 		{
-			BaseHandle::s_handleManager = &m_handles;
-
-			AddSystem< Reflex::Systems::RenderSystem >();
+			Setup();
 		}
 
-		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const SpacialStorageType type, const unsigned storageSize, const unsigned tileMapGridSize /*= 0U*/ )
+		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects )
 			: m_window( window )
 			, m_worldView( m_window.getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_components( 10 )
-			, m_objects( sizeof( Object ), 100 )
-			, m_tileMap( m_worldBounds, type, storageSize, tileMapGridSize )
+			, m_objects( sizeof( Object ), initialMaxObjects )
+			, m_tileMap( m_worldBounds, spacialHashMapSize )
 		{
-			BaseHandle::s_handleManager = &m_handles;
-
-			AddSystem< Reflex::Systems::RenderSystem >();
+			Setup();
 		}
 
 		World::~World()
 		{
 			DestroyAllObjects();
+		}
+
+		void World::Setup()
+		{
+			BaseHandle::s_handleManager = &m_handles;
+
+			m_sceneGraphRoot = std::make_unique< SceneNodeRoot >();
+			m_sceneGraphRoot->setPosition( 0.0f, 0.0f );
+			Handle< SceneNodeRoot > sceneGraphHandle = m_handles.Insert< SceneNodeRoot >( m_sceneGraphRoot.get() );
+			m_sceneGraphRoot->SetHandle( sceneGraphHandle );
+
+			AddSystem< Reflex::Systems::RenderSystem >();
 		}
 
 		void World::Update( const float deltaTime )
@@ -106,7 +114,8 @@ namespace Reflex
 			SyncHandles< Object >( m_objects );
 
 			auto newHandle = ObjectHandle( newObject->m_self );
-			newHandle->AddComponent< Reflex::Components::Transform >( position, rotation, scale );
+			auto transform = newHandle->AddComponent< Reflex::Components::Transform >( position, rotation, scale );
+			m_sceneGraphRoot->AttachChild( transform );
 			return newHandle;
 		}
 

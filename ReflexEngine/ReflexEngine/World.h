@@ -5,8 +5,9 @@
 #include "Object.h"
 #include "ObjectAllocator.h"
 #include "System.h"
-#include "HandleManager.h"
+#include "HandleFwd.hpp"
 #include "TileMap.h"
+#include "SceneNode.h"
 
 // Engine class
 namespace Reflex
@@ -14,7 +15,6 @@ namespace Reflex
 	namespace Core
 	{
 		using Systems::System;
-		using Reflex::Components::Component;
 
 		// World class
 		class World : private sf::NonCopyable
@@ -22,10 +22,11 @@ namespace Reflex
 		public:
 			friend class Object;
 
-			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned tileMapGridSize = 0U );
-			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const SpacialStorageType type, const unsigned storageSize, const unsigned tileMapGridSize = 0U );
+			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned initialMaxObjects );
+			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects );
 			~World();
 
+			void Setup();
 			void Update( const float deltaTime );
 			void Render();
 
@@ -62,7 +63,7 @@ namespace Reflex
 
 		protected:
 			template< class T, typename... Args >
-			Handle< T > CreateComponent( ObjectHandle& owner, Args&&... args );
+			Handle< T > CreateComponent( const ObjectHandle& owner, Args&&... args );
 
 			void DestroyComponent( Type componentType, BaseHandle component );
 
@@ -93,17 +94,30 @@ namespace Reflex
 			// Handle manager which maps a handle to a void* in memory (such as in the above object allocator or a component allocator)
 			HandleManager m_handles;
 
-			// List of components, indexed by their type (EG. Sprite), this is what holds the memory of all components in the engine
+			// List of components, indexed by their type (EG. Sprite), holds the memory of all components
 			std::unordered_map< Type, std::unique_ptr< ObjectAllocator > > m_components;
 
-			// List of systems, indexed by their pointer, which grants access to the vector storing the component types it requires
+			// List of systems, indexed by their type, holds memory for all the Systems
 			std::unordered_map< Type, std::unique_ptr< System > > m_systems;
 
 			// Tilemap which stores object handles in the world in an efficient spacial hash map
 			TileMap m_tileMap;
+			std::unique_ptr< class SceneNodeRoot > m_sceneGraphRoot;
 
 			// Removes objects / components on frame move instead of during sometime dangerous
 			std::vector< BaseHandle > m_markedForDeletion;
+		};
+
+		class SceneNodeRoot : public SceneNode< Reflex::Components::Transform, SceneNodeRoot >
+		{
+		public:
+			void SetHandle( Handle< SceneNodeRoot > self ) { m_self = self; }
+
+		private:
+			virtual Handle< SceneNodeRoot > GetHandle() const final { return m_self; }
+
+		private:
+			Handle< SceneNodeRoot > m_self;
 		};
 
 		// Template functions
@@ -193,7 +207,7 @@ namespace Reflex
 		}
 
 		template< class T, typename... Args >
-		Handle< T > World::CreateComponent( ObjectHandle& owner, Args&&... args )
+		Handle< T > World::CreateComponent( const ObjectHandle& owner, Args&&... args )
 		{
 			const auto componentType = Type( typeid( T ) );
 
@@ -238,7 +252,7 @@ namespace Reflex
 				// This looks through the required types and sees if the object has one of each of them
 				for( auto& requiredType : requiredTypes )
 				{
-					const auto handle = ( requiredType == componentType ? componentHandle : owner->GetComponent( requiredType ) );
+					const auto handle = ( requiredType == componentType ? ( BaseHandle )componentHandle : owner->GetComponent( requiredType ) );
 
 					if( !handle.IsValid() )
 						break;

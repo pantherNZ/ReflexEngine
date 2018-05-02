@@ -9,48 +9,54 @@ namespace Reflex
 {
 	namespace Core
 	{
-		TileMap::TileMap( const sf::FloatRect& worldBounds, const unsigned tileMapGridSize /*= 0U*/ )
+		TileMap::TileMap( const sf::FloatRect& worldBounds )
 			: m_worldBounds( worldBounds )
-			, m_tileMapGridSize( tileMapGridSize )
+			//, m_tileMapGridSize( tileMapGridSize )
 		{
 		}
 
-		TileMap::TileMap( const sf::FloatRect& worldBounds, const SpacialStorageType type, const unsigned storageSize, const unsigned tileMapGridSize /*= 0U*/ )
+		TileMap::TileMap( const sf::FloatRect& worldBounds, const unsigned spacialHashMapSize )
 			: m_worldBounds( worldBounds )
-			, m_tileMapGridSize( tileMapGridSize )
+			//, m_tileMapGridSize( tileMapGridSize )
 		{
-			Reset( storageSize, false );
+			Reset( spacialHashMapSize, false );
 		}
 
-		void TileMap::Insert( ObjectHandle obj )
+		void TileMap::Insert( const ObjectHandle& obj )
 		{
-			if( obj )
+			if( obj && m_spacialHashMapSize )
 			{
-				const auto id = GetID( obj );
-				auto& bucket = m_spacialHashMap[id];
-				bucket.insert( obj );
+				const auto position = obj->GetComponent< Reflex::Components::Transform >()->getPosition();
+				Insert( obj, AABB( position, sf::Vector2f( 0.0f, 0.0f ) ) );
 			}
 		}
 
-		void TileMap::Insert( ObjectHandle obj, const sf::Vector2f& topLeft, const sf::Vector2f& botRight )
+		void TileMap::Insert( const ObjectHandle& obj, const AABB& boundary )
 		{
-			if( obj )
+			if( obj && m_spacialHashMapSize )
 			{
-				const auto ids = GetID( topLeft, botRight );
+				const auto ids = GetID( boundary );
 
 				for( auto& id : ids )
 				{
+					if( id == -1 )
+						continue;
+
 					auto& bucket = m_spacialHashMap[id];
 					bucket.insert( obj );
 				}
 			}
 		}
 
-		void TileMap::Remove( ObjectHandle obj )
+		void TileMap::Remove( const ObjectHandle& obj )
 		{
-			if( obj )
+			if( obj && m_spacialHashMapSize )
 			{
 				const auto id = GetID( obj );
+
+				if( id == -1 )
+					return;
+
 				auto& bucket = m_spacialHashMap[id];
 				const auto found = bucket.find( obj );
 				assert( found != bucket.end() );
@@ -59,9 +65,9 @@ namespace Reflex
 			}
 		}
 
-		void TileMap::RemoveByID( ObjectHandle obj, const unsigned id )
+		void TileMap::RemoveByID( const ObjectHandle& obj, const unsigned id )
 		{
-			if( obj )
+			if( obj && m_spacialHashMapSize && id < m_spacialHashMap.size() )
 			{
 				auto& bucket = m_spacialHashMap[id];
 				const auto found = bucket.find( obj );
@@ -71,7 +77,7 @@ namespace Reflex
 			}
 		}
 
-		void TileMap::GetNearby( ObjectHandle obj, std::vector< ObjectHandle >& out ) const
+		void TileMap::GetNearby( const ObjectHandle& obj, std::vector< ObjectHandle >& out ) const
 		{
 			ForEachNearby( obj, [&out]( const ObjectHandle& obj )
 			{
@@ -87,9 +93,9 @@ namespace Reflex
 			} );
 		}
 
-		void TileMap::GetNearby( ObjectHandle obj, const sf::Vector2f& topLeft, const sf::Vector2f& botRight, std::vector< ObjectHandle >& out ) const
+		void TileMap::GetNearby( const ObjectHandle& obj, const AABB& boundary, std::vector< ObjectHandle >& out ) const
 		{
-			ForEachNearby( obj, topLeft, botRight, [&out]( const ObjectHandle& obj )
+			ForEachNearby( obj, boundary, [&out]( const ObjectHandle& obj )
 			{
 				out.push_back( obj );
 			} );
@@ -98,22 +104,20 @@ namespace Reflex
 		void TileMap::Reset( const bool shouldRePopulate /*= false*/ )
 		{
 			m_spacialHashMap.empty();
-			m_spacialHashMapWidth = ( unsigned )std::ceil( m_worldBounds.width / m_storageSize );
-			m_spacialHashMapHeight = ( unsigned )std::ceil( m_worldBounds.height / m_storageSize );
+			m_spacialHashMapWidth = ( unsigned )std::ceil( m_worldBounds.width / m_spacialHashMapSize );
+			m_spacialHashMapHeight = ( unsigned )std::ceil( m_worldBounds.height / m_spacialHashMapSize );
 			m_spacialHashMap.resize( m_spacialHashMapWidth * m_spacialHashMapHeight );
 
-			TODO( "Implement shouldRePopulate system from world" );
+			TODO( "TileMap: Implement shouldRePopulate system from world" );
 		}
 
-		void TileMap::Reset( const unsigned spacialHashMapGridSize, const bool shouldRePopulate /*= false*/ )
+		void TileMap::Reset( const unsigned spacialHashMapSize, const bool shouldRePopulate /*= false*/ )
 		{
-			m_storageSize = spacialHashMapGridSize;
+			m_spacialHashMapSize = spacialHashMapSize;
 			Reset( shouldRePopulate );
-
-			TODO( "Implement shouldRePopulate system from world" );
 		}
 
-		unsigned TileMap::GetID( const ObjectHandle obj ) const
+		unsigned TileMap::GetID( const ObjectHandle& obj ) const
 		{
 			assert( obj );
 			return GetID( obj->GetComponent< Reflex::Components::Transform >()->getPosition() );
@@ -121,12 +125,19 @@ namespace Reflex
 
 		unsigned TileMap::GetID( const sf::Vector2f& position ) const
 		{
+			if( position.x < m_worldBounds.left || position.x > ( m_worldBounds.left + m_worldBounds.width ) ||
+				position.y < m_worldBounds.top || position.y > ( m_worldBounds.top + m_worldBounds.height ) ||
+				!m_spacialHashMapSize )
+				return -1;
+
 			const auto loc = Hash( position );
 			return loc.y * m_spacialHashMapWidth + loc.x;
 		}
 
-		std::vector< unsigned > TileMap::GetID( const sf::Vector2f& topLeft, const sf::Vector2f& botRight ) const
+		std::vector< unsigned > TileMap::GetID( const AABB& boundary ) const
 		{
+			const auto topLeft = boundary.centre - boundary.halfSize;
+			const auto botRight = boundary.centre + boundary.halfSize;
 			const auto locTopLeft = Hash( topLeft );
 			const auto locBotRight = Hash( botRight );
 			std::vector< unsigned > ids;
@@ -140,7 +151,7 @@ namespace Reflex
 
 		sf::Vector2i TileMap::Hash( const sf::Vector2f& position ) const
 		{
-			return sf::Vector2i( int( position.x / m_storageSize ), int( position.y / m_storageSize ) );
+			return sf::Vector2i( int( position.x / m_spacialHashMapSize ), int( position.y / m_spacialHashMapSize ) );
 		}
 	}
 }

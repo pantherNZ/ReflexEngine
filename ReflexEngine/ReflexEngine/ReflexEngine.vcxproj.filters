@@ -96,15 +96,15 @@
     <ClInclude Include="VectorMap.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="World.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Engine.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneNode.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="StateManager.cpp">
@@ -145,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="Logging.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

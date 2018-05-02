@@ -12,7 +12,6 @@ namespace Reflex
 		// Forward declaration of common handle types
 		typedef Handle< class Object > ObjectHandle;
 
-
 		// Template functions
 		template< class T >
 		Handle< T >::Handle( const BaseHandle& handle )

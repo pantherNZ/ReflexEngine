@@ -2,6 +2,7 @@
 #include "RenderSystem.h"
 #include "SFMLObjectComponent.h"
 #include "TransformComponent.h"
+#include "HandleFwd.hpp"
 
 namespace Reflex
 {
@@ -18,29 +19,27 @@ namespace Reflex
 			PROFILE;
 			sf::RenderStates copied_states( states );
 
-			for( auto& component : m_components )
+			ForEachSystemComponent< Reflex::Components::SFMLObject, Reflex::Components::Transform >( 
+				[&target, &copied_states, &states]( SFMLObjectHandle object, TransformHandle transform )
 			{
-				auto* transform = Reflex::Core::Handle< Reflex::Components::Transform >( component.back() ).Get();
 				copied_states.transform = states.transform * transform->getTransform();
-
-				auto* object = Reflex::Core::Handle< Reflex::Components::SFMLObject >( component.front() ).Get();
 
 				switch( object->GetType() )
 				{
 				case Components::Rectangle:
 					target.draw( object->GetRectangleShape(), copied_states );
-					break;
+				break;
 				case Components::Convex:
 					target.draw( object->GetConvexShape(), copied_states );
-					break;
+				break;
 				case Components::Circle:
 					target.draw( object->GetCircleShape(), copied_states );
-					break;
+				break;
 				case Components::Sprite:
 					target.draw( object->GetSprite(), copied_states );
-					break;
+				break;
 				}
-			}
+			} );
 		}
 	}
 }
