@@ -36,7 +36,7 @@ bool SpacialHashMapDemo::Update( const float deltaTime )
 	{
 		auto& transform = obj->GetComponent< Reflex::Components::Transform >();
 		transform->move( 0.0f, 5.0f * deltaTime );
-		auto pos = transform->getPosition();
+		auto pos = transform->GetWorldPosition();
 		pos.y += 250.0f * deltaTime;
 		pos.y = ( pos.y >= m_bounds.height ? 0.0f : pos.y );
 		transform->setPosition( pos );

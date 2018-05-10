@@ -75,6 +75,11 @@ namespace Reflex
 		return true;
 	}
 
+	bool IntersectPolygonCircle( const std::vector< sf::Vector2f >& polygon, const Circle& circle )
+	{
+		return IntersectPolygonCircle( polygon, circle.centre, circle.radius );
+	}
+
 	bool IntersectLineLine( const sf::Vector2f& p1, const sf::Vector2f& p2, const sf::Vector2f& p3, const sf::Vector2f& p4 )
 	{
 		const sf::Vector2f second_line_segment = p4 - p3;
@@ -114,13 +119,23 @@ namespace Reflex
 		return distance_squared <= circle_radius * circle_radius;
 	}
 
-	bool IntersectCircleCircle( const sf::Vector2f& position1, const sf::Vector2f& position2, const float size1, const float size2 )
+	bool IntersectLineCircle( const sf::Vector2f& line_begin, const sf::Vector2f& line_end, const Circle& circle )
+	{
+		return IntersectLineCircle( line_begin, line_end, circle.centre, circle.radius );
+	}
+
+	bool IntersectCircleCircle( const sf::Vector2f& position1, const float size1, const sf::Vector2f& position2, const float size2 )
 	{
 		const sf::Vector2f distance_vector = position1 - position2;
 		const float collision_distance = size1 + size2;
 		const float distance_length_squared = Dot( distance_vector, distance_vector );
 
 		return ( distance_length_squared <= collision_distance * collision_distance );
+	}
+
+	bool IntersectCircleCircle( const Circle& circle1, const Circle& circle2 )
+	{
+		return IntersectCircleCircle( circle1.centre, circle1.radius, circle2.centre, circle2.radius );
 	}
 
 	bool IntersectPolygonSquare( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& square_position, const float half_width )
@@ -188,8 +203,24 @@ namespace Reflex
 		return true;
 	}
 
+	AABB::AABB()
+		: centre( 0.0f, 0.0f )
+		, halfSize( 0.0f, 0.0f )
+	{
+
+	}
+
+	AABB::AABB( const sf::Vector2f& centre )
+		: centre( centre )
+		, halfSize( 0.0f, 0.0f )
+	{
+
+
+	}
+
 	AABB::AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize )
-		: centre( centre ), halfSize( halfSize ) 
+		: centre( centre )
+		, halfSize( halfSize ) 
 	{
 
 	}
@@ -229,4 +260,17 @@ namespace Reflex
 		return ToAABB( sf::Vector2f( bounds.left, bounds.top ), sf::Vector2f( bounds.left + bounds.width, bounds.top + bounds.height ) );
 	}
 
+	Circle::Circle()
+		: centre( 0.0f, 0.0f )
+		, radius( 0.0f )
+	{
+
+	}
+
+	Circle::Circle( const sf::Vector2f& centre, const float radius )
+		: centre( centre )
+		, radius( radius )
+	{
+
+	}
 }

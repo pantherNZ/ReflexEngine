@@ -60,7 +60,7 @@ namespace Reflex
 			}
 			catch( std::exception& e )
 			{
-				LOG_CRIT( Stream( "EXCEPTION: " << *e.what() << "\n" ) );
+				LOG_CRIT( "*EXCEPTION* " << *e.what() );
 			}
 		}
 

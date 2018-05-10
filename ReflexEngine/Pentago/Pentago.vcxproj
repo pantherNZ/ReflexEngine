@@ -127,12 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Grid.cpp" />
+    <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PentagoGameState.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Grid.h" />
+    <ClInclude Include="GameBoard.h" />
+    <ClInclude Include="MarbleComponent.h" />
     <ClInclude Include="PentagoGameState.h" />
   </ItemGroup>
   <ItemGroup>

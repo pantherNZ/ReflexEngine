@@ -21,6 +21,7 @@ namespace Reflex
 		{
 		public:
 			friend class Object;
+			friend class Reflex::Components::Grid;
 
 			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned initialMaxObjects );
 			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects );
@@ -28,9 +29,11 @@ namespace Reflex
 
 			void Setup();
 			void Update( const float deltaTime );
+			void ProcessEvent( const sf::Event& event );
 			void Render();
 
 			ObjectHandle CreateObject( const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
+			ObjectHandle CreateObject( const bool attachToRoot, const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
 			void DestroyObject( ObjectHandle object );
 
 			void DestroyAllObjects();
@@ -60,6 +63,7 @@ namespace Reflex
 			sf::RenderTarget& GetWindow();
 			TileMap& GetTileMap();
 			const sf::FloatRect GetBounds() const;
+			ObjectHandle GetSceneObject( const unsigned index = 0U ) const;
 
 		protected:
 			template< class T, typename... Args >
@@ -102,22 +106,10 @@ namespace Reflex
 
 			// Tilemap which stores object handles in the world in an efficient spacial hash map
 			TileMap m_tileMap;
-			std::unique_ptr< class SceneNodeRoot > m_sceneGraphRoot;
+			TransformHandle m_sceneGraphRoot;
 
 			// Removes objects / components on frame move instead of during sometime dangerous
 			std::vector< BaseHandle > m_markedForDeletion;
-		};
-
-		class SceneNodeRoot : public SceneNode< Reflex::Components::Transform, SceneNodeRoot >
-		{
-		public:
-			void SetHandle( Handle< SceneNodeRoot > self ) { m_self = self; }
-
-		private:
-			virtual Handle< SceneNodeRoot > GetHandle() const final { return m_self; }
-
-		private:
-			Handle< SceneNodeRoot > m_self;
 		};
 
 		// Template functions
@@ -221,7 +213,7 @@ namespace Reflex
 			
 				if( !result.second )
 				{
-					LOG_CRIT( Stream( "Failed to allocate memory for component allocator of type: " << componentType.name() ) );
+					LOG_CRIT( "Failed to allocate memory for component allocator of type: " << componentType.name() );
 					return Handle< T >();
 				}
 			}

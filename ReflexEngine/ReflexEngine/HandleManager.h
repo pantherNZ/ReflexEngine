@@ -80,7 +80,7 @@ namespace Reflex
 			if( entry->m_counter == handle.m_counter && entry->m_allocated )
 				return ( T* )entry->m_ptr;
 
-			return NULL;
+			return nullptr;
 		}
 	}
 }

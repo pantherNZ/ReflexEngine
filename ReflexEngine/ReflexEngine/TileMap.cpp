@@ -26,7 +26,7 @@ namespace Reflex
 		{
 			if( obj && m_spacialHashMapSize )
 			{
-				const auto position = obj->GetComponent< Reflex::Components::Transform >()->getPosition();
+				const auto position = obj->GetComponent< Reflex::Components::Transform >()->GetWorldPosition();
 				Insert( obj, AABB( position, sf::Vector2f( 0.0f, 0.0f ) ) );
 			}
 		}
@@ -120,7 +120,7 @@ namespace Reflex
 		unsigned TileMap::GetID( const ObjectHandle& obj ) const
 		{
 			assert( obj );
-			return GetID( obj->GetComponent< Reflex::Components::Transform >()->getPosition() );
+			return GetID( obj->GetComponent< Reflex::Components::Transform >()->GetWorldPosition() );
 		}
 
 		unsigned TileMap::GetID( const sf::Vector2f& position ) const

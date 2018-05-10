@@ -38,6 +38,10 @@ namespace Reflex
 			Handle( const BaseHandle& handle );
 			T* Get() const;
 			T* operator->() const;
+			Handle< T > operator<( const Handle< T >* other );
+
+			template< class V >
+			Handle( const Handle< V >& handle ) = delete;
 		};
 	}
 }

@@ -25,6 +25,7 @@ namespace Reflex
 
 			virtual void RegisterComponents() = 0;
 			virtual void Update( const float deltaTime ) { }
+			virtual void ProcessEvent( const sf::Event& event ) { }
 			virtual void Render( sf::RenderTarget& target, sf::RenderStates states ) const { }
 			virtual void OnSystemStartup() { }
 			virtual void OnSystemShutdown() { }

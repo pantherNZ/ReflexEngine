@@ -6,11 +6,12 @@ namespace Reflex
 {
 	namespace Components
 	{
-		Transform::Transform( const ObjectHandle& object, BaseHandle handle,
+		Transform::Transform( const ObjectHandle& object, BaseHandle componentHandle,
 			const sf::Vector2f& position /*= sf::Vector2f()*/,
 			const float rotation /*= 0.0f*/,
 			const sf::Vector2f& scale /*= sf::Vector2f( 1.0f, 1.0f ) */ )
-			: Component( object, handle )
+			: Component( object, componentHandle )
+			, SceneNode( object )
 		{
 			sf::Transformable::setPosition( position );
 			m_object->GetWorld().GetTileMap().Insert( m_object, AABB( position, sf::Vector2f( 0.0f, 0.0f ) ) );
@@ -47,11 +48,6 @@ namespace Reflex
 		void Transform::move( const sf::Vector2f& offset )
 		{
 			setPosition( getPosition() + offset );
-		}
-
-		Reflex::Core::TransformHandle Transform::GetHandle() const
-		{
-			return TransformHandle( GetObject()->m_self );
 		}
 	}
 }

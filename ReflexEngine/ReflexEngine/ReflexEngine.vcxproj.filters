@@ -99,6 +99,15 @@
     <ClInclude Include="QuadTree.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="GridComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractableComponent.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractableSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="World.cpp">
@@ -148,6 +157,18 @@
     </ClCompile>
     <ClCompile Include="QuadTree.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="GridComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneNode.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractableComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractableSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

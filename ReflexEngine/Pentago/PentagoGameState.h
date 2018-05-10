@@ -1,7 +1,7 @@
 #pragma once
 
 #include "..\ReflexEngine\Engine.h"
-#include "Grid.h"
+#include "GameBoard.h"
 
 using namespace Reflex::Core;
 
@@ -18,5 +18,9 @@ protected:
 private:
 	sf::FloatRect m_bounds;
 	World m_world;
-	Grid m_grid;
+	GameBoard m_board;
+	sf::Text m_turnText[2];
+
+	bool m_playerTurn = true;
+	bool m_playerIsWhite = true;
 };

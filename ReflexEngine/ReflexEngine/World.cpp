@@ -40,12 +40,7 @@ namespace Reflex
 		void World::Setup()
 		{
 			BaseHandle::s_handleManager = &m_handles;
-
-			m_sceneGraphRoot = std::make_unique< SceneNodeRoot >();
-			m_sceneGraphRoot->setPosition( 0.0f, 0.0f );
-			Handle< SceneNodeRoot > sceneGraphHandle = m_handles.Insert< SceneNodeRoot >( m_sceneGraphRoot.get() );
-			m_sceneGraphRoot->SetHandle( sceneGraphHandle );
-
+			m_sceneGraphRoot = CreateObject( false )->GetTransform();
 			AddSystem< Reflex::Systems::RenderSystem >();
 		}
 
@@ -57,6 +52,12 @@ namespace Reflex
 
 			// Deleting objects
 			DeletePendingItems();
+		}
+
+		void World::ProcessEvent( const sf::Event& event )
+		{
+			for( auto& system : m_systems )
+				system.second->ProcessEvent( event );
 		}
 
 		void World::DeletePendingItems()
@@ -108,14 +109,22 @@ namespace Reflex
 
 		ObjectHandle World::CreateObject( const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
 		{
+			return CreateObject( true, position, rotation, scale );
+		}
+
+		ObjectHandle World::CreateObject( const bool attachToRoot, const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
+		{
 			Object* newObject = ( Object* )m_objects.Allocate();
 			new ( newObject ) Object( *this, m_handles.Insert( newObject ) );
 
 			SyncHandles< Object >( m_objects );
 
 			auto newHandle = ObjectHandle( newObject->m_self );
-			auto transform = newHandle->AddComponent< Reflex::Components::Transform >( position, rotation, scale );
-			m_sceneGraphRoot->AttachChild( transform );
+			newHandle->AddComponent< Reflex::Components::Transform >( position, rotation, scale );
+
+			if( attachToRoot )
+				m_sceneGraphRoot->AttachChild( newHandle );
+
 			return newHandle;
 		}
 
@@ -199,25 +208,9 @@ namespace Reflex
 			return m_worldBounds;
 		}
 
-		//Reflex::Core::SceneNode* World::GetWorldGraphFromLayer( unsigned short layer ) const
-		//{
-		//	return mSceneLayers[layer];
-		//}
-		//
-		//void World::AddSceneNode( unsigned short layer, std::unique_ptr< SceneNode > node )
-		//{
-		//	m_sceneLayers[layer]->AttachChild( std::move( node ) );
-		//}
-		//
-		//void World::BuildScene()
-		//{
-		//	// Initialize the different layers
-		//	for( std::size_t i = 0; i < MaxLayers; ++i )
-		//	{
-		//		auto layerNode = std::make_unique< SceneNode >();
-		//		m_sceneLayers[i] = layerNode.get();
-		//		m_worldGraph.AttachChild( std::move( layerNode ) );
-		//	}
-		//}
+		ObjectHandle World::GetSceneObject( const unsigned index /*= 0U*/ ) const
+		{
+			return m_sceneGraphRoot->GetChild( index );
+		}
 	}
 }

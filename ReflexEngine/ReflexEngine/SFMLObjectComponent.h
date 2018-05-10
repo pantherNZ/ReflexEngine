@@ -29,16 +29,16 @@ namespace Reflex
 		{
 		public:
 			// Initialise by circle shape
-			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::CircleShape& shape );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::CircleShape& shape );
 
 			// Initialise by convex shape
-			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::ConvexShape& shape );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::ConvexShape& shape );
 
 			// Initialise by rectangle shape
-			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::RectangleShape& shape );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::RectangleShape& shape );
 
 			// Initialise by sprite
-			SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::Sprite& sprite );
+			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::Sprite& sprite );
 
 			// Get functions
 			sf::CircleShape& GetCircleShape();

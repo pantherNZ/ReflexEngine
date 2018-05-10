@@ -25,6 +25,7 @@ namespace Reflex
 		bool insert( const T& t );
 		bool insert( T&& t );
 		bool erase( const T& t );
+		bool erase( const iterator& t );
 
 		template< typename Pred >
 		void erase_if( Pred pred );
@@ -65,7 +66,7 @@ namespace Reflex
 		auto found = std::lower_bound( begin(), end(), t );
 		if( found == end() || *found != t )
 		{
-			m_vector.Insert( found, t );
+			m_vector.insert( found, t );
 			return true;
 		}
 		return false;
@@ -77,7 +78,7 @@ namespace Reflex
 		auto found = std::lower_bound( begin(), end(), t );
 		if( found == end() || *found != t )
 		{
-			m_vector.Insert( found, std::move( t ) );
+			m_vector.insert( found, std::move( t ) );
 			return true;
 		}
 		return false;
@@ -93,6 +94,16 @@ namespace Reflex
 			return true;
 		}
 		return false;
+	}
+
+	template< typename T >
+	bool VectorSet< T >::erase( typename const VectorSet< T >::iterator& t )
+	{
+		if( t == end() )
+			return false;
+
+		m_vector.erase( t );
+		return true;
 	}
 
 	template< typename T >

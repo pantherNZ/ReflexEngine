@@ -3,6 +3,7 @@
 #include "Precompiled.h"
 #include "Component.h"
 #include "Entity.h"
+#include "TransformComponent.h"
 
 namespace Reflex
 {
@@ -13,7 +14,7 @@ namespace Reflex
 		class Object : public Entity
 		{
 		public:
-			Object( World& world, BaseHandle handle );
+			Object( World& world, BaseHandle objectHandle );
 			virtual ~Object() { }
 
 			void Destroy();
@@ -50,6 +51,11 @@ namespace Reflex
 
 			BaseHandle GetComponent( Type componentType ) const;
 			BaseHandle GetComponent( const unsigned index ) const;
+
+			template< class T >
+			std::vector< Handle< T > > GetComponents() const;
+
+			TransformHandle GetTransform() const;
 
 			World& GetWorld() const;
 
@@ -162,6 +168,29 @@ namespace Reflex
 				return Handle< T >();
 
 			return Handle< T >( m_components[index].second );
+		}
+
+		template< class T >
+		std::vector< Handle< T > > GetComponents() const
+		{
+			const auto componentType = Type( typeid( T ) );
+
+			if( componentType == m_cachedTransformType )
+				return { m_components[0].second };
+
+			std::vector< Handle< T > > results;
+
+			for( auto& componentHandle : m_components )
+			{
+				if( !componentHandle.second.IsValid() )
+					continue;
+
+				if( componentType == componentHandle.first )
+					results.push_back( Handle< T >( componentHandle.second ) );
+			}
+
+			return std::move( results );
+
 		}
 	}
 }

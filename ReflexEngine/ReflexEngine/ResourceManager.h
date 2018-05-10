@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 #include <map>
+#include "Logging.h"
+#include "Utility.h"
 
 namespace Reflex
 {
@@ -10,6 +12,12 @@ namespace Reflex
 
 	namespace Core
 	{
+		template< typename Resource >
+		class ResouceManager;
+
+		typedef ResouceManager< sf::Texture > TextureManager;
+		typedef ResouceManager< sf::Font > FontManager;
+
 		template< typename Resource >
 		class ResouceManager
 		{
@@ -38,7 +46,7 @@ namespace Reflex
 			auto newResource = std::make_unique< Resource >();
 
 			if( !newResource->loadFromFile( filename ) )
-				throw std::runtime_error( "ResouceManager::LoadResource | Failed to load " + filename );
+				THROW( "Failed to load " << filename );
 
 			return InsertResource( id, filename, std::move( newResource ) );
 		}
@@ -50,7 +58,7 @@ namespace Reflex
 			auto newResource = std::make_unique< Resource >();
 
 			if( !newResource->loadFromFile( filename, secondParam ) )
-				throw std::runtime_error( "ResouceManager::LoadResource | Failed to load " + filename );
+				THROW( "Failed to load " << filename );
 
 			return InsertResource( id, filename, std::move( newResource ) );
 		}
@@ -61,7 +69,7 @@ namespace Reflex
 			auto found = m_resourceMap.find( id );
 
 			if( found == m_resourceMap.end() )
-				LOG_CRIT( "ResouceManager::GetResource | Resource doesn't exist " + std::to_string( ( int )id ) );
+				LOG_CRIT( "Resource doesn't exist " << ( int )id );
 
 			return *found->second;
 		}
@@ -72,7 +80,7 @@ namespace Reflex
 			auto inserted = m_resourceMap.insert( std::make_pair( id, std::move( newResource ) ) );
 
 			if( !inserted.second )
-				LOG_CRIT( "ResouceManager::LoadResource | Resource already loaded " );// +filename );
+				LOG_CRIT( "Resource already loaded " << filename );
 
 			auto& resource_iter = *inserted.first;
 			return *resource_iter.second;

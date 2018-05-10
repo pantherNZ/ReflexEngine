@@ -20,7 +20,7 @@ namespace Reflex
 		{
 		public:
 			// Constructors / Destructors
-			Component( const ObjectHandle& object, const BaseHandle& handle );
+			Component( const ObjectHandle& object, const BaseHandle& componentHandle );
 			virtual ~Component() { }
 
 			ObjectHandle GetObject() const;

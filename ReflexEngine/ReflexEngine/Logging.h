@@ -8,13 +8,20 @@
 #include <sstream>
 
 #include "VectorMap.h"
+#include "Utility.h"
 
 namespace Reflex
 {
 	// Logging system
-	inline void LOG_CRIT( std::string log ) { std::cout << "CRIT: " << log << "\n"; }
-	inline void LOG_WARN( std::string log ) { std::cout << "Warning: " << log << "\n"; }
-	inline void LOG_INFO( std::string log ) { std::cout << "Info: " << log << "\n"; }
+	namespace
+	{
+		inline void LOG( std::string log ) { std::cout << log << "\n"; }
+	}
+
+	#define LOG_CRIT( x ) assert( false ); LOG( Stream( "CRIT: (" << __FUNCTION__ << ") " << x ) );
+	#define LOG_WARN( x ) LOG( Stream( "Warning: (" << __FUNCTION__ << ") " << x ) );
+	#define LOG_INFO( x ) LOG( Stream( "Info: " << x ) );
+	#define THROW( x ) throw std::runtime_error( Stream( "EXCEPTION: (" << __FUNCTION__ << ") " << x ) );
 
 	// Profiling code
 	namespace Core
@@ -22,7 +29,6 @@ namespace Reflex
 		class Profiler : sf::NonCopyable
 		{
 		public:
-			Profiler();
 			static Profiler& GetProfiler();
 			void StartProfile( const std::string& name );
 			void EndProfile( const std::string& name );
@@ -30,6 +36,7 @@ namespace Reflex
 			void OutputResults( const std::string& file );
 
 		protected:
+			Profiler() { }
 
 		private:
 			struct ProfileData

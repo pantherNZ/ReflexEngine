@@ -11,17 +11,11 @@ namespace Reflex
 		// Static profiler
 		std::unique_ptr< Profiler > Profiler::s_profiler = nullptr;
 
-		Profiler::Profiler()
-		{
-			if( s_profiler )
-				LOG_CRIT( "Profiler should not be allocated, please use \"GetProfiler\" static function" );
-		}
-
 		// Function definitions
 		Profiler& Profiler::GetProfiler()
 		{
 			if( !s_profiler )
-				s_profiler = std::make_unique< Profiler >();
+				s_profiler = std::unique_ptr< Profiler >( new Profiler() );
 			return *s_profiler.get();
 		}
 

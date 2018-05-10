@@ -64,7 +64,9 @@ namespace Reflex
 			const auto found = m_stateFactories.find( stateID );
 
 			if( found == m_stateFactories.end() )
-				LOG_CRIT( "StateManager::CreateState | Failed to find creation function for state " + stateID );
+			{
+				LOG_CRIT( "Failed to find creation function for state " + stateID );
+			}
 
 			return found->second();
 		}

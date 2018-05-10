@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ResourceManager.h"
-
 #include <SFML\Graphics\Texture.hpp>
 #include <SFML\Graphics\Font.hpp>
 
@@ -13,9 +11,6 @@ namespace Reflex
 {
 	namespace Core
 	{
-		// Type defs
-		typedef ResouceManager< sf::Texture > TextureManager;
-		typedef ResouceManager< sf::Font > FontManager;
 		typedef std::type_index Type;
 	}
 
@@ -196,14 +191,17 @@ namespace Reflex
 	}
 
 	bool IntersectPolygonCircle( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& circlePosition, const float radius );
+	bool IntersectPolygonCircle( const std::vector< sf::Vector2f >& polygon, const Circle& circle );
 
 	bool IntersectLineLine( const sf::Vector2f& p1, const sf::Vector2f& p2, const sf::Vector2f& p3, const sf::Vector2f& p4 );
 
 	bool IntersectPolygonLine( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& line_begin, const sf::Vector2f& line_end );
 
 	bool IntersectLineCircle( const sf::Vector2f& line_begin, const sf::Vector2f& line_end, const sf::Vector2f& circle_position, const float circle_radius );
+	bool IntersectLineCircle( const sf::Vector2f& line_begin, const sf::Vector2f& line_end, const Circle& circle );
 
-	bool IntersectCircleCircle( const sf::Vector2f& position1, const sf::Vector2f& position2, const float size1, const float size2 );
+	bool IntersectCircleCircle( const sf::Vector2f& position1, const float size1, const sf::Vector2f& position2, const float size2 );
+	bool IntersectCircleCircle( const Circle& circle1, const Circle& circle2 );
 
 	bool IntersectPolygonSquare( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& square_position, const float half_width );
 
@@ -213,7 +211,8 @@ namespace Reflex
 	struct AABB
 	{
 		// Methods
-		AABB( ) { }
+		AABB();
+		AABB( const sf::Vector2f& centre );
 		AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize );
 		void Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize );
 
@@ -227,4 +226,15 @@ namespace Reflex
 
 	AABB ToAABB( const sf::Vector2f& topLeft, const sf::Vector2f& botRight );
 	AABB ToAABB( const sf::FloatRect& bounds );
+
+	struct Circle
+	{
+		// Methods
+		Circle();
+		Circle( const sf::Vector2f& centre, const float radius );
+
+		// Members
+		sf::Vector2f centre;
+		float radius;
+	};
 }

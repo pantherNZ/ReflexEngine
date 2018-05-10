@@ -5,32 +5,32 @@ namespace Reflex
 {
 	namespace Components
 	{
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::CircleShape& shape )
-			: Component( object, handle )
+		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::CircleShape& shape )
+			: Component( object, componentHandle )
 			, m_type( Rectangle )
 			, m_object( shape )
 		{
 			Reflex::CenterOrigin( m_object.circleShape );
 		}
 
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::ConvexShape& shape )
-			: Component( object, handle )
+		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::ConvexShape& shape )
+			: Component( object, componentHandle )
 			, m_type( Rectangle )
 			, m_object( shape )
 		{
 			Reflex::CenterOrigin( m_object.convexShape );
 		}
 
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::RectangleShape& shape )
-			: Component( object, handle )
+		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::RectangleShape& shape )
+			: Component( object, componentHandle )
 			, m_type( Rectangle )
 			, m_object( shape )
 		{
 			Reflex::CenterOrigin( m_object.rectShape );
 		}
 
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& handle, const sf::Sprite& sprite )
-			: Component( object, handle )
+		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::Sprite& sprite )
+			: Component( object, componentHandle )
 			, m_type( Sprite )
 			, m_object( sprite )
 		{

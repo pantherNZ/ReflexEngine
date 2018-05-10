@@ -147,6 +147,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="GridComponent.h" />
+    <ClInclude Include="InteractableComponent.h" />
+    <ClInclude Include="InteractableSystem.h" />
     <ClInclude Include="Precompiled.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Context.h" />
@@ -177,13 +180,17 @@
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="GridComponent.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="HandleManager.cpp" />
+    <ClCompile Include="InteractableComponent.cpp" />
+    <ClCompile Include="InteractableSystem.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectAllocator.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SFMLObjectComponent.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="StateManager.cpp" />

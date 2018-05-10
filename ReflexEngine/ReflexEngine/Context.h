@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Precompiled.h"
+#include "ResourceManager.h"
 
 namespace Reflex
 {
