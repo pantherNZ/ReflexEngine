@@ -55,12 +55,18 @@ namespace Reflex
 			template< class T >
 			std::vector< Handle< T > > GetComponents() const;
 
+			template< typename... Args >
+			void CopyComponentsFrom( const ObjectHandle& other );
+
 			TransformHandle GetTransform() const;
 
 			World& GetWorld() const;
 
-		private:
+		protected:
 			Object() = delete;
+
+			template< typename T, typename... Args >
+			void CopyComponentFrom( const ObjectHandle& other );
 
 		protected:
 			World& m_world;
@@ -171,7 +177,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		std::vector< Handle< T > > GetComponents() const
+		std::vector< Handle< T > > Object::GetComponents() const
 		{
 			const auto componentType = Type( typeid( T ) );
 
@@ -190,7 +196,20 @@ namespace Reflex
 			}
 
 			return std::move( results );
+		}
 
+		template< typename... Args >
+		void Object::CopyComponentsFrom( const ObjectHandle& other )
+		{
+			
+
+		}
+
+		template< typename T, typename... Args >
+		void Object::CopyComponentFrom( const ObjectHandle& other )
+		{
+			auto component = GetComponent< T >();
+			auto ptr = component.Get();
 		}
 	}
 }

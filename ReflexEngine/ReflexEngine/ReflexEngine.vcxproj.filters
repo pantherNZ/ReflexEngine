@@ -164,11 +164,11 @@
     <ClCompile Include="SceneNode.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="InteractableComponent.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="InteractableSystem.cpp">
       <Filter>Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractableComponent.cpp">
+      <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

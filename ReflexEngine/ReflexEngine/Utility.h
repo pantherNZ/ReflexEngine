@@ -28,6 +28,39 @@ namespace Reflex
 	#define TODO( Msg ) __pragma( message( __FILE__ "(" STRINGIFY2( __LINE__ ) ") : TODO [ " Msg " ]" ) )
 	#define Stream( message ) [&](){ std::stringstream s; s << message; return s.str(); }()
 
+	// Axis aligned bounding box
+	struct AABB
+	{
+		// Methods
+		AABB();
+		AABB( const sf::Vector2f& centre );
+		AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize );
+		void Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize );
+
+		bool Contains( const sf::Vector2f& position ) const;
+		bool Intersects( const AABB& other ) const;
+
+		// Members
+		sf::Vector2f centre;
+		sf::Vector2f halfSize;
+	};
+
+	AABB ToAABB( const sf::Vector2f& topLeft, const sf::Vector2f& botRight );
+	AABB ToAABB( const sf::FloatRect& bounds );
+
+	// Circle struct
+	struct Circle
+	{
+		// Methods
+		Circle();
+		Circle( const sf::Vector2f& centre, const float radius );
+
+		// Members
+		sf::Vector2f centre;
+		float radius;
+	};
+
+	// Helper functions
 	inline int RandomInt( const int max )
 	{
 		return rand() % ( max + 1 );
@@ -206,35 +239,4 @@ namespace Reflex
 	bool IntersectPolygonSquare( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& square_position, const float half_width );
 
 	bool IntersectCircleSquare( const sf::Vector2f& circle_position, const float circle_radius, const sf::Vector2f& square_position, const float half_width );
-
-	// Axis aligned bounding box
-	struct AABB
-	{
-		// Methods
-		AABB();
-		AABB( const sf::Vector2f& centre );
-		AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize );
-		void Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize );
-
-		bool Contains( const sf::Vector2f& position ) const;
-		bool Intersects( const AABB& other ) const;
-
-		// Members
-		sf::Vector2f centre;
-		sf::Vector2f halfSize;
-	};
-
-	AABB ToAABB( const sf::Vector2f& topLeft, const sf::Vector2f& botRight );
-	AABB ToAABB( const sf::FloatRect& bounds );
-
-	struct Circle
-	{
-		// Methods
-		Circle();
-		Circle( const sf::Vector2f& centre, const float radius );
-
-		// Members
-		sf::Vector2f centre;
-		float radius;
-	};
 }

@@ -8,6 +8,7 @@
 #include "HandleFwd.hpp"
 #include "TileMap.h"
 #include "SceneNode.h"
+#include "Context.h"
 
 // Engine class
 namespace Reflex
@@ -23,8 +24,8 @@ namespace Reflex
 			friend class Object;
 			friend class Reflex::Components::Grid;
 
-			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned initialMaxObjects );
-			explicit World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects );
+			explicit World( Context context, sf::FloatRect worldBounds, const unsigned initialMaxObjects );
+			explicit World( Context context, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects );
 			~World();
 
 			void Setup();
@@ -34,6 +35,7 @@ namespace Reflex
 
 			ObjectHandle CreateObject( const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
 			ObjectHandle CreateObject( const bool attachToRoot, const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
+
 			void DestroyObject( ObjectHandle object );
 
 			void DestroyAllObjects();
@@ -61,6 +63,7 @@ namespace Reflex
 
 			HandleManager& GetHandleManager();
 			sf::RenderTarget& GetWindow();
+			Context& GetContext();
 			TileMap& GetTileMap();
 			const sf::FloatRect GetBounds() const;
 			ObjectHandle GetSceneObject( const unsigned index = 0U ) const;
@@ -86,7 +89,8 @@ namespace Reflex
 				MaxLayers = 5,
 			};
 
-			sf::RenderTarget& m_window;
+			Context m_context;
+			//sf::RenderTarget& m_window;
 			sf::View m_worldView;
 			sf::FloatRect m_worldBounds;
 

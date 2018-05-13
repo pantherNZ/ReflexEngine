@@ -12,7 +12,7 @@ namespace Reflex
 PentagoGameState::PentagoGameState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
-	, m_world( *context.window, m_bounds, 100 )
+	, m_world( context, m_bounds, 100 )
 	, m_board( m_world, m_playerIsWhite )
 {
 	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );

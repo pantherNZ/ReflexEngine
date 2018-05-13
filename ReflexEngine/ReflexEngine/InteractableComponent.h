@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "Utility.h"
 
 namespace Reflex
 {
@@ -20,32 +21,26 @@ namespace Reflex
 		class Interactable : public Component
 		{
 		public:
-			Interactable( const ObjectHandle& object, const BaseHandle& componentHandle, std::function< void( const InteractableHandle& ) > highlightedCallback, std::function< void( const InteractableHandle& ) > selectedCallback );
+			Interactable( const ObjectHandle& object, const BaseHandle& componentHandle );
+			Interactable( const ObjectHandle& object, const BaseHandle& componentHandle, const Reflex::AABB& bounds );
+			Interactable( const ObjectHandle& object, const BaseHandle& componentHandle, const Reflex::Circle& bounds );
 
-			Interactable( const ObjectHandle& object, const BaseHandle& componentHandle, const AABB& bounds, 
-				std::function< void( const InteractableHandle& ) > highlightedCallback, 
-				std::function< void( const InteractableHandle& ) > selectedCallback );
-
-			Interactable( const ObjectHandle& object, const BaseHandle& componentHandle, const Circle& bounds, 
-				std::function< void( const InteractableHandle& ) > highlightedCallback, 
-				std::function< void( const InteractableHandle& ) > selectedCallback );
-
-			bool m_isHighlightable = false;
-			bool m_isHighlighted = false;
-
-			bool m_isSelectable = false;
+			bool m_isFocussed = false;
 			bool m_isSelected = false;
 
-			std::function< void( const InteractableHandle& ) > m_highlightedCallback;
+			std::function< void( const InteractableHandle& ) > m_gainedFocusCallback;
+			std::function< void( const InteractableHandle& ) > m_lostFocusCallback;
 			std::function< void( const InteractableHandle& ) > m_selectedCallback;
+			std::function< void( const InteractableHandle& ) > m_unselectedCallback;
 
 			union CollisionType
 			{
-				AABB boxBounds;
-				Circle circleBounds;
+				Reflex::AABB boxBounds;
+				Reflex::Circle circleBounds;
 
-				CollisionType( const AABB& boxBounds ) : boxBounds( boxBounds ) { }
-				CollisionType( const Circle& circleBounds ) : circleBounds( circleBounds ) { }
+				CollisionType() { }
+				CollisionType( const Reflex::AABB& boxBounds ) : boxBounds( boxBounds ) { }
+				CollisionType( const Reflex::Circle& circleBounds ) : circleBounds( circleBounds ) { }
 				~CollisionType() { }
 			};
 

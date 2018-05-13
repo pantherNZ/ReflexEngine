@@ -8,9 +8,9 @@ namespace Reflex
 {
 	namespace Core
 	{
-		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned initialMaxObjects )
-			: m_window( window )
-			, m_worldView( m_window.getDefaultView() )
+		World::World( Context context, sf::FloatRect worldBounds, const unsigned initialMaxObjects )
+			: m_context( context )
+			, m_worldView( context.window->getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_components( 10 )
@@ -20,9 +20,9 @@ namespace Reflex
 			Setup();
 		}
 
-		World::World( sf::RenderTarget& window, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects )
-			: m_window( window )
-			, m_worldView( m_window.getDefaultView() )
+		World::World( Context context, sf::FloatRect worldBounds, const unsigned spacialHashMapSize, const unsigned initialMaxObjects )
+			: m_context( context )
+			, m_worldView( context.window->getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_components( 10 )
@@ -99,11 +99,11 @@ namespace Reflex
 
 		void World::Render()
 		{
-			m_window.setView( m_worldView );
+			m_context.window->setView( m_worldView );
 
 			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
 			{
-				m_window.draw( *iter->second );
+				m_context.window->draw( *iter->second );
 			}
 		}
 
@@ -195,7 +195,12 @@ namespace Reflex
 
 		sf::RenderTarget& World::GetWindow()
 		{
-			return m_window;
+			return *m_context.window;
+		}
+
+		Context& World::GetContext()
+		{
+			return m_context;
 		}
 
 		Reflex::Core::TileMap& World::GetTileMap()
