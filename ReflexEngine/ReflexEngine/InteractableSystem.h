@@ -13,8 +13,13 @@ namespace Reflex
 
 			void RegisterComponents() final;
 			void Update( const float deltaTime ) final;
+			void ProcessEvent( const sf::Event& event ) final;
 			void OnSystemStartup() final {}
 			void OnSystemShutdown() final {}
+
+		protected:
+			bool m_mousePressed = false;
+			bool m_mouseReleased = false;
 		};
 	}
 }

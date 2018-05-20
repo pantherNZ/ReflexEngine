@@ -8,12 +8,6 @@ namespace Reflex
 	{
 		unsigned SceneNode::s_nextRenderIndex = 0U;
 
-		SceneNode::SceneNode( const ObjectHandle& self )
-			: m_owningObject( self )
-		{
-
-		}
-
 		void SceneNode::AttachChild( const ObjectHandle& child )
 		{
 			auto transform = child->GetTransform();

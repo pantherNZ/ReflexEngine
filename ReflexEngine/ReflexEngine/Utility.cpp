@@ -257,7 +257,34 @@ namespace Reflex
 
 	Reflex::AABB ToAABB( const sf::FloatRect& bounds )
 	{
-		return ToAABB( sf::Vector2f( bounds.left, bounds.top ), sf::Vector2f( bounds.left + bounds.width, bounds.top + bounds.height ) );
+		return ToAABB( 
+			sf::Vector2f( bounds.left, bounds.top ), 
+			sf::Vector2f( bounds.left + bounds.width, bounds.top + bounds.height ) );
+	}
+
+	AABB ToAABB( const sf::IntRect& bounds )
+	{
+		return ToAABB( 
+			sf::Vector2f( ( float )bounds.left, ( float )bounds.top ), 
+			sf::Vector2f( ( float )bounds.left + bounds.width, ( float )bounds.top + bounds.height ) );
+	}
+
+	sf::IntRect ToIntRect( const AABB& aabb )
+	{
+		return sf::IntRect( 
+			int( aabb.centre.x - aabb.halfSize.x ), 
+			int( aabb.centre.y - aabb.halfSize.y ), 
+			int( aabb.centre.x + aabb.halfSize.x ),
+			int( aabb.centre.y + aabb.halfSize.y ) );
+	}
+
+	sf::FloatRect ToFloatRect( const AABB& aabb )
+	{
+		return sf::FloatRect(
+			aabb.centre.x - aabb.halfSize.x,
+			aabb.centre.y - aabb.halfSize.y,
+			aabb.centre.x + aabb.halfSize.x,
+			aabb.centre.y + aabb.halfSize.y );
 	}
 
 	Circle::Circle()
@@ -272,5 +299,15 @@ namespace Reflex
 		, radius( radius )
 	{
 
+	}
+
+	bool Circle::Contains( const sf::Vector2f& position ) const
+	{
+		return GetDistanceSq( position, centre ) <= radius * radius;
+	}
+
+	bool Circle::Intersects( const Circle& other ) const
+	{
+		return IntersectCircleCircle( *this, other );
 	}
 }

@@ -6,17 +6,16 @@ namespace Reflex
 {
 	namespace Components
 	{
-		Transform::Transform( const ObjectHandle& object, BaseHandle componentHandle,
-			const sf::Vector2f& position /*= sf::Vector2f()*/,
-			const float rotation /*= 0.0f*/,
-			const sf::Vector2f& scale /*= sf::Vector2f( 1.0f, 1.0f ) */ )
-			: Component( object, componentHandle )
-			, SceneNode( object )
+		Transform::Transform( const sf::Vector2f& position /*= sf::Vector2f()*/, const float rotation /*= 0.0f*/, const sf::Vector2f& scale /*= sf::Vector2f( 1.0f, 1.0f )*/ )
 		{
 			sf::Transformable::setPosition( position );
-			m_object->GetWorld().GetTileMap().Insert( m_object, AABB( position, sf::Vector2f( 0.0f, 0.0f ) ) );
 			setRotation( rotation );
 			setScale( scale );
+		}
+
+		void Transform::OnConstructionComplete()
+		{
+			m_object->GetWorld().GetTileMap().Insert( m_object, AABB( GetWorldPosition(), sf::Vector2f( 0.0f, 0.0f ) ) );
 		}
 
 		void Transform::setPosition( float x, float y )
@@ -48,6 +47,13 @@ namespace Reflex
 		void Transform::move( const sf::Vector2f& offset )
 		{
 			setPosition( getPosition() + offset );
+		}
+
+		void Transform::SetOwningObject( const ObjectHandle& owner )
+		{
+			Component::SetOwningObject( owner );
+
+			m_owningObject = owner;
 		}
 	}
 }

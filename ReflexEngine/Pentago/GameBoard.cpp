@@ -4,21 +4,24 @@
 #include "..\ReflexEngine\GRIDComponent.h"
 #include "MarbleComponent.h"
 #include "..\ReflexEngine\InteractableComponent.h"
+#include "Resources.h"
 
 GameBoard::GameBoard( World& world, const bool playerIsWhite )
 	: m_world( world )
 	, m_bounds( Reflex::ToAABB( m_world.GetBounds() ) )
-	, m_tree( m_bounds )
 {
+	const auto& background = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::BackgroundTexture, "Data/Textures/BackgroundPlaceholder.png" );
+	const auto& plate = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::BoardTexture, "Data/Textures/MovingPlateUpdate.png" );
+	world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg1, "Data/Textures/GoldEgg.png" );
+	world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg2, "Data/Textures/BlackEgg.png" );
+
 	// Board size will be 60% of the world boundary (screen height)
 	m_bounds.halfSize = sf::Vector2f( m_bounds.halfSize.y, m_bounds.halfSize.y ) * 0.6f;
 	m_marbleSize = m_bounds.halfSize.x / 5.0f;
 
 	auto gameBoard = m_world.CreateObject( m_bounds.centre );
-	m_tree.Insert( gameBoard, m_bounds );
 	auto grid = gameBoard->AddComponent< Reflex::Components::Grid >( sf::Vector2u( 2U, 2U ), m_bounds.halfSize );
-	//auto cornerVisual = gameBoard->AddComponent< Reflex::Components::SFMLObject >( sf::RectangleShape( m_bounds.halfSize * 2.0f ) );
-	//cornerVisual->GetRectangleShape().setFillColor( sf::Color::Red );
+	gameBoard->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( background ) );
 
 	for( unsigned y = 0U; y < 2; ++y )
 	{
@@ -28,10 +31,11 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 
 			cornerObject->AddComponent< Reflex::Components::Grid >( sf::Vector2u( 3U, 3U ), m_bounds.halfSize / 3.0f );
 			grid->AddToGrid( cornerObject, x, y );
-			m_tree.Insert( cornerObject, Reflex::AABB( cornerObject->GetComponent< Reflex::Components::Transform >()->GetWorldPosition(), m_bounds.halfSize / 3.0f ) );
 
-			auto cornerVisual = cornerObject->AddComponent< Reflex::Components::SFMLObject >( sf::RectangleShape( m_bounds.halfSize - sf::Vector2f( 10.0f, 10.0f ) ) );
-			cornerVisual->GetRectangleShape().setFillColor( sf::Color::Green );
+			//auto cornerVisual = cornerObject->AddComponent< Reflex::Components::SFMLObject >( sf::RectangleShape( m_bounds.halfSize - sf::Vector2f( 10.0f, 10.0f ) ) );
+			auto cornerVisual = cornerObject->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( plate ) );
+			//cornerVisual->GetSprite().setTextureRect( Reflex::ToIntRect( Reflex::AABB( m_bounds.centre, m_bounds.halfSize - sf::Vector2f( 10.0f, 10.0f ) ) ) );
+			//cornerVisual->GetRectangleShape().setFillColor( sf::Color::Green );
 		}
 	}
 
@@ -40,14 +44,27 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 	circle->GetCircleShape().setFillColor( playerIsWhite ? sf::Color::White : sf::Color::Black );
 	
 	auto interactable = playerMarble->AddComponent< Reflex::Components::Interactable >();
-	interactable->m_selectedCallback = [&]( )
+	interactable->m_gainedFocusCallback = [=]( const InteractableHandle& interactable )
+	{
+		circle->GetCircleShape().setFillColor( sf::Color::Blue );
+		//if( !m_selectedMarble )
+		//{
+		//	m_selectedMarble = m_world.CreateObject();
+		//	m_selectedMarble->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( playerMarble );
+		//}
+	};
+
+	interactable->m_lostFocusCallback = [=]( const InteractableHandle& interactable )
+	{
+		circle->GetCircleShape().setFillColor( playerIsWhite ? sf::Color::White : sf::Color::Black );
+	};
 
 	// Testing the board
 	//for( unsigned y = 0U; y < 6; ++y )
 	//	for( unsigned x = 0U; x < 6; ++x )
 	//		PlaceMarble( false, x, y );
 }
-
+/*
 void GameBoard::PlaceMarble( const bool black, const sf::Vector2f& position )
 {
 	ObjectHandle bottom = m_tree.FindBottomMost( position );
@@ -115,4 +132,4 @@ ObjectHandle GameBoard::GetMarble( const sf::Vector2u& index ) const
 	auto cornerObject = grid->GetCell( index / 3U );
 	auto cornerGrid = cornerObject->GetComponent< Reflex::Components::Grid >();
 	return cornerGrid->GetCell( index );
-}
+}*/

@@ -8,9 +8,8 @@ using namespace Reflex::Core;
 class GraphNode : public Reflex::Components::Component
 {
 public:
-	GraphNode( ObjectHandle object, BaseHandle handle, const sf::Color& colour, const float size, const std::string& label, const sf::Font& font )
-		: Component( object, handle )
-		, m_shape( sf::Vector2f( size, size ) )
+	GraphNode( const sf::Color& colour, const float size, const std::string& label, const sf::Font& font )
+		: m_shape( sf::Vector2f( size, size ) )
 		, m_label( label, font )
 	{
 		m_shape.setFillColor( colour );

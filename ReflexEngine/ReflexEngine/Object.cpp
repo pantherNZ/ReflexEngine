@@ -7,9 +7,8 @@ namespace Reflex
 {
 	namespace Core
 	{
-		Object::Object( World& world, BaseHandle objectHandle )
-			: Entity( objectHandle )
-			, m_world( world )
+		Object::Object( World& world )
+			: m_world( world )
 			, m_cachedTransformType( Type( typeid( Reflex::Components::Transform ) ) )
 		{
 

@@ -178,7 +178,6 @@
     <ClInclude Include="SceneNode.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GridComponent.cpp" />
     <ClCompile Include="Handle.cpp" />

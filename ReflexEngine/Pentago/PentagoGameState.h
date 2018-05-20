@@ -18,9 +18,10 @@ protected:
 private:
 	sf::FloatRect m_bounds;
 	World m_world;
-	GameBoard m_board;
-	sf::Text m_turnText[2];
 
 	bool m_playerTurn = true;
 	bool m_playerIsWhite = true;
+
+	GameBoard m_board;
+	sf::Text m_turnText[2];
 };

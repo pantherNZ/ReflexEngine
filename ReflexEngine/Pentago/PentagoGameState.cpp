@@ -1,13 +1,5 @@
 #include "PentagoGameState.h"
-
-namespace Reflex
-{
-	enum class ResourceID : unsigned short
-	{
-		ArialFontID,
-		GraphNodeTextureID,
-	};
-}
+#include "Resources.h"
 
 PentagoGameState::PentagoGameState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
@@ -15,10 +7,10 @@ PentagoGameState::PentagoGameState( StateManager& stateManager, Context context 
 	, m_world( context, m_bounds, 100 )
 	, m_board( m_world, m_playerIsWhite )
 {
-	context.fontManager->LoadResource( Reflex::ResourceID::ArialFontID, "Data/Fonts/arial.ttf" );
+	const auto& font = context.fontManager->LoadResource( Reflex::ResourceID::ArialFont, "Data/Fonts/arial.ttf" );
 
-	m_turnText[0] = sf::Text( "Your turn", context.fontManager->GetResource( Reflex::ResourceID::ArialFontID ), 40U );
-	m_turnText[1] = sf::Text( "Computer's turn", context.fontManager->GetResource( Reflex::ResourceID::ArialFontID ), 40U );
+	m_turnText[0] = sf::Text( "Your turn", font, 40U );
+	m_turnText[1] = sf::Text( "Computer's turn", font, 40U );
 
 	for( unsigned i = 0U; i < 2; ++i )
 	{
@@ -38,17 +30,19 @@ void PentagoGameState::Render()
 bool PentagoGameState::Update( const float deltaTime )
 {
 	m_world.Update( deltaTime );
+
+	if( m_board.m_selectedMarble )
+	{
+		const auto mousePosition = Reflex::ToVector2f( sf::Mouse::getPosition( *GetContext().window ) );
+		m_board.m_selectedMarble->GetTransform()->setPosition( mousePosition );
+	}
+
 	return true;
 }
 
 bool PentagoGameState::ProcessEvent( const sf::Event& event )
 {
 	m_world.ProcessEvent( event );
-
-	if (event.type == sf::Event::MouseButtonPressed )
-	{
-		m_board.PlaceMarble( false, Reflex::ToVector2f( sf::Mouse::getPosition( *GetContext().window ) ) );
-	}
 
 	return true;
 }

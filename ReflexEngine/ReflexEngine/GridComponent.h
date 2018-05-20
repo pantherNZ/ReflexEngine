@@ -20,8 +20,8 @@ namespace Reflex
 		class Grid : public Component
 		{
 		public:
-			Grid( const ObjectHandle& object, const BaseHandle& componentHandle, const unsigned width, const unsigned height, const float cellWidth, const float cellHeight );
-			Grid( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::Vector2u gridSize, const sf::Vector2f cellSize );
+			Grid( const unsigned width, const unsigned height, const float cellWidth, const float cellHeight );
+			Grid( const sf::Vector2u gridSize, const sf::Vector2f cellSize );
 
 			void AddToGrid( const ObjectHandle& handle, const unsigned x, const unsigned y );
 			void AddToGrid( const ObjectHandle& handle, const sf::Vector2u index );

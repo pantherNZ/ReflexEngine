@@ -12,6 +12,7 @@ namespace Reflex
 	namespace Core
 	{
 		typedef Handle< class Reflex::Components::Component > ComponentHandle;
+		class World;
 	}
 
 	namespace Components
@@ -19,14 +20,17 @@ namespace Reflex
 		class Component : public Entity
 		{
 		public:
-			// Constructors / Destructors
-			Component( const ObjectHandle& object, const BaseHandle& componentHandle );
-			virtual ~Component() { }
+			friend Reflex::Core::World;
 
-			ObjectHandle GetObject() const;
+			virtual void OnConstructionComplete() { }
 
-		private:
-			Component() = delete;
+			ObjectHandle GetObject() const { return m_object; }
+
+			virtual void SetOwningObject( const ObjectHandle& owner ) { m_object = owner; }
+
+		protected:
+			Component() { }
+			~Component() { }
 
 		protected:
 			ObjectHandle m_object;

@@ -6,18 +6,16 @@ namespace Reflex
 {
 	namespace Components
 	{
-		Grid::Grid( const ObjectHandle& object, const BaseHandle& componentHandle, const unsigned width, const unsigned height, const float cellWidth, const float cellHeight )
-			: Component( object, componentHandle )
-			, m_gridSize( width, height )
+		Grid::Grid( const unsigned width, const unsigned height, const float cellWidth, const float cellHeight )
+			: m_gridSize( width, height )
 			, m_cellSize( cellWidth, cellHeight )
 		{
 			assert( width != 0U && height != 0U );
 			m_children.resize( GetTotalCells() );
 		}
 
-		Grid::Grid( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::Vector2u gridSize, const sf::Vector2f cellSize )
-			: Component( object, componentHandle )
-			, m_gridSize( gridSize )
+		Grid::Grid( const sf::Vector2u gridSize, const sf::Vector2f cellSize )
+			: m_gridSize( gridSize )
 			, m_cellSize( cellSize )
 		{
 			assert( m_gridSize.x != 0U && m_gridSize.y != 0U );

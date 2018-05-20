@@ -11,10 +11,10 @@ namespace Reflex
 	{
 		class World;
 
-		class Object : public Entity
+		class Object : public Entity, private sf::NonCopyable
 		{
 		public:
-			Object( World& world, BaseHandle objectHandle );
+			Object( World& world );
 			virtual ~Object() { }
 
 			void Destroy();
@@ -42,12 +42,13 @@ namespace Reflex
 			template< class T >
 			bool HasComponent() const;
 
-			// Returns a component handle of template type if this object has one
+			// Returns a component handle of template type if this object has one (index is the nth number of the component looking for)
 			template< class T >
-			Handle< T > GetComponent() const;
+			Handle< T > GetComponent( const unsigned index = 0U ) const;
 
+			// Returns a component handle of the template type at the specified index in the component array
 			template< class T >
-			Handle< T > GetComponent( const unsigned index ) const;
+			Handle< T > GetComponentAt( const unsigned index ) const;
 
 			BaseHandle GetComponent( Type componentType ) const;
 			BaseHandle GetComponent( const unsigned index ) const;
@@ -55,7 +56,8 @@ namespace Reflex
 			template< class T >
 			std::vector< Handle< T > > GetComponents() const;
 
-			template< typename... Args >
+			// Copy components from another object to this object
+			template< typename T, typename... Args >
 			void CopyComponentsFrom( const ObjectHandle& other );
 
 			TransformHandle GetTransform() const;
@@ -65,8 +67,9 @@ namespace Reflex
 		protected:
 			Object() = delete;
 
-			template< typename T, typename... Args >
-			void CopyComponentFrom( const ObjectHandle& other );
+			// Use SFINAE to remove the base case where there is 0 argument types (above function calls itself recursively until we reach 0 template arguments)
+			template< typename... Args >
+			typename std::enable_if< sizeof...( Args ) == 0 >::type CopyComponentsFrom( const ObjectHandle& other ) {}
 
 		protected:
 			World& m_world;
@@ -82,7 +85,8 @@ namespace Reflex
 		Handle< T > Object::AddComponent( Args&&... args )
 		{
 			auto component = m_world.CreateComponent< T >( ObjectHandle( m_self ), std::forward< Args >( args )... );
-			m_components.emplace_back( Type( typeid( T ) ), std::move( component ) );
+			m_components.emplace_back( Type( typeid( T ) ), component );
+			component->OnConstructionComplete();
 			return component;
 		}
 
@@ -148,9 +152,10 @@ namespace Reflex
 		}
 
 		template< class T >
-		Handle< T > Object::GetComponent() const
+		Handle< T > Object::GetComponent( const unsigned index /*= 0U*/ ) const
 		{
 			const auto componentType = Type( typeid( T ) );
+			unsigned count = index;
 
 			if( componentType == m_cachedTransformType )
 				return m_components[0].second;
@@ -160,7 +165,7 @@ namespace Reflex
 				if( !componentHandle.second.IsValid() )
 					continue;
 
-				if( componentType == componentHandle.first )
+				if( componentType == componentHandle.first && !( count-- ) )
 					return Handle< T >( componentHandle.second );
 			}
 
@@ -168,7 +173,7 @@ namespace Reflex
 		}
 
 		template< class T >
-		Handle< T > Object::GetComponent( const unsigned index ) const
+		Handle< T > Object::GetComponentAt( const unsigned index ) const
 		{
 			if( index >= m_components.size() )
 				return Handle< T >();
@@ -198,18 +203,17 @@ namespace Reflex
 			return std::move( results );
 		}
 
-		template< typename... Args >
+		template< typename T, typename... Args >
 		void Object::CopyComponentsFrom( const ObjectHandle& other )
 		{
-			
-
-		}
-
-		template< typename T, typename... Args >
-		void Object::CopyComponentFrom( const ObjectHandle& other )
-		{
 			auto component = GetComponent< T >();
-			auto ptr = component.Get();
+
+			if( !component )
+				return;
+
+			AddComponent< T >( *component.Get() );
+
+			CopyComponentsFrom< Args... >( other );
 		}
 	}
 }

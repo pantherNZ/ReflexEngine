@@ -18,6 +18,7 @@ namespace Reflex
 	{
 		enum SFMLObjectType
 		{
+			Invalid,
 			Circle,
 			Rectangle,
 			Convex,
@@ -28,23 +29,26 @@ namespace Reflex
 		class SFMLObject : public Component
 		{
 		public:
-			// Initialise by circle shape
-			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::CircleShape& shape );
-
-			// Initialise by convex shape
-			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::ConvexShape& shape );
-
-			// Initialise by rectangle shape
-			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::RectangleShape& shape );
-
-			// Initialise by sprite
-			SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::Sprite& sprite );
+			SFMLObject( const sf::CircleShape& shape );
+			SFMLObject( const sf::ConvexShape& shape );
+			SFMLObject( const sf::RectangleShape& shape );
+			SFMLObject( const sf::Sprite& sprite );
+			SFMLObject( const SFMLObject& other );
+			~SFMLObject();
 
 			// Get functions
 			sf::CircleShape& GetCircleShape();
+			const sf::CircleShape& GetCircleShape() const;
+
 			sf::RectangleShape& GetRectangleShape();
+			const sf::RectangleShape& GetRectangleShape() const;
+			
 			sf::ConvexShape& GetConvexShape();
+			const sf::ConvexShape& GetConvexShape() const;
+
 			sf::Sprite& GetSprite();
+			const sf::Sprite& GetSprite() const;
+
 			const SFMLObjectType GetType() const;
 
 		private:
@@ -55,15 +59,16 @@ namespace Reflex
 				sf::ConvexShape convexShape;			// 300 bytes
 				sf::Sprite sprite;						// 272 bytes
 
-				ObjectType( sf::CircleShape shape ) : circleShape( shape ) { }
-				ObjectType( sf::RectangleShape shape ) : rectShape( shape ) { }
-				ObjectType( sf::ConvexShape shape ) : convexShape( shape ) { }
-				ObjectType( sf::Sprite sprite ) : sprite( sprite ) { }
-				~ObjectType() { }
+				ObjectType() {}
+				ObjectType( const sf::CircleShape& shape ) : circleShape( shape ) {}
+				ObjectType( const sf::RectangleShape& shape ) : rectShape( shape ) {}
+				ObjectType( const sf::ConvexShape& shape ) : convexShape( shape ) {}
+				ObjectType( const sf::Sprite& sprite ) : sprite( sprite ) {}
+				~ObjectType() {}
 			};
 
-			ObjectType m_object;
-			SFMLObjectType m_type;
+			ObjectType m_objectData;
+			SFMLObjectType m_type = Invalid;
 		};
 	}
 }

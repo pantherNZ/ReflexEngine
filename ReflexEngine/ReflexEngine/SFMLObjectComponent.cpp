@@ -5,56 +5,110 @@ namespace Reflex
 {
 	namespace Components
 	{
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::CircleShape& shape )
-			: Component( object, componentHandle )
-			, m_type( Rectangle )
-			, m_object( shape )
+		SFMLObject::SFMLObject( const sf::CircleShape& shape )
+			: m_type( Circle )
+			, m_objectData( shape )
 		{
-			Reflex::CenterOrigin( m_object.circleShape );
+			Reflex::CenterOrigin( m_objectData.circleShape );
 		}
 
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::ConvexShape& shape )
-			: Component( object, componentHandle )
-			, m_type( Rectangle )
-			, m_object( shape )
+		SFMLObject::SFMLObject( const sf::ConvexShape& shape )
+			: m_type( Convex )
+			, m_objectData( shape )
 		{
-			Reflex::CenterOrigin( m_object.convexShape );
+			Reflex::CenterOrigin( m_objectData.convexShape );
 		}
 
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::RectangleShape& shape )
-			: Component( object, componentHandle )
-			, m_type( Rectangle )
-			, m_object( shape )
+		SFMLObject::SFMLObject( const sf::RectangleShape& shape )
+			: m_type( Rectangle )
+			, m_objectData( shape )
 		{
-			Reflex::CenterOrigin( m_object.rectShape );
+			Reflex::CenterOrigin( m_objectData.rectShape );
 		}
 
-		SFMLObject::SFMLObject( const ObjectHandle& object, const BaseHandle& componentHandle, const sf::Sprite& sprite )
-			: Component( object, componentHandle )
-			, m_type( Sprite )
-			, m_object( sprite )
+		SFMLObject::SFMLObject( const sf::Sprite& sprite )
+			: m_type( Sprite )
+			, m_objectData( sprite )
 		{
-			Reflex::CenterOrigin( m_object.sprite );
+			Reflex::CenterOrigin( m_objectData.sprite );
 		}
 
-		sf::CircleShape& SFMLObject::GetCircleShape() 
-		{ 
-			return m_object.circleShape;
+		SFMLObject::SFMLObject( const SFMLObject& other )
+		{
+			switch( other.GetType() )
+			{
+			case Circle:
+				m_objectData.circleShape = other.GetCircleShape();
+			break;
+			case Sprite:
+				m_objectData.sprite = other.GetSprite();
+			break;
+			case Rectangle:
+				m_objectData.rectShape = other.GetRectangleShape();
+			break;
+			case Convex:
+				m_objectData.convexShape = other.GetConvexShape();
+			break;
+			}
 		}
 
-		sf::RectangleShape& SFMLObject::GetRectangleShape() 
-		{ 
-			return m_object.rectShape;
+		SFMLObject::~SFMLObject()
+		{
+			switch( GetType() )
+			{
+			case Circle:
+				m_objectData.circleShape.~CircleShape();
+			break;
+			case Sprite:
+				m_objectData.sprite.~Sprite();
+			break;
+			case Rectangle:
+				m_objectData.rectShape.~RectangleShape();
+			break;
+			case Convex:
+				m_objectData.convexShape.~ConvexShape();
+			break;
+			}
 		}
 
-		sf::ConvexShape& SFMLObject::GetConvexShape() 
+		sf::CircleShape& SFMLObject::GetCircleShape()
 		{ 
-			return m_object.convexShape;
+			return m_objectData.circleShape;
 		}
 
-		sf::Sprite& SFMLObject::GetSprite() 
+		const sf::CircleShape& SFMLObject::GetCircleShape() const
+		{
+			return m_objectData.circleShape;
+		}
+
+		sf::RectangleShape& SFMLObject::GetRectangleShape()
 		{ 
-			return m_object.sprite; 
+			return m_objectData.rectShape;
+		}
+
+		const sf::RectangleShape& SFMLObject::GetRectangleShape() const
+		{
+			return m_objectData.rectShape;
+		}
+
+		sf::ConvexShape& SFMLObject::GetConvexShape()
+		{ 
+			return m_objectData.convexShape;
+		}
+
+		const sf::ConvexShape& SFMLObject::GetConvexShape() const
+		{
+			return m_objectData.convexShape;
+		}
+
+		sf::Sprite& SFMLObject::GetSprite()
+		{ 
+			return m_objectData.sprite;
+		}
+
+		const sf::Sprite& SFMLObject::GetSprite() const
+		{
+			return m_objectData.sprite;
 		}
 
 		const Reflex::Components::SFMLObjectType SFMLObject::GetType() const

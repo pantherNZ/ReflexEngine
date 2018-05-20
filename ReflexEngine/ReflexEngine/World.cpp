@@ -3,6 +3,7 @@
 #include "Object.h"
 #include "TransformComponent.h"
 #include "RenderSystem.h"
+#include "InteractableSystem.h"
 
 namespace Reflex
 {
@@ -42,6 +43,7 @@ namespace Reflex
 			BaseHandle::s_handleManager = &m_handles;
 			m_sceneGraphRoot = CreateObject( false )->GetTransform();
 			AddSystem< Reflex::Systems::RenderSystem >();
+			AddSystem< Reflex::Systems::InteractableSystem >();
 		}
 
 		void World::Update( const float deltaTime )
@@ -115,7 +117,9 @@ namespace Reflex
 		ObjectHandle World::CreateObject( const bool attachToRoot, const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
 		{
 			Object* newObject = ( Object* )m_objects.Allocate();
-			new ( newObject ) Object( *this, m_handles.Insert( newObject ) );
+			auto objectHandle = m_handles.Insert( newObject );
+			new ( newObject ) Object( *this );
+			newObject->m_self = objectHandle;
 
 			SyncHandles< Object >( m_objects );
 
@@ -216,6 +220,60 @@ namespace Reflex
 		ObjectHandle World::GetSceneObject( const unsigned index /*= 0U*/ ) const
 		{
 			return m_sceneGraphRoot->GetChild( index );
+		}
+
+		std::unordered_map< Type, std::unique_ptr< ObjectAllocator > >::iterator World::GetComponentAllocator( const Type& componentType, const size_t componentSize )
+		{
+			// Create an allocator for this type if one doesn't already exist
+			auto found = m_components.find( componentType );
+
+			if( found == m_components.end() )
+			{
+				const auto result = m_components.insert( std::make_pair( componentType, std::make_unique< ObjectAllocator >( componentSize, 10 ) ) );
+				found = result.first;
+
+				if( !result.second )
+					LOG_CRIT( "Failed to allocate memory for component allocator of type: " << componentType.name() );
+			}
+
+			return found;
+		}
+
+		void World::AddComponentToSystems( const ObjectHandle& owner, const BaseHandle& componentHandle, const Type& componentType )
+		{
+			// Here we want to check if we should add this component to any systems
+			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
+			{
+				// If the system doesn't care about this type, skip it
+				const auto& requiredTypes = iter->second->m_requiredComponentTypes;
+				if( std::find( requiredTypes.begin(), requiredTypes.end(), componentType ) == requiredTypes.end() )
+					continue;
+
+				auto& componentsPerObject = iter->second->m_components;
+
+				std::vector< BaseHandle > tempList;
+				bool canAddDueToNewComponent = false;
+
+				// This looks through the required types and sees if the object has one of each of them
+				for( auto& requiredType : requiredTypes )
+				{
+					const auto handle = ( requiredType == componentType ? componentHandle : owner->GetComponent( requiredType ) );
+
+					if( !handle.IsValid() )
+						break;
+
+					if( handle == componentHandle )
+						canAddDueToNewComponent = true;
+
+					tempList.push_back( handle );
+				}
+
+				// Escape if the object didn't have the components required OR if our new component isn't even the one that is now allowing it to be a part of the system
+				if( tempList.size() < requiredTypes.size() || !canAddDueToNewComponent )
+					continue;
+
+				iter->second->m_components.push_back( std::move( tempList ) );
+			}
 		}
 	}
 }

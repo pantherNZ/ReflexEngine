@@ -57,7 +57,7 @@ namespace Reflex
 	private:
 		std::vector< T > m_vector;
 
-		void Validate() { std::sort( m_vector.begin(), m_vector.end() ); m_vector.erase( std::unique( m_vector.begin(), m_vector.end() ), m_vector.end() ); }
+		void validate() { std::sort( m_vector.begin(), m_vector.end() ); m_vector.erase( std::unique( m_vector.begin(), m_vector.end() ), m_vector.end() ); }
 	};
 
 	template< typename T >

@@ -7,10 +7,9 @@ namespace Reflex
 {
 	namespace Core
 	{
-		class Entity : private sf::NonCopyable
+		class Entity
 		{
 		public:
-			explicit Entity( const BaseHandle& handle ) : m_self( handle ) { }
 			virtual ~Entity() { }
 			BaseHandle m_self;
 		};

@@ -122,9 +122,6 @@
     <ClCompile Include="Object.cpp">
       <Filter>Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Components</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectAllocator.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
