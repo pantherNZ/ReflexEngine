@@ -18,6 +18,9 @@ namespace Reflex
 			void OnSystemShutdown() final {}
 
 		protected:
+			bool CheckCollision( const TransformHandle& transform, const sf::FloatRect& localBounds, const sf::Vector2f& mousePosition ) const;
+
+		protected:
 			bool m_mousePressed = false;
 			bool m_mouseReleased = false;
 		};

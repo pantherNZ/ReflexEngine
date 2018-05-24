@@ -27,11 +27,11 @@ namespace Reflex
 			if( obj && m_spacialHashMapSize )
 			{
 				const auto position = obj->GetComponent< Reflex::Components::Transform >()->GetWorldPosition();
-				Insert( obj, AABB( position, sf::Vector2f( 0.0f, 0.0f ) ) );
+				Insert( obj, sf::FloatRect( position, sf::Vector2f( 0.0f, 0.0f ) ) );
 			}
 		}
 
-		void TileMap::Insert( const ObjectHandle& obj, const AABB& boundary )
+		void TileMap::Insert( const ObjectHandle& obj, const sf::FloatRect& boundary )
 		{
 			if( obj && m_spacialHashMapSize )
 			{
@@ -93,7 +93,7 @@ namespace Reflex
 			} );
 		}
 
-		void TileMap::GetNearby( const ObjectHandle& obj, const AABB& boundary, std::vector< ObjectHandle >& out ) const
+		void TileMap::GetNearby( const ObjectHandle& obj, const sf::FloatRect& boundary, std::vector< ObjectHandle >& out ) const
 		{
 			ForEachNearby( obj, boundary, [&out]( const ObjectHandle& obj )
 			{
@@ -134,12 +134,10 @@ namespace Reflex
 			return loc.y * m_spacialHashMapWidth + loc.x;
 		}
 
-		std::vector< unsigned > TileMap::GetID( const AABB& boundary ) const
+		std::vector< unsigned > TileMap::GetID( const sf::FloatRect& boundary ) const
 		{
-			const auto topLeft = boundary.centre - boundary.halfSize;
-			const auto botRight = boundary.centre + boundary.halfSize;
-			const auto locTopLeft = Hash( topLeft );
-			const auto locBotRight = Hash( botRight );
+			const auto locTopLeft = Hash( sf::Vector2f( boundary.left, boundary.top ) );
+			const auto locBotRight = Hash( sf::Vector2f( boundary.left + boundary.width, boundary.top + boundary.height ) );
 			std::vector< unsigned > ids;
 
 			for( int x = locTopLeft.x; x <= locBotRight.x; ++x )

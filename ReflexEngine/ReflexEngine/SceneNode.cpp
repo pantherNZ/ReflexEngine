@@ -54,6 +54,42 @@ namespace Reflex
 			return GetWorldTransform() * sf::Vector2f();
 		}
 
+		sf::Vector2f SceneNode::GetWorldTranslation() const
+		{
+			sf::Vector2f worldTranslation;
+
+			for( ObjectHandle node = m_owningObject; node != ObjectHandle::null; node = node->GetTransform()->m_parent )
+			{
+				worldTranslation.x += node->GetTransform()->getPosition().x;
+				worldTranslation.y += node->GetTransform()->getPosition().y;
+			}
+
+			return worldTranslation;
+		}
+
+		float SceneNode::GetWorldRotation() const
+		{
+			float worldRotation = 0.0f;
+
+			for( ObjectHandle node = m_owningObject; node != ObjectHandle::null; node = node->GetTransform()->m_parent )
+				worldRotation += node->GetTransform()->getRotation();
+
+			return worldRotation;
+		}
+
+		sf::Vector2f SceneNode::GetWorldScale() const
+		{
+			sf::Vector2f worldScale;
+
+			for( ObjectHandle node = m_owningObject; node != ObjectHandle::null; node = node->GetTransform()->m_parent )
+			{
+				worldScale.x *= node->GetTransform()->getScale().x;
+				worldScale.y *= node->GetTransform()->getScale().y;
+			}
+
+			return worldScale;
+		}
+
 		unsigned SceneNode::GetChildrenCount() const
 		{
 			return m_children.size();

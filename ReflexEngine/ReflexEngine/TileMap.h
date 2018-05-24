@@ -17,12 +17,12 @@ namespace Reflex
 			explicit TileMap( const sf::FloatRect& worldBounds, const unsigned spacialHashMapSize );
 
 			void Insert( const ObjectHandle& obj );
-			void Insert( const ObjectHandle& obj,  const AABB& boundary );
+			void Insert( const ObjectHandle& obj,  const sf::FloatRect& boundary );
 			void Remove( const ObjectHandle& obj );
 
 			void GetNearby( const ObjectHandle& obj, std::vector< ObjectHandle >& out ) const;
 			void GetNearby( const sf::Vector2f& position, std::vector< ObjectHandle >& out ) const;
-			void GetNearby( const ObjectHandle& obj, const AABB& boundary, std::vector< ObjectHandle >& out ) const;
+			void GetNearby( const ObjectHandle& obj, const sf::FloatRect& boundary, std::vector< ObjectHandle >& out ) const;
 
 			template< typename Func >
 			void ForEachNearby( const ObjectHandle& obj, Func f ) const;
@@ -31,7 +31,7 @@ namespace Reflex
 			void ForEachNearby( const sf::Vector2f& position, Func f ) const;
 
 			template< typename Func >
-			void ForEachNearby( const ObjectHandle& obj, const AABB& boundary, Func f ) const;
+			void ForEachNearby( const ObjectHandle& obj, const sf::FloatRect& boundary, Func f ) const;
 
 			void Reset( const bool shouldRePopulate = false );
 			void Reset( const unsigned spacialHashMapSize, const bool shouldRePopulate = false );
@@ -40,7 +40,7 @@ namespace Reflex
 			void RemoveByID( const ObjectHandle& obj, const unsigned id );
 			unsigned GetID( const ObjectHandle& obj ) const;
 			unsigned GetID( const sf::Vector2f& position ) const;
-			std::vector< unsigned > GetID( const AABB& boundary ) const;
+			std::vector< unsigned > GetID( const sf::FloatRect& boundary ) const;
 			sf::Vector2i Hash( const sf::Vector2f& position ) const;
 
 		private:
@@ -90,7 +90,7 @@ namespace Reflex
 		}
 
 		template< typename Func >
-		void TileMap::ForEachNearby( const ObjectHandle& obj, const AABB& boundary, Func f ) const
+		void TileMap::ForEachNearby( const ObjectHandle& obj, const sf::FloatRect& boundary, Func f ) const
 		{
 			if( obj && m_spacialHashMapSize )
 			{

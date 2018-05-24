@@ -140,7 +140,7 @@ namespace Reflex
 
 			if( found != m_components.end() )
 			{
-				m_world.DestroyComponent( *found );
+				m_world.DestroyComponent( componentType, found->second );
 				m_components.erase( found );
 			}
 		}
@@ -206,10 +206,13 @@ namespace Reflex
 		template< typename T, typename... Args >
 		void Object::CopyComponentsFrom( const ObjectHandle& other )
 		{
-			auto component = GetComponent< T >();
+			auto component = other->GetComponent< T >();
 
 			if( !component )
 				return;
+
+			if( GetComponent< T >().IsValid() )
+				RemoveComponent< T >();
 
 			AddComponent< T >( *component.Get() );
 

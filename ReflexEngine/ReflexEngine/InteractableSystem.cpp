@@ -16,9 +16,16 @@ namespace Reflex
 			RequiresComponent( SFMLObject );
 		}
 
+		bool InteractableSystem::CheckCollision( const TransformHandle& transform, const sf::FloatRect& localBounds, const sf::Vector2f& mousePosition ) const
+		{
+			sf::Transform transformFinal;
+			transformFinal.scale( transform->GetWorldScale() ).translate( transform->GetWorldScale() );
+			return Reflex::BoundingBox( transformFinal.transformRect( localBounds ), transform->GetWorldRotation() ).contains( mousePosition );
+		}
+
 		void InteractableSystem::Update( const float deltaTime )
 		{
-			const auto mouse_position = Reflex::ToVector2f( sf::Mouse::getPosition( *GetWorld().GetContext().window ) );
+			const auto mousePosition = Reflex::ToVector2f( sf::Mouse::getPosition( *GetWorld().GetContext().window ) );
 
 			ForEachSystemComponent< Transform, Interactable, SFMLObject >(
 				[&]( const TransformHandle& transform, InteractableHandle& interactable, const SFMLObjectHandle& sfmlObj )
@@ -30,16 +37,16 @@ namespace Reflex
 				switch( sfmlObj->GetType() )
 				{
 				case SFMLObjectType::Circle:
-					collision = Reflex::Circle( transform->GetWorldPosition(), sfmlObj->GetCircleShape().getRadius() ).Contains( mouse_position );
+					collision = Reflex::Circle( transform->GetWorldPosition(), sfmlObj->GetCircleShape().getRadius() ).Contains( mousePosition );
 				break;
 				case SFMLObjectType::Rectangle:
-					collision = Reflex::ToAABB( transform->GetWorldTransform().transformRect( sfmlObj->GetRectangleShape().getLocalBounds() ) ).Contains( mouse_position );
+					collision = CheckCollision( transform, sfmlObj->GetRectangleShape().getLocalBounds(), mousePosition );
 				break;
 				case SFMLObjectType::Convex:
-					collision = Reflex::ToAABB( transform->GetWorldTransform().transformRect( sfmlObj->GetConvexShape().getLocalBounds() ) ).Contains( mouse_position );
+					collision = CheckCollision( transform, sfmlObj->GetConvexShape().getLocalBounds(), mousePosition );
 				break;
 				case SFMLObjectType::Sprite:
-					collision = Reflex::ToAABB( transform->GetWorldTransform().transformRect( sfmlObj->GetSprite().getLocalBounds() ) ).Contains( mouse_position );
+					collision = CheckCollision( transform, sfmlObj->GetSprite().getLocalBounds(), mousePosition );
 				break;
 				}
 
@@ -56,14 +63,16 @@ namespace Reflex
 						ptr->m_gainedFocusCallback( interactable );
 
 					// Lost highlight, then we also unselect
-					if( !collision && !ptr->m_selectionIsToggle )
+					if( !collision && !ptr->m_selectionIsToggle && ptr->m_unselectIfLostFocus )
 						ptr->Deselect();
 				}
 
 				// Selection (or can be deselection for toggle mode)
 				if( ptr->m_isFocussed && m_mousePressed )
-					if( ptr->m_isSelected == ptr->m_selectionIsToggle )
-						ptr->m_isSelected ? ptr->Deselect() : ptr->Select();
+				{
+					ptr->m_isSelected && ptr->m_selectionIsToggle ? ptr->Deselect() : ptr->Select();
+					m_mousePressed = false;
+				}
 
 				// Un-selection
 				if( m_mouseReleased && !ptr->m_selectionIsToggle )

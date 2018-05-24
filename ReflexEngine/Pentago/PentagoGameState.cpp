@@ -14,7 +14,7 @@ PentagoGameState::PentagoGameState( StateManager& stateManager, Context context 
 
 	for( unsigned i = 0U; i < 2; ++i )
 	{
-		m_turnText[i].setPosition( m_board.m_bounds.centre - sf::Vector2f( 0.0f, m_board.m_bounds.halfSize.y + 50.0f ) );
+		m_turnText[i].setPosition( sf::Vector2f( m_board.m_boardBounds.left + m_board.m_boardBounds.width / 2.0f, m_board.m_boardBounds.top - 50.0f ) );
 		m_turnText[i].setFillColor( sf::Color::White );
 		Reflex::CenterOrigin( m_turnText[i] );
 	}

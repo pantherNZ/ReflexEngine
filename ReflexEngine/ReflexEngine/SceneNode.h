@@ -19,6 +19,10 @@ namespace Reflex
 			sf::Transform GetWorldTransform() const;
 			sf::Vector2f GetWorldPosition() const; 
 
+			sf::Vector2f GetWorldTranslation() const;
+			float GetWorldRotation() const;
+			sf::Vector2f GetWorldScale() const;
+
 			template< typename Func >
 			void ForEachChild( Func function )
 			{

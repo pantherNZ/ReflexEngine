@@ -34,7 +34,7 @@ namespace Reflex
 			SFMLObject( const sf::RectangleShape& shape );
 			SFMLObject( const sf::Sprite& sprite );
 			SFMLObject( const SFMLObject& other );
-			~SFMLObject();
+			~SFMLObject() { }
 
 			// Get functions
 			sf::CircleShape& GetCircleShape();

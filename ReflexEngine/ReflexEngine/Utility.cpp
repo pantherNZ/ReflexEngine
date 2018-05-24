@@ -203,88 +203,56 @@ namespace Reflex
 		return true;
 	}
 
-	AABB::AABB()
-		: centre( 0.0f, 0.0f )
-		, halfSize( 0.0f, 0.0f )
+	sf::Vector2f RotatePoint( const sf::Vector2f& rotateAround, const sf::Vector2f& point, const float angle )
+	{
+		const float s = sin( angle );
+		const float c = cos( angle );
+
+		// translate point back to origin
+		sf::Vector2f result( point - rotateAround );
+
+		// rotate point
+		result.x = result.x * c - result.y * s;
+		result.y = result.x * s + result.y * c;
+
+		// translate point back
+		result -= rotateAround;
+
+		return result;
+	}
+
+	BoundingBox::BoundingBox()
+		: sf::FloatRect()
+		, rotation( 0.0f )
 	{
 
 	}
 
-	AABB::AABB( const sf::Vector2f& centre )
-		: centre( centre )
-		, halfSize( 0.0f, 0.0f )
-	{
-
-
-	}
-
-	AABB::AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize )
-		: centre( centre )
-		, halfSize( halfSize ) 
+	BoundingBox::BoundingBox( const sf::FloatRect& aabb, const float rotation )
+		: sf::FloatRect( aabb )
+		, rotation( rotation )
 	{
 
 	}
 
-	void AABB::Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize )
+	bool BoundingBox::contains( float x, float y ) const
 	{
-		centre = _centre;
-		halfSize = _halfSize;
+		return sf::FloatRect::contains( RotatePoint( sf::Vector2f( left + width / 2.0f, top + height / 2.0f ), sf::Vector2f( x, y ), -rotation ) );
 	}
 
-	bool AABB::Contains( const sf::Vector2f& position ) const
+	bool BoundingBox::contains( const sf::Vector2f& point ) const
 	{
-		return position.x >= centre.x - halfSize.x && 
-			position.x <= centre.x + halfSize.x &&
-			position.y >= centre.y - halfSize.y &&
-			position.y <= centre.y + halfSize.y;
+		return sf::FloatRect::contains( RotatePoint( sf::Vector2f( left + width / 2.0f, top + height / 2.0f ), point, -rotation ) );
 	}
 
-	bool AABB::Intersects( const AABB& other ) const
+	bool BoundingBox::intersects( const BoundingBox& other ) const
 	{
-		return centre.x + halfSize.x >= other.centre.x - other.halfSize.x &&
-			centre.x - halfSize.x <= other.centre.x + other.halfSize.x &&
-			centre.y + halfSize.y >= other.centre.y - other.halfSize.y &&
-			centre.y - halfSize.y <= other.centre.y + other.halfSize.y;
-	}
+		const auto otherCentre = sf::Vector2f( other.left + other.width / 2.0f, other.top + other.height / 2.0f );
 
-	Reflex::AABB ToAABB( const sf::Vector2f& topLeft, const sf::Vector2f& botRight )
-	{
-		AABB result;
-		result.centre = ( topLeft + botRight ) / 2.0f;
-		result.halfSize = sf::Vector2f( abs( botRight.x - result.centre.x ), abs( botRight.y - result.centre.y ) );
-		return std::move( result );
-	}
-
-	Reflex::AABB ToAABB( const sf::FloatRect& bounds )
-	{
-		return ToAABB( 
-			sf::Vector2f( bounds.left, bounds.top ), 
-			sf::Vector2f( bounds.left + bounds.width, bounds.top + bounds.height ) );
-	}
-
-	AABB ToAABB( const sf::IntRect& bounds )
-	{
-		return ToAABB( 
-			sf::Vector2f( ( float )bounds.left, ( float )bounds.top ), 
-			sf::Vector2f( ( float )bounds.left + bounds.width, ( float )bounds.top + bounds.height ) );
-	}
-
-	sf::IntRect ToIntRect( const AABB& aabb )
-	{
-		return sf::IntRect( 
-			int( aabb.centre.x - aabb.halfSize.x ), 
-			int( aabb.centre.y - aabb.halfSize.y ), 
-			int( aabb.centre.x + aabb.halfSize.x ),
-			int( aabb.centre.y + aabb.halfSize.y ) );
-	}
-
-	sf::FloatRect ToFloatRect( const AABB& aabb )
-	{
-		return sf::FloatRect(
-			aabb.centre.x - aabb.halfSize.x,
-			aabb.centre.y - aabb.halfSize.y,
-			aabb.centre.x + aabb.halfSize.x,
-			aabb.centre.y + aabb.halfSize.y );
+		return contains( RotatePoint( otherCentre, sf::Vector2f( other.left, other.top ), -other.rotation ) ) ||
+			contains( RotatePoint( otherCentre, sf::Vector2f( other.left + other.width, other.top ), -other.rotation ) ) ||
+			contains( RotatePoint( otherCentre, sf::Vector2f( other.left, other.top + other.height ), -other.rotation ) ) ||
+			contains( RotatePoint( otherCentre, sf::Vector2f( other.left + other.width, other.top + other.height ), -other.rotation ) );
 	}
 
 	Circle::Circle()

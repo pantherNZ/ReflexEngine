@@ -28,44 +28,20 @@ namespace Reflex
 	#define TODO( Msg ) __pragma( message( __FILE__ "(" STRINGIFY2( __LINE__ ) ") : TODO [ " Msg " ]" ) )
 	#define Stream( message ) [&](){ std::stringstream s; s << message; return s.str(); }()
 
-	// Axis aligned bounding box
-	struct AABB
+	// Bounding box with rect
+	struct BoundingBox : public sf::FloatRect
 	{
 		// Methods
-		AABB();
-		AABB( const sf::Vector2f& centre );
-		AABB( const sf::Vector2f& centre, const sf::Vector2f& halfSize );
+		BoundingBox();
+		BoundingBox( const sf::FloatRect& aabb, const float rotation = 0.0f );
 
-		void Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize );
-		bool Contains( const sf::Vector2f& position ) const;
-		bool Intersects( const AABB& other ) const;
-
-		// Members
-		sf::Vector2f centre;
-		sf::Vector2f halfSize;
-	};
-
-	struct Rect : public AABB
-	{
-		// Methods
-		Rect();
-		Rect( const AABB& aabb );
-		Rect( const sf::Vector2f& centre );
-		Rect( const sf::Vector2f& centre, const sf::Vector2f& halfSize, const float rotation );
-
-		void Assign( const sf::Vector2f& _centre, const sf::Vector2f& _halfSize, const float rotation );
-		bool Contains( const sf::Vector2f& position ) const;
-		bool Intersects( const AABB& other ) const;
+		bool contains( float x, float y ) const;
+		bool contains( const sf::Vector2f& point ) const;
+		bool intersects( const BoundingBox& other ) const;
 
 		// Members
 		float rotation = 0.0f;
 	};
-
-	AABB ToAABB( const sf::Vector2f& topLeft, const sf::Vector2f& botRight );
-	AABB ToAABB( const sf::FloatRect& bounds );
-	AABB ToAABB( const sf::IntRect& bounds );
-	sf::IntRect ToIntRect( const AABB& aabb );
-	sf::FloatRect ToFloatRect( const AABB& aabb );
 
 	// Circle struct
 	struct Circle

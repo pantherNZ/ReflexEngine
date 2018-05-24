@@ -4,29 +4,30 @@ namespace Reflex
 {
 	namespace Core
 	{
-		QuadTree::QuadTree( const AABB& boundary )
+		QuadTree::QuadTree( const sf::FloatRect& boundary )
 			: m_boundary( boundary )
 		{
 			m_objects.reserve( QUAD_TREE_SPACE );
 		}
 
-		void QuadTree::SetBoundary( const AABB& boundary )
+		void QuadTree::SetBoundary( const sf::FloatRect& boundary )
 		{
 			m_boundary = boundary;
 		}
 
 		void QuadTree::Subdivide()
 		{
-			const auto newHalfSize = m_boundary.halfSize / 2.0f;
-			m_children[0] = std::make_unique< QuadTree >( AABB( m_boundary.centre + sf::Vector2f( -newHalfSize.x, -newHalfSize.y ), newHalfSize ) );
-			m_children[1] = std::make_unique< QuadTree >( AABB( m_boundary.centre + sf::Vector2f( newHalfSize.x, -newHalfSize.y ), newHalfSize ) );
-			m_children[2] = std::make_unique< QuadTree >( AABB( m_boundary.centre + sf::Vector2f( -newHalfSize.x, newHalfSize.y ), newHalfSize ) );
-			m_children[3] = std::make_unique< QuadTree >( AABB( m_boundary.centre + sf::Vector2f( newHalfSize.x, newHalfSize.y ), newHalfSize ) );
+			const auto centre = sf::Vector2f( m_boundary.left + m_boundary.width / 2.0f, m_boundary.top + m_boundary.height / 2.0f );
+			const auto newHalfSize = sf::Vector2f( m_boundary.width / 2.0f, m_boundary.height / 2.0f );
+			m_children[0] = std::make_unique< QuadTree >( sf::FloatRect( centre + sf::Vector2f( -newHalfSize.x, -newHalfSize.y ), newHalfSize ) );
+			m_children[1] = std::make_unique< QuadTree >( sf::FloatRect( centre + sf::Vector2f( newHalfSize.x, -newHalfSize.y ), newHalfSize ) );
+			m_children[2] = std::make_unique< QuadTree >( sf::FloatRect( centre + sf::Vector2f( -newHalfSize.x, newHalfSize.y ), newHalfSize ) );
+			m_children[3] = std::make_unique< QuadTree >( sf::FloatRect( centre + sf::Vector2f( newHalfSize.x, newHalfSize.y ), newHalfSize ) );
 		}
 
-		void QuadTree::Insert( const ObjectHandle& obj, const AABB& objectBounds )
+		void QuadTree::Insert( const ObjectHandle& obj, const sf::FloatRect& objectBounds )
 		{
-			if( !m_boundary.Intersects( objectBounds ) )
+			if( !m_boundary.intersects( objectBounds ) )
 				return;
 
 			if( m_objects.size() < QUAD_TREE_SPACE )
@@ -45,16 +46,16 @@ namespace Reflex
 
 		void QuadTree::Query( const sf::Vector2f& position, std::vector< ObjectHandle >& out ) const
 		{
-			Query( AABB( position ), out );
+			Query( sf::FloatRect( position, sf::Vector2f( 0.0f, 0.0f ) ), out );
 		}
 
-		void QuadTree::Query( const AABB& bounds, std::vector< ObjectHandle >& out ) const
+		void QuadTree::Query( const sf::FloatRect& bounds, std::vector< ObjectHandle >& out ) const
 		{
-			if( !m_boundary.Intersects( bounds ) )
+			if( !m_boundary.intersects( bounds ) )
 				return;
 
 			for( auto& item : m_objects )
-				if( item.second.Intersects( bounds ) )
+				if( item.second.intersects( bounds ) )
 					out.push_back( item.first );
 
 			if( m_children[0] )
@@ -62,18 +63,18 @@ namespace Reflex
 					m_children[i]->Query( bounds, out );
 		}
 
-		void QuadTree::Query( const sf::Vector2f& position, std::vector< std::pair< ObjectHandle, AABB > >& out ) const
+		void QuadTree::Query( const sf::Vector2f& position, std::vector< std::pair< ObjectHandle, sf::FloatRect > >& out ) const
 		{
-			Query( AABB( position ), out );
+			Query( sf::FloatRect( position, sf::Vector2f( 0.0f, 0.0f ) ), out );
 		}
 
-		void QuadTree::Query( const AABB& bounds, std::vector< std::pair< ObjectHandle, AABB > >& out ) const
+		void QuadTree::Query( const sf::FloatRect& bounds, std::vector< std::pair< ObjectHandle, sf::FloatRect > >& out ) const
 		{
-			if( !m_boundary.Intersects( bounds ) )
+			if( !m_boundary.intersects( bounds ) )
 				return;
 
 			for( auto& item : m_objects )
-				if( item.second.Intersects( bounds ) )
+				if( item.second.intersects( bounds ) )
 					out.push_back( item );
 
 			if( m_children[0] )
@@ -81,52 +82,14 @@ namespace Reflex
 					m_children[i]->Query( bounds, out );
 		}
 
-		ObjectHandle QuadTree::FindBottomMost( const sf::Vector2f& position ) const
-		{
-			return FindBottomMost( AABB( position ) );
-		}
-
-		ObjectHandle QuadTree::FindBottomMost( const AABB& bounds ) const
-		{
-			if( !m_boundary.Intersects( bounds ) )
-				return ObjectHandle::null;
-
-			std::vector< std::pair< ObjectHandle, AABB > > valid;
-
-			for( auto& item : m_objects )
-				if( item.second.Intersects( bounds ) )
-					valid.push_back( item );
-
-			if( m_children[0] )
-				for( unsigned i = 0U; i < QUAD_TREE_CHILDREN; ++i )
-					m_children[i]->Query( bounds, valid );
-
-			if( valid.empty() )
-				return ObjectHandle::null;
-
-			unsigned bestIndex = 0U;
-			float smallest = std::numeric_limits< float >::infinity();
-
-			for( unsigned i = 0U; i < valid.size(); ++i )
-			{
-				if( valid[i].second.halfSize.x * valid[i].second.halfSize.y < smallest )
-				{
-					smallest = valid[i].second.halfSize.x * valid[i].second.halfSize.y;
-					bestIndex = i;
-				}
-			}
-
-			return valid[bestIndex].first;
-		}
-
 		void QuadTree::Remove( const ObjectHandle& obj, const sf::Vector2f& position )
 		{
-			Remove( obj, AABB( position ) );
+			Remove( obj, sf::FloatRect( position, sf::Vector2f( 0.0f, 0.0f ) ) );
 		}
 
-		void QuadTree::Remove( const ObjectHandle& obj, const AABB& objectBounds )
+		void QuadTree::Remove( const ObjectHandle& obj, const sf::FloatRect& objectBounds )
 		{
-			if( !m_boundary.Intersects( objectBounds ) )
+			if( !m_boundary.intersects( objectBounds ) )
 				return;
 
 			for( auto& iter = m_objects.begin(); iter != m_objects.end(); ++iter )

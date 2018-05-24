@@ -34,41 +34,10 @@ namespace Reflex
 		}
 
 		SFMLObject::SFMLObject( const SFMLObject& other )
+			: Component( other )
+			, m_type( other.m_type )
 		{
-			switch( other.GetType() )
-			{
-			case Circle:
-				m_objectData.circleShape = other.GetCircleShape();
-			break;
-			case Sprite:
-				m_objectData.sprite = other.GetSprite();
-			break;
-			case Rectangle:
-				m_objectData.rectShape = other.GetRectangleShape();
-			break;
-			case Convex:
-				m_objectData.convexShape = other.GetConvexShape();
-			break;
-			}
-		}
-
-		SFMLObject::~SFMLObject()
-		{
-			switch( GetType() )
-			{
-			case Circle:
-				m_objectData.circleShape.~CircleShape();
-			break;
-			case Sprite:
-				m_objectData.sprite.~Sprite();
-			break;
-			case Rectangle:
-				m_objectData.rectShape.~RectangleShape();
-			break;
-			case Convex:
-				m_objectData.convexShape.~ConvexShape();
-			break;
-			}
+			memcpy( &this->m_objectData, &other.m_objectData, sizeof m_objectData );
 		}
 
 		sf::CircleShape& SFMLObject::GetCircleShape()
