@@ -31,6 +31,12 @@ namespace Reflex
 		{
 			return Get();
 		}
+		
+		template< class T >
+		bool Handle< T >::IsValid() const
+		{
+			return BaseHandle::IsValid() && Get();
+		}
 	}
 }
 
