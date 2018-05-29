@@ -19,8 +19,11 @@ namespace Reflex
 		bool InteractableSystem::CheckCollision( const TransformHandle& transform, const sf::FloatRect& localBounds, const sf::Vector2f& mousePosition ) const
 		{
 			sf::Transform transformFinal;
-			transformFinal.scale( transform->GetWorldScale() ).translate( transform->GetWorldScale() );
-			return Reflex::BoundingBox( transformFinal.transformRect( localBounds ), transform->GetWorldRotation() ).contains( mousePosition );
+			transformFinal.scale( transform->GetWorldScale() ).translate( transform->GetWorldTranslation() );
+			auto globalBounds = transformFinal.transformRect( localBounds );
+			globalBounds.left -= localBounds.width / 2.0f;
+			globalBounds.top -= localBounds.height / 2.0f;
+			return Reflex::BoundingBox( globalBounds, transform->GetWorldRotation() ).contains( mousePosition );
 		}
 
 		void InteractableSystem::Update( const float deltaTime )
@@ -33,7 +36,6 @@ namespace Reflex
 				bool collision = false;
 				
 				// Collision with bounds
-				TODO( "Handle collision with rotated rects" );
 				switch( sfmlObj->GetType() )
 				{
 				case SFMLObjectType::Circle:
@@ -80,6 +82,36 @@ namespace Reflex
 			} );
 
 			m_mouseReleased = false;
+		}
+
+		void InteractableSystem::Render( sf::RenderTarget& target, sf::RenderStates states ) const
+		{
+			sf::RenderStates copied_states( states );
+
+			//ForEachSystemComponent< Transform, Interactable, SFMLObject >(
+			//	[&]( const TransformHandle& transform, InteractableHandle& interactable, const SFMLObjectHandle& sfmlObj )
+			//{
+			//	if( interactable->m_renderCollisionBounds )
+			//	{
+			//		copied_states.transform = states.transform * transform->getTransform();
+			//
+			//		switch( sfmlObj->GetType() )
+			//		{
+			//		case Components::Rectangle:
+			//			target.draw( object->GetRectangleShape(), copied_states );
+			//		break;
+			//		case Components::Convex:
+			//			target.draw( object->GetConvexShape(), copied_states );
+			//		break;
+			//		case Components::Circle:
+			//			target.draw( object->GetCircleShape(), copied_states );
+			//		break;
+			//		case Components::Sprite:
+			//			target.draw( object->GetSprite(), copied_states );
+			//		break;
+			//		}
+			//	}
+			//} );
 		}
 
 		void InteractableSystem::ProcessEvent( const sf::Event& event )

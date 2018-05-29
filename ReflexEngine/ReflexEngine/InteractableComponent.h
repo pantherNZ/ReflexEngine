@@ -25,6 +25,7 @@ namespace Reflex
 			bool m_isSelected = false;
 			bool m_selectionIsToggle = true;
 			bool m_unselectIfLostFocus = false;
+			bool m_renderCollisionBounds = false;
 
 			void Select();
 			void Deselect();

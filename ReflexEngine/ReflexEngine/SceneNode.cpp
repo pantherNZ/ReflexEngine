@@ -79,7 +79,7 @@ namespace Reflex
 
 		sf::Vector2f SceneNode::GetWorldScale() const
 		{
-			sf::Vector2f worldScale;
+			sf::Vector2f worldScale( 1.0f, 1.0f );
 
 			for( ObjectHandle node = m_owningObject; node != ObjectHandle::null; node = node->GetTransform()->m_parent )
 			{
@@ -104,6 +104,11 @@ namespace Reflex
 			}
 
 			return m_children[index];
+		}
+
+		ObjectHandle SceneNode::GetParent() const
+		{
+			return m_parent;
 		}
 
 		void SceneNode::SetZOrder( const unsigned renderIndex )

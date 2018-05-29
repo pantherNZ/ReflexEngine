@@ -10,15 +10,15 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 {
 	const auto& background = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::BackgroundTexture, "Data/Textures/BackgroundPlaceholder.png" );
 	const auto& plate = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::BoardTexture, "Data/Textures/MovingPlateUpdate.png" );
-	world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg1, "Data/Textures/GoldEgg.png" );
-	world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg2, "Data/Textures/BlackEgg.png" );
+	const auto& eggGold = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg1, "Data/Textures/GoldEgg.png" );
+	const auto& eggBlack = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg2, "Data/Textures/BlackEgg.png" );
 
 	// Board size will be 60% of the world boundary (screen height)
 	const auto centre = sf::Vector2f( m_world.GetBounds().left + m_world.GetBounds().width / 2.0f, m_world.GetBounds().top + m_world.GetBounds().height / 2.0f );
 	m_boardBounds.width = m_boardBounds.height = m_world.GetBounds().height * 0.6f;
 	m_boardBounds.left = centre.x - m_boardBounds.width / 2.0f;
 	m_boardBounds.top = centre.y - m_boardBounds.height / 2.0f;
-	m_marbleSize = m_boardBounds.width / 5.0f;
+	m_marbleSize = m_boardBounds.width / 8.5f;
 	const float boardSize = m_boardBounds.width;
 
 	auto gameBoard = m_world.CreateObject( centre );
@@ -35,20 +35,18 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 			grid->AddToGrid( cornerObject, x, y );
 
 			auto cornerVisual = cornerObject->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( plate ) );
-			cornerVisual->GetSprite().setScale( sf::Vector2f( ( m_boardBounds.width / 2.0f - 10.0f ) / cornerVisual->GetSprite().getTextureRect().width, ( m_boardBounds.height / 2.0f - 10.0f ) / cornerVisual->GetSprite().getTextureRect().height ) );
+			Reflex::ScaleTo( cornerVisual->GetSprite(), sf::Vector2f( m_boardBounds.width / 2.0f - 10.0f, m_boardBounds.height / 2.0f - 10.0f ) );
 		}
 	}
 
 	auto playerMarble = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + 50.0f, 0.0f ) );
-	auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::CircleShape( m_marbleSize / 4.0f ) );
-	circle->GetCircleShape().setFillColor( playerIsWhite ? sf::Color::White : sf::Color::Black );
-	
+	auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( playerIsWhite ? eggGold : eggBlack ) );
+	Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
+
 	auto interactable = playerMarble->AddComponent< Reflex::Components::Interactable >();
 	interactable->m_selectionIsToggle = false;
 	interactable->m_selectedCallback = [=]( const InteractableHandle& interactable )
 	{
-		circle->GetCircleShape().setFillColor( sf::Color::Blue );
-
 		if( !m_selectedMarble )
 		{
 			m_selectedMarble = m_world.CreateObject();
@@ -58,10 +56,30 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 
 	interactable->m_deselectedCallback = [=]( const InteractableHandle& interactable )
 	{
-		circle->GetCircleShape().setFillColor( playerIsWhite ? sf::Color::White : sf::Color::Black );
-
 		if( m_selectedMarble )
 		{
+			const auto mousePosition = Reflex::ToVector2f( sf::Mouse::getPosition( *m_world.GetContext().window ) );
+			auto result = grid->GetCellIndex( mousePosition );
+
+			if( result.first )
+			{
+				auto corner = grid->GetCell( result.second );
+				auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
+				result = cornerGrid->GetCellIndex( mousePosition );
+
+				if( result.first )
+				{
+					auto object = cornerGrid->GetCell( result.second );
+
+					if( !object )
+					{
+						cornerGrid->AddToGrid( m_selectedMarble, result.second );
+						m_selectedMarble = ObjectHandle::null;
+						return;
+					}
+				}
+			}
+
 			m_selectedMarble->Destroy();
 			m_selectedMarble = ObjectHandle::null;
 		}

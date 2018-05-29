@@ -64,6 +64,9 @@ namespace Reflex
 
 		void ObjectAllocator::Swap( unsigned a, unsigned b )
 		{
+			if( a == b )
+				return;
+
 			assert( a < m_size );
 			assert( b < m_size );
 
@@ -77,6 +80,9 @@ namespace Reflex
 
 		void ObjectAllocator::Move( unsigned a, unsigned b )
 		{
+			if( a == b )
+				return;
+
 			void* A = ( char * )m_array + a * m_objectSize;
 			void* B = ( char * )m_array + b * m_objectSize;
 			std::memcpy( A, B, m_objectSize );

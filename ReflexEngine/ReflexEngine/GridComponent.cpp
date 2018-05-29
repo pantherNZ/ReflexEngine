@@ -148,7 +148,7 @@ namespace Reflex
 		{
 			const auto topLeft = m_centreGrid ? sf::Vector2f( ( GetWidth() / -2.0f + 0.5f ) * m_cellSize.x, ( GetHeight() / -2.0f + 0.5f ) * m_cellSize.y ) : sf::Vector2f( 0.0f, 0.0f );
 			const auto gridCentre = GetObject()->GetComponent< Reflex::Components::Transform >()->getPosition();
-			const auto localPosition = position - topLeft - gridCentre;
+			const auto localPosition = position - ( topLeft + gridCentre );
 			const auto indexX = int( localPosition.x / m_cellSize.x );
 			const auto indexY = int( localPosition.y / m_cellSize.y );
 			return std::make_pair( indexX >= 0 && indexX < ( int )GetWidth() && indexY >= 0 && indexY < ( int )GetHeight(), sf::Vector2u( indexX, indexY ) );

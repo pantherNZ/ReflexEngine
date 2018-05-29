@@ -77,7 +77,6 @@ namespace Reflex
 		{
 			HandleEntry* entry = m_array.data() + handle.m_index;
 
-			// Internal bug if fires
 			assert( entry->m_allocated );
 
 			entry->m_counter++;

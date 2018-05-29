@@ -117,7 +117,7 @@ namespace Reflex
 			TransformHandle m_sceneGraphRoot;
 
 			// Removes objects / components on frame move instead of during sometime dangerous
-			std::vector< BaseHandle > m_markedForDeletion;
+			std::vector< ObjectHandle > m_markedForDeletion;
 		};
 
 		// Template functions

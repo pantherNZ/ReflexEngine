@@ -205,6 +205,9 @@ namespace Reflex
 
 	sf::Vector2f RotatePoint( const sf::Vector2f& rotateAround, const sf::Vector2f& point, const float angle )
 	{
+		if( angle == 0.0f )
+			return point;
+
 		const float s = sin( angle );
 		const float c = cos( angle );
 
@@ -216,7 +219,7 @@ namespace Reflex
 		result.y = result.x * s + result.y * c;
 
 		// translate point back
-		result -= rotateAround;
+		result += rotateAround;
 
 		return result;
 	}

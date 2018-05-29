@@ -2,6 +2,7 @@
 
 #include <SFML\Graphics\Texture.hpp>
 #include <SFML\Graphics\Font.hpp>
+#include <SFML\Graphics\Sprite.hpp>
 
 #include <sstream>
 #include <typeindex>
@@ -211,14 +212,19 @@ namespace Reflex
 		return sf::Vector2f( vector.x * cosR - vector.y * sinR, vector.y * cosR + vector.x * sinR );
 	}
 
-	inline sf::Vector2i ToVector2i( const sf::Vector2f convert )
+	inline sf::Vector2i ToVector2i( const sf::Vector2f& convert )
 	{
 		return sf::Vector2i( ( int )Round( convert.x ), ( int )Round( convert.y ) );
 	}
 
-	inline sf::Vector2f ToVector2f( const sf::Vector2i convert )
+	inline sf::Vector2f ToVector2f( const sf::Vector2i& convert )
 	{
 		return sf::Vector2f( ( float )convert.x, ( float )convert.y );
+	}
+
+	inline void ScaleTo( sf::Sprite& sprite, const sf::Vector2f& targetScale )
+	{
+		sprite.setScale( sf::Vector2f( targetScale.x / ( float )sprite.getTextureRect().width, targetScale.y / ( float )sprite.getTextureRect().height ) );
 	}
 
 	bool IntersectPolygonCircle( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& circlePosition, const float radius );
