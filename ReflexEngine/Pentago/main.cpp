@@ -1,6 +1,7 @@
 // Includes
 #include "..\ReflexEngine\Engine.h"
 
+#include "vld.h"
 #include "PentagoGameState.h"
 
 enum StateTypes : unsigned

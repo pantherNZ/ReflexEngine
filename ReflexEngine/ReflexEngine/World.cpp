@@ -69,16 +69,20 @@ namespace Reflex
 				for( auto& objectHandle : m_markedForDeletion )
 				{
 					auto* object = objectHandle.Get();
-					object->GetTransform()->GetParent()->GetTransform()->DetachChild( objectHandle );
+
+					// Detach from parent
+					const auto parent = object->GetTransform()->GetParent();
+					if( parent )
+						parent->GetTransform()->DetachChild( objectHandle );
+
 					m_handles.Remove( objectHandle );
+					object->RemoveAllComponents();
+					object->~Object();
 					auto moved = ( Object* )m_objects.Release( object );
 
 					// Sync handle of potentially moved object
-					if( moved && moved != object )
+					if( moved )
 						m_handles.Update( moved );
-
-					moved->RemoveAllComponents();
-					moved->~Object();
 				}
 
 				m_markedForDeletion.clear();
@@ -89,17 +93,15 @@ namespace Reflex
 		{
 			while( allocator.Size() )
 			{
-				auto* component = ( Entity* )allocator[allocator.Size() - 1];
+				auto* object = ( Entity* )allocator[0];
+				m_handles.Remove( object->m_self );
+				object->~Entity();
 
-				Entity* entity = m_handles.GetAs< Entity >( component->m_self );
-				m_handles.Remove( component->m_self );
-				auto moved = ( Entity* )allocator.Release( entity );
+				auto moved = ( Entity* )allocator.Release( object );
 
 				// Sync handle of potentially moved object
-				if( moved && moved != entity )
+				if( moved )
 					m_handles.Update( moved );
-
-				entity->~Entity();
 			}
 		}
 
@@ -149,14 +151,9 @@ namespace Reflex
 		void World::DestroyAllObjects()
 		{
 			ResetAllocator( m_objects );
-			//while( m_objects.Size() )
-			//{
-			//	auto* object = ( Object* )m_objects[0];
-			//	object->Destroy();
-			//}
 
-			//for( auto& allocator : m_components )
-			//	ResetAllocator( *allocator.second.get() );
+			for( auto& allocator : m_components )
+				ResetAllocator( *allocator.second.get() );
 
 			for( auto& system : m_systems )
 				system.second->m_components.clear();
@@ -172,13 +169,12 @@ namespace Reflex
 			//
 			Entity* entity = m_handles.GetAs< Entity >( component );
 			m_handles.Remove( component );
+			entity->~Entity();
 			auto moved = ( Entity* )m_components[componentType]->Release( entity );
 
 			// Sync handle of potentially moved object
-			if( moved && moved != entity )
+			if( moved )
 				m_handles.Update( moved );
-
-			entity->~Entity();
 
 			// Remove this component from any systems
 			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )

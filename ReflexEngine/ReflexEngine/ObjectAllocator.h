@@ -48,7 +48,7 @@ namespace Reflex
 		private:
 			void Grow();
 			void GrowInteral();
-			void Move( unsigned a, unsigned b );
+			void Move( unsigned dest, unsigned src );
 
 			ObjectAllocator() = delete;
 

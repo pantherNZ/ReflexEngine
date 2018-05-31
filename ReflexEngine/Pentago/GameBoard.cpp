@@ -86,7 +86,16 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 	};
 
 	// Testing the board
-	//for( unsigned y = 0U; y < 6; ++y )
-	//	for( unsigned x = 0U; x < 6; ++x )
-	//		PlaceMarble( false, x, y );
+	for( unsigned y = 0U; y < 6; ++y )
+	{
+		for( unsigned x = 0U; x < 6; ++x )
+		{
+			auto newObj = m_world.CreateObject();
+			newObj->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( playerMarble );
+			
+			auto corner = grid->GetCell( x / 2, y / 2 );
+			auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
+			cornerGrid->AddToGrid( newObj, x % 3, y % 3 );
+		}
+	}
 }
