@@ -215,10 +215,10 @@ namespace Reflex
 			// This should never happen
 			assert( found != m_components.end() );
 
-			// Allocate the object from the allocator
+			// Allocate the component's memory from the allocator
 			auto* component = ( T* )found->second->Allocate();
 
-			// Create handle & allocate
+			// Create handle & construct
 			const auto componentHandle = m_handles.Insert< T >( component );
 			new ( component ) T( std::forward< Args >( args )... );
 			component->m_self = componentHandle;

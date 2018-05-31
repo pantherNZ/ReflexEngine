@@ -117,18 +117,22 @@ namespace Reflex
 
 		ObjectHandle World::CreateObject( const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
 		{
-			return CreateObject( true, position, rotation, scale );
+			return CreateObject( false, position, rotation, scale );
 		}
 
 		ObjectHandle World::CreateObject( const bool attachToRoot, const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
 		{
+			// Allocate the component's memory from the allocator
 			Object* newObject = ( Object* )m_objects.Allocate();
+
+			// Create handle & construct
 			auto objectHandle = m_handles.Insert( newObject );
 			new ( newObject ) Object( *this );
 			newObject->m_self = objectHandle;
 
 			SyncHandles< Object >( m_objects );
 
+			// Add the transform component by default
 			auto newHandle = ObjectHandle( newObject->m_self );
 			newHandle->AddComponent< Reflex::Components::Transform >( position, rotation, scale );
 
@@ -161,12 +165,6 @@ namespace Reflex
 
 		void World::DestroyComponent( Type componentType, BaseHandle component )
 		{
-			//assert( !component.markedForDeletion );
-			//if( !component.markedForDeletion )
-			//{
-			//	m_markedForDeletion.push_back( component );
-			//	component.markedForDeletion = true;
-			//
 			Entity* entity = m_handles.GetAs< Entity >( component );
 			m_handles.Remove( component );
 			entity->~Entity();

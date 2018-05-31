@@ -20,8 +20,11 @@ namespace Reflex
 		class Transform : public Component, public Reflex::Core::SceneNode
 		{
 		public:
+			// Copy constructor (from a handle)
+			template< typename T >
+			Transform( const Handle< T >& other ) : Transform( *other.Get() ) { }
+
 			Transform( const sf::Vector2f& position = sf::Vector2f(), const float rotation = 0.0f, const sf::Vector2f& scale = sf::Vector2f( 1.0f, 1.0f ) );
-			Transform( const Transform& other );
 
 			void OnConstructionComplete() final;
 

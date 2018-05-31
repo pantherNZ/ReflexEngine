@@ -28,9 +28,13 @@ namespace Reflex
 
 			virtual void SetOwningObject( const ObjectHandle& owner ) { m_object = owner; }
 
+			// Copy constructor (from a handle)
+			template< typename T >
+			Component( const Handle< T >& other ) : Component( *other.Get() ) { }
+
 		protected:
 			Component() { }
-			~Component() { }
+			virtual ~Component() { }
 
 		protected:
 			ObjectHandle m_object;

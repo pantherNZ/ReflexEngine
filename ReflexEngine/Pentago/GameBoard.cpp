@@ -40,6 +40,7 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 	}
 
 	auto playerMarble = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + 50.0f, 0.0f ) );
+	//auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::CircleShape( m_marbleSize / 2.0f ) );
 	auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( playerIsWhite ? eggGold : eggBlack ) );
 	Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
 
@@ -85,17 +86,32 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 		}
 	};
 
+	const auto PlaceMarble = [&]( const int x, const int y )
+	{
+		auto newObj = m_world.CreateObject();
+		newObj->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( playerMarble );
+		//auto circle = newObj->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( playerIsWhite ? eggGold : eggBlack ) );
+		//Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
+
+		auto corner = grid->GetCell( x / 3, y / 3 );
+		auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
+		cornerGrid->AddToGrid( newObj, x % 3, y % 3 );
+	};
+
+	PlaceMarble( 3, 0 );
+	PlaceMarble( 4, 0 );
+	//PlaceMarble( 5, 0 );
+	PlaceMarble( 3, 1 );
+	PlaceMarble( 4, 1 );
+	PlaceMarble( 5, 1 );
+	//PlaceMarble( 6, 0 );
+	//PlaceMarble( 7, 0 );
+	//PlaceMarble( 8, 0 );
+	//
+	return;
+
 	// Testing the board
 	for( unsigned y = 0U; y < 6; ++y )
-	{
 		for( unsigned x = 0U; x < 6; ++x )
-		{
-			auto newObj = m_world.CreateObject();
-			newObj->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( playerMarble );
-			
-			auto corner = grid->GetCell( x / 2, y / 2 );
-			auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
-			cornerGrid->AddToGrid( newObj, x % 3, y % 3 );
-		}
-	}
+			PlaceMarble( x, y );
 }
