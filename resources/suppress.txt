@@ -1,0 +1,604 @@
+# File for suppressing errors found in pid 1384: "Pentago.exe"
+
+Error #1: INVALID HEAP ARGUMENT to free
+replace_free   
+    d:\drmemory_package\common\alloc_replace.c(2706):
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+    ??:0
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+    ??:0
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+    ??:0
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+    ??:0
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+    ??:0
+ucrtbased.dll!initterm_e   
+    ??:0
+ucrtbased.dll!initterm_e   
+    ??:0
+ucrtbased.dll!initterm_e   
+    ??:0
+ucrtbased.dll!execute_onexit_table
+    ??:0
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+    ??:0
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+    ??:0
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+    ??:0
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+    ??:0
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+    ??:0
+ntdll.dll!RtlCheckTokenCapability
+    ??:0
+ntdll.dll!RtlHashUnicodeString
+    ??:0
+ntdll.dll!LdrShutdownProcess
+    ??:0
+ntdll.dll!RtlExitUserProcess
+    ??:0
+KERNEL32.dll!ExitProcess 
+    ??:0
+
+# Suppression for Error #1
+INVALID HEAP ARGUMENT
+name=Error #1 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+KERNEL32.dll!ExitProcess
+
+## Mod+offs-style suppression for Error #1:
+INVALID HEAP ARGUMENT
+name=Error #1 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x4179>
+<sfml-system-d-2.dll+0x4078>
+<sfml-graphics-d-2.dll+0x10cf21>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-graphics-d-2.dll+0xff746>
+<sfml-graphics-d-2.dll+0x10070e>
+<sfml-graphics-d-2.dll+0x100468>
+<sfml-graphics-d-2.dll+0x1008ab>
+<sfml-graphics-d-2.dll+0x100a1f>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+<KERNEL32.dll+0x13a23>
+
+# Suppression for Error #2
+INVALID HEAP ARGUMENT
+name=Error #2 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+KERNEL32.dll!ExitProcess
+
+## Mod+offs-style suppression for Error #2:
+INVALID HEAP ARGUMENT
+name=Error #2 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x4179>
+<sfml-system-d-2.dll+0x4078>
+<sfml-graphics-d-2.dll+0x10cef1>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-graphics-d-2.dll+0xff746>
+<sfml-graphics-d-2.dll+0x10070e>
+<sfml-graphics-d-2.dll+0x100468>
+<sfml-graphics-d-2.dll+0x1008ab>
+<sfml-graphics-d-2.dll+0x100a1f>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+<KERNEL32.dll+0x13a23>
+
+# Suppression for Error #3
+INVALID HEAP ARGUMENT
+name=Error #3 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+KERNEL32.dll!ExitProcess
+
+## Mod+offs-style suppression for Error #3:
+INVALID HEAP ARGUMENT
+name=Error #3 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x4179>
+<sfml-system-d-2.dll+0x4078>
+<sfml-graphics-d-2.dll+0x10ce91>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-graphics-d-2.dll+0xff746>
+<sfml-graphics-d-2.dll+0x10070e>
+<sfml-graphics-d-2.dll+0x100468>
+<sfml-graphics-d-2.dll+0x1008ab>
+<sfml-graphics-d-2.dll+0x100a1f>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+<KERNEL32.dll+0x13a23>
+
+# Suppression for Error #4
+INVALID HEAP ARGUMENT
+name=Error #4 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+sfml-graphics-d-2.dll!sf::VertexArray::setPrimitiveType
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+KERNEL32.dll!ExitProcess
+
+## Mod+offs-style suppression for Error #4:
+INVALID HEAP ARGUMENT
+name=Error #4 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x4179>
+<sfml-system-d-2.dll+0x4078>
+<sfml-graphics-d-2.dll+0x10cec1>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-graphics-d-2.dll+0xff746>
+<sfml-graphics-d-2.dll+0x10070e>
+<sfml-graphics-d-2.dll+0x100468>
+<sfml-graphics-d-2.dll+0x1008ab>
+<sfml-graphics-d-2.dll+0x100a1f>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+<KERNEL32.dll+0x13a23>
+
+# Suppression for Error #5
+INVALID HEAP ARGUMENT
+name=Error #5 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+
+## Mod+offs-style suppression for Error #5:
+INVALID HEAP ARGUMENT
+name=Error #5 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x14769>
+<sfml-system-d-2.dll+0x14638>
+<sfml-window-d-2.dll+0x1ccda>
+<sfml-window-d-2.dll+0x3497d>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-window-d-2.dll+0x2b9e6>
+<sfml-window-d-2.dll+0x2d1ee>
+<sfml-window-d-2.dll+0x2cf48>
+<sfml-window-d-2.dll+0x2d38b>
+<sfml-window-d-2.dll+0x2d4ff>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+
+# Suppression for Error #6
+INVALID HEAP ARGUMENT
+name=Error #6 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+
+## Mod+offs-style suppression for Error #6:
+INVALID HEAP ARGUMENT
+name=Error #6 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-window-d-2.dll+0x2c1ce>
+<sfml-window-d-2.dll+0xa836>
+<sfml-window-d-2.dll+0xc7bd>
+<sfml-window-d-2.dll+0xc6fe>
+<sfml-window-d-2.dll+0xab24>
+<sfml-window-d-2.dll+0x8e35>
+<sfml-window-d-2.dll+0x8fad>
+<sfml-window-d-2.dll+0x348ad>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-window-d-2.dll+0x2b9e6>
+<sfml-window-d-2.dll+0x2d1ee>
+<sfml-window-d-2.dll+0x2cf48>
+<sfml-window-d-2.dll+0x2d38b>
+<sfml-window-d-2.dll+0x2d4ff>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+
+# Suppression for Error #7
+INVALID HEAP ARGUMENT
+name=Error #7 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+
+## Mod+offs-style suppression for Error #7:
+INVALID HEAP ARGUMENT
+name=Error #7 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x14769>
+<sfml-system-d-2.dll+0x14638>
+<sfml-window-d-2.dll+0x8c5a>
+<sfml-window-d-2.dll+0x348fd>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-window-d-2.dll+0x2b9e6>
+<sfml-window-d-2.dll+0x2d1ee>
+<sfml-window-d-2.dll+0x2cf48>
+<sfml-window-d-2.dll+0x2d38b>
+<sfml-window-d-2.dll+0x2d4ff>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+
+# Suppression for Error #8
+INVALID HEAP ARGUMENT
+name=Error #8 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+
+## Mod+offs-style suppression for Error #8:
+INVALID HEAP ARGUMENT
+name=Error #8 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x14769>
+<sfml-system-d-2.dll+0x14638>
+<sfml-window-d-2.dll+0x8c9a>
+<sfml-window-d-2.dll+0x3488d>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-window-d-2.dll+0x2b9e6>
+<sfml-window-d-2.dll+0x2d1ee>
+<sfml-window-d-2.dll+0x2cf48>
+<sfml-window-d-2.dll+0x2d38b>
+<sfml-window-d-2.dll+0x2d4ff>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+
+# Suppression for Error #9
+INVALID HEAP ARGUMENT
+name=Error #9 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-window-d-2.dll!sf::Window::setActive
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+KERNEL32.dll!ExitProcess
+
+## Mod+offs-style suppression for Error #9:
+INVALID HEAP ARGUMENT
+name=Error #9 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x4179>
+<sfml-system-d-2.dll+0x4078>
+<sfml-window-d-2.dll+0x348d1>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-window-d-2.dll+0x2b9e6>
+<sfml-window-d-2.dll+0x2d1ee>
+<sfml-window-d-2.dll+0x2cf48>
+<sfml-window-d-2.dll+0x2d38b>
+<sfml-window-d-2.dll+0x2d4ff>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+<KERNEL32.dll+0x13a23>
+
+# Suppression for Error #10
+INVALID HEAP ARGUMENT
+name=Error #10 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+sfml-window-d-2.dll!sf::Window::setActive
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+
+## Mod+offs-style suppression for Error #10:
+INVALID HEAP ARGUMENT
+name=Error #10 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x14769>
+<sfml-system-d-2.dll+0x14638>
+<sfml-window-d-2.dll+0x431a>
+<sfml-window-d-2.dll+0x3486d>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-window-d-2.dll+0x2b9e6>
+<sfml-window-d-2.dll+0x2d1ee>
+<sfml-window-d-2.dll+0x2cf48>
+<sfml-window-d-2.dll+0x2d38b>
+<sfml-window-d-2.dll+0x2d4ff>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+
+# Suppression for Error #11
+INVALID HEAP ARGUMENT
+name=Error #11 (update to meaningful name)
+drmemorylib.dll!replace_free
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!initterm_e
+ucrtbased.dll!execute_onexit_table
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+sfml-system-d-2.dll!sf::MemoryInputStream::MemoryInputStream
+ntdll.dll!RtlCheckTokenCapability
+ntdll.dll!RtlHashUnicodeString
+ntdll.dll!LdrShutdownProcess
+ntdll.dll!RtlExitUserProcess
+KERNEL32.dll!ExitProcess
+
+## Mod+offs-style suppression for Error #11:
+INVALID HEAP ARGUMENT
+name=Error #11 (update to meaningful name)
+<drmemorylib.dll+0x20900>
+<sfml-system-d-2.dll+0x186de>
+<sfml-system-d-2.dll+0x1781c>
+<sfml-system-d-2.dll+0x4179>
+<sfml-system-d-2.dll+0x4078>
+<sfml-system-d-2.dll+0x1fefd>
+<ucrtbased.dll+0xb5be5>
+<ucrtbased.dll+0xb5793>
+<ucrtbased.dll+0xb583e>
+<ucrtbased.dll+0xb5d1e>
+<sfml-system-d-2.dll+0x17c06>
+<sfml-system-d-2.dll+0x1929e>
+<sfml-system-d-2.dll+0x18ff8>
+<sfml-system-d-2.dll+0x1943b>
+<sfml-system-d-2.dll+0x195af>
+<ntdll.dll+0x694c6>
+<ntdll.dll+0x3fc56>
+<ntdll.dll+0x30b6d>
+<ntdll.dll+0x30a65>
+<KERNEL32.dll+0x13a23>
+
+# Suppression for Error #12
+LEAK
+name=Error #12 (update to meaningful name)
+drmemorylib.dll!replace_malloc
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+Pentago.exe!*
+
+## Mod+offs-style suppression for Error #12:
+LEAK
+name=Error #12 (update to meaningful name)
+<drmemorylib.dll+0x20300>
+<Pentago.exe+0xd248d>
+<Pentago.exe+0x602b9>
+<Pentago.exe+0x6350b>
+<Pentago.exe+0x73848>
+<Pentago.exe+0x71331>
+<Pentago.exe+0x7148a>
+<Pentago.exe+0x7129b>
+<Pentago.exe+0x7540e>
+<Pentago.exe+0x755ec>
+<Pentago.exe+0x7a685>
+<Pentago.exe+0x797c6>
+

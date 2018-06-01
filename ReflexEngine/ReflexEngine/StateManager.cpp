@@ -68,7 +68,7 @@ namespace Reflex
 				LOG_CRIT( "Failed to find creation function for state " + stateID );
 			}
 
-			return found->second();
+			return std::move( found->second() );
 		}
 
 		void StateManager::ApplyPendingChanges()
