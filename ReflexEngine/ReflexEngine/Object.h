@@ -214,7 +214,7 @@ namespace Reflex
 			if( GetComponent< T >().IsValid() )
 				RemoveComponent< T >();
 
-			AddComponent< T >( *component.Get() );
+			AddComponent< T >( component );
 
 			CopyComponentsFrom< Args... >( other );
 		}

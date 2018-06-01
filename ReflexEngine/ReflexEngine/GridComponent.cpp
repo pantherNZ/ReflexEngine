@@ -29,9 +29,7 @@ namespace Reflex
 
 		void Grid::AddToGrid( const ObjectHandle& handle, const sf::Vector2u index )
 		{
-			const auto insertIndex = GetIndex( index );
-
-			if( insertIndex >= GetTotalCells() )
+			if( index.x >= GetWidth() || index.y >= GetHeight() )
 			{
 				LOG_CRIT( "Trying to add to grid with an invalid index of (" << index.x << ", " << index.y << ")" );
 				return;
@@ -42,6 +40,7 @@ namespace Reflex
 			if( transform->m_parent )
 				transform->m_parent->GetTransform()->DetachChild( handle );
 
+			const auto insertIndex = GetIndex( index );
 			m_children[insertIndex] = handle;
 			transform->m_parent = GetObject();
 			transform->SetZOrder( SceneNode::s_nextRenderIndex++ );
@@ -56,14 +55,13 @@ namespace Reflex
 
 		ObjectHandle Grid::RemoveFromGrid( const sf::Vector2u index )
 		{
-			const auto insertIndex = GetIndex( index );
-
-			if( insertIndex > GetTotalCells() )
+			if( index.x >= GetWidth() || index.y >= GetHeight() )
 			{
 				LOG_CRIT( "Trying to remove from grid with an invalid index of (" << index.x << ", " << index.y << ")" );
 				return ObjectHandle::null;
 			}
 
+			const auto insertIndex = GetIndex( index );
 			const auto result = m_children[insertIndex];
 			auto transform = result->GetTransform();
 			GetObject()->GetWorld().m_sceneGraphRoot->AttachChild( result );
@@ -78,14 +76,13 @@ namespace Reflex
 
 		ObjectHandle Grid::GetCell( const sf::Vector2u index ) const
 		{
-			const auto insertIndex = GetIndex( index );
-
-			if( insertIndex > GetTotalCells() )
+			if( index.x >= GetWidth() || index.y >= GetHeight() )
 			{
 				LOG_CRIT( "Trying to access from grid with an invalid index of (" << index.x << ", " << index.y << ")" );
 				return TransformHandle::null;
 			}
 
+			const auto insertIndex = GetIndex( index );
 			return m_children[insertIndex];
 		}
 

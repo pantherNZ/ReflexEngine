@@ -36,6 +36,10 @@ namespace Reflex
 			if( --m_size )
 			{
 				unsigned index = GetIndex( memory );
+
+				if( index == m_size )
+					return nullptr;
+
 				Move( index, m_size );
 				return ( char * )m_array + index * m_objectSize;
 			}
@@ -78,14 +82,14 @@ namespace Reflex
 			std::memcpy( B, t, m_objectSize );
 		}
 
-		void ObjectAllocator::Move( unsigned a, unsigned b )
+		void ObjectAllocator::Move( unsigned dest, unsigned src )
 		{
-			if( a == b )
+			if( dest == src )
 				return;
 
-			void* A = ( char * )m_array + a * m_objectSize;
-			void* B = ( char * )m_array + b * m_objectSize;
-			std::memcpy( A, B, m_objectSize );
+			void* destPtr = ( char * )m_array + dest * m_objectSize;
+			void* srcPtr = ( char * )m_array + src * m_objectSize;
+			std::memcpy( destPtr, srcPtr, m_objectSize );
 		}
 
 		void ObjectAllocator::Shrink()
