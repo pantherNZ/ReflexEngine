@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EntityAllocator.h" />
+    <ClInclude Include="EntityIterator.h" />
     <ClInclude Include="GridComponent.h" />
     <ClInclude Include="InteractableComponent.h" />
     <ClInclude Include="InteractableSystem.h" />
@@ -164,8 +166,6 @@
     <ClInclude Include="HandleManager.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="Object.h" />
-    <ClInclude Include="ObjectAllocator.h" />
-    <ClInclude Include="ObjectIterator.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="RenderSystem.h" />
@@ -179,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="EntityAllocator.cpp" />
     <ClCompile Include="GridComponent.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="HandleManager.cpp" />
@@ -186,7 +187,6 @@
     <ClCompile Include="InteractableSystem.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="Object.cpp" />
-    <ClCompile Include="ObjectAllocator.cpp" />
     <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="SceneNode.cpp" />

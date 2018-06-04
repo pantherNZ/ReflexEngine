@@ -37,8 +37,7 @@ namespace Reflex
 			: Component( other )
 			, m_type( other.m_type )
 		{
-			//memcpy( &this->m_objectData, &other.m_objectData, sizeof( ObjectType ) );
-			m_objectData.sprite = other.m_objectData.sprite;
+			memcpy( &this->m_objectData, &other.m_objectData, sizeof( ObjectType ) );
 		}
 
 		sf::CircleShape& SFMLObject::GetCircleShape()

@@ -45,9 +45,6 @@
     <ClInclude Include="Engine.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectAllocator.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="HandleManager.h">
       <Filter>Memory</Filter>
     </ClInclude>
@@ -59,9 +56,6 @@
     </ClInclude>
     <ClInclude Include="Logging.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectIterator.h">
-      <Filter>Memory</Filter>
     </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Core</Filter>
@@ -108,6 +102,12 @@
     <ClInclude Include="InteractableSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
+    <ClInclude Include="EntityAllocator.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityIterator.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="World.cpp">
@@ -121,9 +121,6 @@
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectAllocator.cpp">
-      <Filter>Memory</Filter>
     </ClCompile>
     <ClCompile Include="HandleManager.cpp">
       <Filter>Memory</Filter>
@@ -166,6 +163,9 @@
     </ClCompile>
     <ClCompile Include="InteractableComponent.cpp">
       <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityAllocator.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

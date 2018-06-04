@@ -5,6 +5,7 @@
 #include "Entity.h"
 #include "TransformComponent.h"
 
+
 namespace Reflex
 {
 	namespace Core
@@ -22,6 +23,15 @@ namespace Reflex
 			// Creates and adds a new component of the template type and returns a handle to it
 			template< class T, typename... Args >
 			Handle< T > AddComponent( Args&&... args );
+
+			//template <class T, class... Ts>
+			//struct IsComponentChecker : std::disjunction<std::is_base_of<T, Ts>...> {};
+
+			//template< class T, typename... Args >
+			//typename std::enable_if_t< typename IsComponentChecker< T, Args >, Handle< T > > AddComponent( Args&&... args );
+
+			//template< class T, typename... Args >
+			//typename std::enable_if_t< IsComponentChecker< Reflex::Components::Component, Args >::value, Handle< T > > AddComponent( Args&&... args );
 
 			// Removes all components
 			void RemoveAllComponents();
@@ -57,7 +67,7 @@ namespace Reflex
 			std::vector< Handle< T > > GetComponents() const;
 
 			// Copy components from another object to this object
-			template< typename T, typename... Args >
+			template< typename... Args >
 			void CopyComponentsFrom( const ObjectHandle& other );
 
 			TransformHandle GetTransform() const;
@@ -67,9 +77,15 @@ namespace Reflex
 		protected:
 			Object() = delete;
 
-			// Use SFINAE to remove the base case where there is 0 argument types (above function calls itself recursively until we reach 0 template arguments)
-			template< typename... Args >
-			typename std::enable_if< sizeof...( Args ) == 0 >::type CopyComponentsFrom( const ObjectHandle& other ) {}
+			//template< typename T, typename... Args >
+			//constexpr bool IsComponentChecker()
+			//{
+			//	bool pairs[] = { std::is_base_of_v< T, Args >... };
+			//	for( bool p : pairs )
+			//		if( p )
+			//			return true;
+			//	return false;
+			//}
 
 		protected:
 			World& m_world;
@@ -203,20 +219,10 @@ namespace Reflex
 			return std::move( results );
 		}
 
-		template< typename T, typename... Args >
+		template< typename... Args >
 		void Object::CopyComponentsFrom( const ObjectHandle& other )
 		{
-			auto component = other->GetComponent< T >();
-
-			if( !component )
-				return;
-
-			if( GetComponent< T >().IsValid() )
-				RemoveComponent< T >();
-
-			AddComponent< T >( component );
-
-			CopyComponentsFrom< Args... >( other );
+			m_world.CopyComponentsFrom< Args... >( m_self, other );
 		}
 	}
 }

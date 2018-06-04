@@ -55,11 +55,11 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 		}
 	};
 
-	interactable->m_deselectedCallback = [=]( const InteractableHandle& interactable )
+	interactable->m_deselectedCallback = [this, grid]( const InteractableHandle& interactable )
 	{
 		if( m_selectedMarble )
 		{
-			const auto mousePosition = Reflex::ToVector2f( sf::Mouse::getPosition( *m_world.GetContext().window ) );
+			const auto mousePosition = m_selectedMarble->GetTransform()->getPosition();
 			auto result = grid->GetCellIndex( mousePosition );
 
 			if( result.first )
@@ -98,20 +98,8 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 		cornerGrid->AddToGrid( newObj, x % 3, y % 3 );
 	};
 
-	PlaceMarble( 3, 0 );
-	PlaceMarble( 4, 0 );
-	//PlaceMarble( 5, 0 );
-	PlaceMarble( 3, 1 );
-	PlaceMarble( 4, 1 );
-	PlaceMarble( 5, 1 );
-	//PlaceMarble( 6, 0 );
-	//PlaceMarble( 7, 0 );
-	//PlaceMarble( 8, 0 );
-	//
-	return;
-
 	// Testing the board
-	for( unsigned y = 0U; y < 6; ++y )
-		for( unsigned x = 0U; x < 6; ++x )
-			PlaceMarble( x, y );
+	//for( unsigned y = 0U; y < 6; ++y )
+	//	for( unsigned x = 0U; x < 6; ++x )
+	//		PlaceMarble( x, y );
 }

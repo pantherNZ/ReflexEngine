@@ -3,7 +3,7 @@
 #include "Precompiled.h"
 #include "ResourceManager.h"
 #include "Object.h"
-#include "ObjectAllocator.h"
+#include "EntityAllocator.h"
 #include "System.h"
 #include "HandleFwd.hpp"
 #include "TileMap.h"
@@ -53,14 +53,14 @@ namespace Reflex
 			template< class T >
 			void ForwardRegisterComponent();
 
-			template< class T >
-			void SyncHandles( ObjectAllocator& m_array );
-
-			template< class T >
-			void SyncHandlesForce( ObjectAllocator& m_array );
-
 			template< typename Func >
 			void ForEachObject( Func function );
+
+			template< class T >
+			void SyncHandles( EntityAllocator& m_array );
+
+			template< class T >
+			void SyncHandlesForce( EntityAllocator& m_array );
 
 			HandleManager& GetHandleManager();
 			sf::RenderTarget& GetWindow();
@@ -78,14 +78,22 @@ namespace Reflex
 			template< class T >
 			void DestroyComponent( Handle< T > component );
 
-			std::unordered_map< Type, std::unique_ptr< ObjectAllocator > >::iterator GetComponentAllocator( const Type& componentType, const size_t componentSize );
+			// Copy components from another object to this object
+			template< typename T, typename... Args >
+			void CopyComponentsFrom( const ObjectHandle& to, const ObjectHandle& from );
+
+			// Use SFINAE to remove the base case where there is 0 argument types (above function calls itself recursively until we reach 0 template arguments)
+			template< typename... Args >
+			typename std::enable_if< sizeof...( Args ) == 0 >::type CopyComponentsFrom( const ObjectHandle& to, const ObjectHandle& from ) { }
+
+			std::unordered_map< Type, std::unique_ptr< EntityAllocator > >::iterator GetComponentAllocator( const Type& componentType, const size_t componentSize );
 			void AddComponentToSystems( const ObjectHandle& owner, const BaseHandle& componentHandle, const Type& componentType );
 
 		private:
 			World() = delete;
 
 			void DeletePendingItems();
-			void ResetAllocator( ObjectAllocator& allocator );
+			void ResetAllocator( EntityAllocator& allocator );
 
 		protected:
 			enum Variables
@@ -100,14 +108,14 @@ namespace Reflex
 
 			//b2World m_box2DWorld;
 
-			// Storage for all objects in the game
-			ObjectAllocator m_objects;
-
 			// Handle manager which maps a handle to a void* in memory (such as in the above object allocator or a component allocator)
 			HandleManager m_handles;
 
+			// Storage for all objects in the game
+			EntityAllocator m_objects;
+
 			// List of components, indexed by their type (EG. Sprite), holds the memory of all components
-			std::unordered_map< Type, std::unique_ptr< ObjectAllocator > > m_components;
+			std::unordered_map< Type, std::unique_ptr< EntityAllocator > > m_components;
 
 			// List of systems, indexed by their type, holds memory for all the Systems
 			std::unordered_map< Type, std::unique_ptr< System > > m_systems;
@@ -203,7 +211,7 @@ namespace Reflex
 			const auto componentType = Type( typeid( T ) );
 
 			if( m_components.find( componentType ) == m_components.end() )
-				m_components.insert( std::make_pair( componentType, std::make_unique< ObjectAllocator >( sizeof( T ), 10 ) ) );
+				m_components.insert( std::make_pair( componentType, std::make_unique< EntityAllocator >( sizeof( T ), 10 ) ) );
 		}
 
 		template< class T, typename... Args >
@@ -239,22 +247,30 @@ namespace Reflex
 			DestroyComponent( componentType, component );
 		}
 
-		template< class T >
-		void World::SyncHandles( ObjectAllocator& m_array )
+		template< typename T, typename... Args >
+		void World::CopyComponentsFrom( const ObjectHandle& to, const ObjectHandle& from )
 		{
-			if( m_array.Grew() )
-			{
-				for( auto i = m_array.begin<T>(); i != m_array.end<T>(); ++i )
-					m_handles.Update( &( *i ), i->m_self );
-				m_array.ClearGrewFlag();
-			}
-		}
+			auto component = from->GetComponent< T >();
 
-		template< class T >
-		void World::SyncHandlesForce( ObjectAllocator& m_array )
-		{
-			for( auto i = m_array.begin<T>(); i != m_array.end<T>(); ++i )
-				m_handles.Update( &( *i ), i->m_self );
+			if( component )
+			{
+				// Remove if this component already has this, may want to change this to only happen with the transform component though.
+				if( to->GetComponent< T >().IsValid() )
+					to->RemoveComponent< T >();
+
+				// Pre allocate any memory required to fit the new component (we must do this now because we are passing in a reference to a 
+				// component to copy from and if the allocator expands, the reference would be invalid).
+				const auto componentType = Type( typeid( T ) );
+				const auto found = GetComponentAllocator( componentType, sizeof( T ) );
+				if( found->second->PreAllocate() )
+					SyncHandles< T >( *found->second );
+
+				// Add the component (we know now it is safe to get a reference to the other component and pass it through)
+				to->AddComponent< T >( *component.Get() );
+			}
+
+			// Recursively pop arguments off the variadic template args and continue
+			CopyComponentsFrom< Args... >( to, from );
 		}
 
 		template< typename Func >
@@ -262,6 +278,24 @@ namespace Reflex
 		{
 			for( unsigned i = 0; i < m_objects.Size(); ++i )
 				function( ( Object* )m_objects[i] );
+		}
+
+		template< class T >
+		void World::SyncHandles( EntityAllocator& m_array )
+		{
+			if( m_array.Grew() )
+			{
+				for( auto i = m_array.begin< T >(); i != m_array.end< T >(); ++i )
+					m_handles.Update( &( *i ), i->m_self );
+				m_array.ClearGrewFlag();
+			}
+		}
+
+		template< class T >
+		void World::SyncHandlesForce( EntityAllocator& m_array )
+		{
+			for( auto i = m_array.begin< T >(); i != m_array.end< T >(); ++i )
+				m_handles.Update( &( *i ), i->m_self );
 		}
 	}
 }

@@ -1,17 +1,20 @@
 #pragma once
 
 #include "Precompiled.h"
-#include "ObjectIterator.h"
+#include "EntityIterator.h"
 
 namespace Reflex
 {
 	namespace Core
 	{
-		class ObjectAllocator : private sf::NonCopyable
+		class EntityAllocator : private sf::NonCopyable
 		{
 		public:
-			ObjectAllocator( unsigned objectSize, unsigned numElements );
-			~ObjectAllocator();
+			EntityAllocator( unsigned objectSize, unsigned numElements );
+			~EntityAllocator();
+
+			// Allocates new capacity if required, but does not actually create a new object*, returns whether new space was allocated
+			bool PreAllocate();
 
 			// Allocate space and return index
 			void* Allocate();
@@ -32,9 +35,9 @@ namespace Reflex
 			unsigned Size() const;
 			unsigned Capacity() const;
 			unsigned GetIndex( void* data ) const;
+			void* GetData( unsigned index ) const;
 			bool Grew() const;
 			void ClearGrewFlag();
-			void* GetData( unsigned index ) const;
 
 			// Operator overloads for accessing the data
 			void* operator[]( unsigned index );
@@ -50,14 +53,14 @@ namespace Reflex
 			void GrowInteral();
 			void Move( unsigned dest, unsigned src );
 
-			ObjectAllocator() = delete;
+			EntityAllocator() = delete;
 
 		private:
-			void* m_array;
-			unsigned m_objectSize;
-			unsigned m_size;
-			unsigned m_capacity;
-			bool m_arrayGrew;
+			void* m_array = nullptr;
+			unsigned m_objectSize = 0U;
+			unsigned m_size = 0U;
+			unsigned m_capacity = 0U;
+			bool m_arrayGrew = false;
 		};
 	}
 }

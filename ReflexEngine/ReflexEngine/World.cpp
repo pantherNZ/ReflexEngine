@@ -14,8 +14,8 @@ namespace Reflex
 			, m_worldView( context.window->getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
-			, m_components( 10 )
 			, m_objects( sizeof( Object ), initialMaxObjects )
+			, m_components( 10 )
 			, m_tileMap( m_worldBounds )
 		{
 			Setup();
@@ -26,8 +26,9 @@ namespace Reflex
 			, m_worldView( context.window->getDefaultView() )
 			, m_worldBounds( worldBounds )
 			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
-			, m_components( 10 )
+			, m_handles()
 			, m_objects( sizeof( Object ), initialMaxObjects )
+			, m_components( 10 )
 			, m_tileMap( m_worldBounds, spacialHashMapSize )
 		{
 			Setup();
@@ -89,7 +90,7 @@ namespace Reflex
 			}
 		}
 
-		void World::ResetAllocator( ObjectAllocator& allocator )
+		void World::ResetAllocator( EntityAllocator& allocator )
 		{
 			while( allocator.Size() )
 			{
@@ -117,7 +118,7 @@ namespace Reflex
 
 		ObjectHandle World::CreateObject( const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
 		{
-			return CreateObject( false, position, rotation, scale );
+			return CreateObject( true, position, rotation, scale );
 		}
 
 		ObjectHandle World::CreateObject( const bool attachToRoot, const sf::Vector2f& position, const float rotation, const sf::Vector2f& scale )
@@ -222,14 +223,14 @@ namespace Reflex
 			return m_sceneGraphRoot->GetChild( index );
 		}
 
-		std::unordered_map< Type, std::unique_ptr< ObjectAllocator > >::iterator World::GetComponentAllocator( const Type& componentType, const size_t componentSize )
+		std::unordered_map< Type, std::unique_ptr< EntityAllocator > >::iterator World::GetComponentAllocator( const Type& componentType, const size_t componentSize )
 		{
 			// Create an allocator for this type if one doesn't already exist
 			auto found = m_components.find( componentType );
 
 			if( found == m_components.end() )
 			{
-				const auto result = m_components.insert( std::make_pair( componentType, std::make_unique< ObjectAllocator >( componentSize, 10 ) ) );
+				const auto result = m_components.insert( std::make_pair( componentType, std::make_unique< EntityAllocator >( componentSize, 10 ) ) );
 				found = result.first;
 
 				if( !result.second )

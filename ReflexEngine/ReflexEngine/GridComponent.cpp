@@ -137,17 +137,15 @@ namespace Reflex
 		sf::Vector2f Grid::GetCellPosition( const sf::Vector2u index ) const
 		{
 			const auto topLeft = m_centreGrid ? sf::Vector2f( ( GetWidth() / -2.0f + 0.5f ) * m_cellSize.x, ( GetHeight() / -2.0f + 0.5f ) * m_cellSize.y ) : sf::Vector2f( 0.0f, 0.0f );
-			const auto gridCentre = GetObject()->GetComponent< Reflex::Components::Transform >()->getPosition();
+			const auto gridCentre = GetObject()->GetComponent< Reflex::Components::Transform >()->GetWorldPosition();
 			return topLeft + gridCentre + sf::Vector2f( index.x * m_cellSize.x, index.y * m_cellSize.y );
 		}
 
 		std::pair< bool, sf::Vector2u > Grid::GetCellIndex( const sf::Vector2f position ) const
 		{
-			const auto topLeft = m_centreGrid ? sf::Vector2f( ( GetWidth() / -2.0f + 0.5f ) * m_cellSize.x, ( GetHeight() / -2.0f + 0.5f ) * m_cellSize.y ) : sf::Vector2f( 0.0f, 0.0f );
-			const auto gridCentre = GetObject()->GetComponent< Reflex::Components::Transform >()->getPosition();
-			const auto localPosition = position - ( topLeft + gridCentre );
-			const auto indexX = int( localPosition.x / m_cellSize.x );
-			const auto indexY = int( localPosition.y / m_cellSize.y );
+			const auto localPosition = position - GetCellPosition( sf::Vector2u( 0U, 0U ) );
+			const auto indexX = RoundToInt( localPosition.x / m_cellSize.x );
+			const auto indexY = RoundToInt( localPosition.y / m_cellSize.y );
 			return std::make_pair( indexX >= 0 && indexX < ( int )GetWidth() && indexY >= 0 && indexY < ( int )GetHeight(), sf::Vector2u( indexX, indexY ) );
 		}
 

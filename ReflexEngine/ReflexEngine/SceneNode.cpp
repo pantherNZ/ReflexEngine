@@ -44,7 +44,7 @@ namespace Reflex
 			sf::Transform worldTransform;
 
 			for( ObjectHandle node = m_owningObject; node != ObjectHandle::null; node = node->GetTransform()->m_parent )
-				worldTransform = node->GetTransform()->getTransform() * worldTransform;
+				worldTransform *= node->GetTransform()->getTransform();
 
 			return worldTransform;
 		}

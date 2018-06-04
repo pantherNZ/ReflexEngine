@@ -101,6 +101,11 @@ namespace Reflex
 		return( std::floor( value + 0.5f ) / ( float )accuracy );
 	}
 
+	inline int RoundToInt( float value )
+	{
+		return ( int )std::floor( value + 0.5f );
+	}
+
 	template< typename T >
 	inline T Clamp( T x, T min, T max )
 	{
