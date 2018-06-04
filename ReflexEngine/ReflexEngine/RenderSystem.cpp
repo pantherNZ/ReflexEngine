@@ -22,7 +22,7 @@ namespace Reflex
 			ForEachSystemComponent< Reflex::Components::SFMLObject, Reflex::Components::Transform >( 
 				[&target, &copied_states, &states]( SFMLObjectHandle object, TransformHandle transform )
 			{
-				copied_states.transform = states.transform * transform->getTransform();
+				copied_states.transform = states.transform * transform->GetWorldTransform();
 
 				switch( object->GetType() )
 				{

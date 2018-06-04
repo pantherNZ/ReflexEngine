@@ -46,7 +46,7 @@ GameBoard::GameBoard( World& world, const bool playerIsWhite )
 
 	auto interactable = playerMarble->AddComponent< Reflex::Components::Interactable >();
 	interactable->m_selectionIsToggle = false;
-	interactable->m_selectedCallback = [=]( const InteractableHandle& interactable )
+	interactable->m_selectedCallback = [this, playerMarble]( const InteractableHandle& interactable )
 	{
 		if( !m_selectedMarble )
 		{
