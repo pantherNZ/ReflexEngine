@@ -65,7 +65,7 @@ namespace Reflex
 			assert( a < m_size );
 			assert( b < m_size );
 
-			void* t = alloca( m_objectSize );
+			void* t = malloc( m_objectSize );
 			void* A = ( char * )m_array + a * m_objectSize;
 			void* B = ( char * )m_array + b * m_objectSize;
 			std::memcpy( t, A, m_objectSize );

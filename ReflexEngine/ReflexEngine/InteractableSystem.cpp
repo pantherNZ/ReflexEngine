@@ -33,6 +33,11 @@ namespace Reflex
 			ForEachSystemComponent< Transform, Interactable, SFMLObject >(
 				[&]( const TransformHandle& transform, InteractableHandle& interactable, const SFMLObjectHandle& sfmlObj )
 			{
+				auto* ptr = interactable.Get();
+
+				if( !ptr->isEnabled )
+					return;
+
 				bool collision = false;
 				
 				// Collision with bounds
@@ -52,32 +57,30 @@ namespace Reflex
 				break;
 				}
 
-				auto* ptr = interactable.Get();
-
 				// Focus / highlighting
-				if( ptr->m_isFocussed != collision )
+				if( ptr->isFocussed != collision )
 				{
-					ptr->m_isFocussed = collision;
+					ptr->isFocussed = collision;
 
-					if( !collision && ptr->m_lostFocusCallback )
-						ptr->m_lostFocusCallback( interactable );
-					else if( collision && ptr->m_gainedFocusCallback )
-						ptr->m_gainedFocusCallback( interactable );
+					if( !collision && ptr->lostFocusCallback )
+						ptr->lostFocusCallback( interactable );
+					else if( collision && ptr->gainedFocusCallback )
+						ptr->gainedFocusCallback( interactable );
 
 					// Lost highlight, then we also unselect
-					if( !collision && !ptr->m_selectionIsToggle && ptr->m_unselectIfLostFocus )
+					if( !collision && !ptr->selectionIsToggle && ptr->unselectIfLostFocus )
 						ptr->Deselect();
 				}
 
 				// Selection (or can be deselection for toggle mode)
-				if( ptr->m_isFocussed && m_mousePressed )
+				if( ptr->isFocussed && m_mousePressed )
 				{
-					ptr->m_isSelected && ptr->m_selectionIsToggle ? ptr->Deselect() : ptr->Select();
+					ptr->isSelected && ptr->selectionIsToggle ? ptr->Deselect() : ptr->Select();
 					m_mousePressed = false;
 				}
 
 				// Un-selection
-				if( m_mouseReleased && !ptr->m_selectionIsToggle )
+				if( m_mouseReleased && !ptr->selectionIsToggle )
 					ptr->Deselect();
 			} );
 

@@ -103,7 +103,7 @@ namespace Reflex
 
 		void TileMap::Reset( const bool shouldRePopulate /*= false*/ )
 		{
-			m_spacialHashMap.empty();
+			m_spacialHashMap.clear();
 			m_spacialHashMapWidth = ( unsigned )std::ceil( m_worldBounds.width / m_spacialHashMapSize );
 			m_spacialHashMapHeight = ( unsigned )std::ceil( m_worldBounds.height / m_spacialHashMapSize );
 			m_spacialHashMap.resize( m_spacialHashMapWidth * m_spacialHashMapHeight );

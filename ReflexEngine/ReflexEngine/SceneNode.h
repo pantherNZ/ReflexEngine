@@ -38,7 +38,8 @@ namespace Reflex
 		protected:
 			ObjectHandle m_owningObject;
 			ObjectHandle m_parent;
-			Reflex::VectorSet< ObjectHandle > m_children;
+		//	Reflex::VectorSet< ObjectHandle > m_children;
+			std::vector< ObjectHandle > m_children;
 			unsigned m_renderIndex = 0U;
 			unsigned m_layerIndex = 0U;
 

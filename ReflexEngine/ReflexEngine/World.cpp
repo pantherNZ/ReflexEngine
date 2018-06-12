@@ -2,8 +2,10 @@
 #include "World.h"
 #include "Object.h"
 #include "TransformComponent.h"
+
 #include "RenderSystem.h"
 #include "InteractableSystem.h"
+#include "MovementSystem.h"
 
 namespace Reflex
 {
@@ -42,9 +44,12 @@ namespace Reflex
 		void World::Setup()
 		{
 			BaseHandle::s_handleManager = &m_handles;
-			m_sceneGraphRoot = CreateObject( false )->GetTransform();
+			
 			AddSystem< Reflex::Systems::RenderSystem >();
 			AddSystem< Reflex::Systems::InteractableSystem >();
+			AddSystem< Reflex::Systems::MovementSystem >();
+
+			m_sceneGraphRoot = CreateObject( false )->GetTransform();
 		}
 
 		void World::Update( const float deltaTime )
@@ -94,9 +99,9 @@ namespace Reflex
 		{
 			while( allocator.Size() )
 			{
-				auto* object = ( Entity* )allocator[0];
-				m_handles.Remove( object->m_self );
+				auto* object = ( Entity* )allocator[allocator.Size() - 1];
 				object->~Entity();
+				m_handles.Remove( object->m_self );
 
 				auto moved = ( Entity* )allocator.Release( object );
 
@@ -230,7 +235,7 @@ namespace Reflex
 
 			if( found == m_components.end() )
 			{
-				const auto result = m_components.insert( std::make_pair( componentType, std::make_unique< EntityAllocator >( componentSize, 10 ) ) );
+				const auto result = m_components.insert( std::make_pair( componentType, std::make_unique< EntityAllocator >( componentSize, 1000 ) ) );
 				found = result.first;
 
 				if( !result.second )

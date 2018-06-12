@@ -7,7 +7,6 @@
 #include "System.h"
 #include "HandleFwd.hpp"
 #include "TileMap.h"
-#include "SceneNode.h"
 #include "Context.h"
 #include <assert.h>
 
@@ -211,7 +210,7 @@ namespace Reflex
 			const auto componentType = Type( typeid( T ) );
 
 			if( m_components.find( componentType ) == m_components.end() )
-				m_components.insert( std::make_pair( componentType, std::make_unique< EntityAllocator >( sizeof( T ), 10 ) ) );
+				m_components.insert( std::make_pair( componentType, std::make_unique< EntityAllocator >( sizeof( T ), 1000 ) ) );
 		}
 
 		template< class T, typename... Args >
@@ -219,7 +218,7 @@ namespace Reflex
 		{
 			const auto componentType = Type( typeid( T ) );
 			const auto found = GetComponentAllocator( componentType, sizeof( T ) );
-
+			
 			// This should never happen
 			assert( found != m_components.end() );
 

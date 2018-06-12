@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "Utility.h"
+#include "InteractableSystem.h"
 
 namespace Reflex
 {
@@ -21,19 +22,28 @@ namespace Reflex
 		class Interactable : public Component
 		{
 		public:
-			bool m_isFocussed = false;
-			bool m_isSelected = false;
-			bool m_selectionIsToggle = true;
-			bool m_unselectIfLostFocus = false;
-			bool m_renderCollisionBounds = false;
+			friend class Reflex::Systems::InteractableSystem;
+
+			// Settings, change as you want
+			bool selectionIsToggle = true;
+			bool unselectIfLostFocus = false;
+			bool isEnabled = true;
+
+			// Callbacks
+			std::function< void( const InteractableHandle& ) > gainedFocusCallback;
+			std::function< void( const InteractableHandle& ) > lostFocusCallback;
+			std::function< void( const InteractableHandle& ) > selectedCallback;
+			std::function< void( const InteractableHandle& ) > deselectedCallback;
+
+			bool IsFocussed() const;
+			bool IsSelected() const;
+
+		protected:
+			bool isFocussed = false;
+			bool isSelected = false;
 
 			void Select();
 			void Deselect();
-
-			std::function< void( const InteractableHandle& ) > m_gainedFocusCallback;
-			std::function< void( const InteractableHandle& ) > m_lostFocusCallback;
-			std::function< void( const InteractableHandle& ) > m_selectedCallback;
-			std::function< void( const InteractableHandle& ) > m_deselectedCallback;
 		};
 	}
 }

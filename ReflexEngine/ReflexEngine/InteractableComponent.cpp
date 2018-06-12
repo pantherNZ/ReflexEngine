@@ -6,25 +6,36 @@ namespace Reflex
 {
 	namespace Components
 	{
+
+		bool Interactable::IsFocussed() const
+		{
+			return isFocussed;
+		}
+
+		bool Interactable::IsSelected() const
+		{
+			return isSelected;
+		}
+
 		void Interactable::Select()
 		{
-			if( !m_isSelected )
+			if( !isSelected )
 			{
-				m_isSelected = true;
+				isSelected = true;
 
-				if( m_selectedCallback )
-					m_selectedCallback( Handle< Interactable >( m_self ) );
+				if( selectedCallback )
+					selectedCallback( Handle< Interactable >( m_self ) );
 			}
 		}
 
 		void Interactable::Deselect()
 		{
-			if( m_isSelected )
+			if( isSelected )
 			{
-				m_isSelected = false;
+				isSelected = false;
 
-				if( m_deselectedCallback )
-					m_deselectedCallback( Handle< Interactable >( m_self ) );
+				if( deselectedCallback )
+					deselectedCallback( Handle< Interactable >( m_self ) );
 			}
 		}
 	}

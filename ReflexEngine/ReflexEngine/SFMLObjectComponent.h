@@ -29,10 +29,6 @@ namespace Reflex
 		class SFMLObject : public Component
 		{
 		public:
-			// Copy constructor (from a handle)
-			template< typename T >
-			SFMLObject( const Handle< T >& other ) : SFMLObject( *other.Get() ) { }
-
 			SFMLObject( const sf::CircleShape& shape );
 			SFMLObject( const sf::ConvexShape& shape );
 			SFMLObject( const sf::RectangleShape& shape );

@@ -10,10 +10,15 @@ class PentagoGameState : public State
 public:
 	PentagoGameState( StateManager& stateManager, Context context );
 
+	void SetTurn( const bool playerTurn );
+	void GameOver( const bool playerWin );
+
 protected:
 	void Render() final;
 	bool Update( const float deltaTime ) final;
 	bool ProcessEvent( const sf::Event& event ) final;
+
+	void AITurn();
 
 private:
 	sf::FloatRect m_bounds;
@@ -21,7 +26,10 @@ private:
 
 	bool m_playerTurn = true;
 	bool m_playerIsWhite = true;
+	bool m_gameOver;
+
+	float m_AITimer = 0.0f;
 
 	GameBoard m_board;
-	sf::Text m_turnText[2];
+	sf::Text m_text[4];
 };

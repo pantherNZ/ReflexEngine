@@ -44,14 +44,11 @@ namespace Reflex
 			sf::Vector2f GetCellPosition( const sf::Vector2u index ) const;
 			std::pair< bool, sf::Vector2u > GetCellIndex( const sf::Vector2f position ) const;
 
-			template< typename Func >
-			void ForEachCell( Func function )
-			{
-				Reflex::Core::SceneNode< Transform, Grid >::ForEachChild( function );
-			}
+			void ForEachChild( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback );
 
 		protected:
-			unsigned GetIndex( const sf::Vector2u index ) const;
+			unsigned GetIndex( const sf::Vector2u coords ) const;
+			const sf::Vector2u GetCoords( const unsigned index ) const;
 			void UpdateGridPositions();
 
 		private:

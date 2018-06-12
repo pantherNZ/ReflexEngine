@@ -63,7 +63,6 @@ namespace Reflex
 
 			const auto insertIndex = GetIndex( index );
 			const auto result = m_children[insertIndex];
-			auto transform = result->GetTransform();
 			GetObject()->GetWorld().m_sceneGraphRoot->AttachChild( result );
 			m_children[insertIndex] = ObjectHandle::null;
 			return result;
@@ -137,21 +136,37 @@ namespace Reflex
 		sf::Vector2f Grid::GetCellPosition( const sf::Vector2u index ) const
 		{
 			const auto topLeft = m_centreGrid ? sf::Vector2f( ( GetWidth() / -2.0f + 0.5f ) * m_cellSize.x, ( GetHeight() / -2.0f + 0.5f ) * m_cellSize.y ) : sf::Vector2f( 0.0f, 0.0f );
-			return topLeft + sf::Vector2f( index.x * m_cellSize.x, index.y * m_cellSize.y ); //+ gridCentre
+			const auto position = topLeft + sf::Vector2f( index.x * m_cellSize.x, index.y * m_cellSize.y ); //+ gridCentre
+			const auto transform = GetObject()->GetTransform();
+			const auto gridCentre = transform->GetWorldPosition();
+			return Reflex::RotateAroundPoint( position, gridCentre, transform->GetWorldRotation() );
 		}
 
 		std::pair< bool, sf::Vector2u > Grid::GetCellIndex( const sf::Vector2f position ) const
 		{
-			const auto gridCentre = GetObject()->GetComponent< Reflex::Components::Transform >()->GetWorldPosition();
+			const auto transform = GetObject()->GetTransform();
+			const auto gridCentre = transform->GetWorldPosition();
 			const auto localPosition = position - ( gridCentre + GetCellPosition( sf::Vector2u( 0U, 0U ) ) );
-			const auto indexX = RoundToInt( localPosition.x / m_cellSize.x );
-			const auto indexY = RoundToInt( localPosition.y / m_cellSize.y );
+			const auto rotatedPosition = Reflex::RotateAroundPoint( localPosition, gridCentre, -transform->GetWorldRotation() );
+			const auto indexX = RoundToInt( rotatedPosition.x / m_cellSize.x );
+			const auto indexY = RoundToInt( rotatedPosition.y / m_cellSize.y );
 			return std::make_pair( indexX >= 0 && indexX < ( int )GetWidth() && indexY >= 0 && indexY < ( int )GetHeight(), sf::Vector2u( indexX, indexY ) );
 		}
 
-		unsigned Grid::GetIndex( const sf::Vector2u index ) const
+		void Grid::ForEachChild( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback )
 		{
-			return index.y * GetWidth() + index.x;
+			for( unsigned i = 0U; i < m_children.size(); ++i )
+				callback( m_children[i], GetCoords( i ) );
+		}
+
+		unsigned Grid::GetIndex( const sf::Vector2u coords ) const
+		{
+			return coords.y * GetWidth() + coords.x;
+		}
+
+		const sf::Vector2u Grid::GetCoords( const unsigned index ) const
+		{
+			return sf::Vector2u( index % GetWidth(), index / GetWidth() );
 		}
 
 		void Grid::UpdateGridPositions()

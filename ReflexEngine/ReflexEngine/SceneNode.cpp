@@ -18,24 +18,25 @@ namespace Reflex
 			transform->m_parent = m_owningObject;
 			transform->SetZOrder( s_nextRenderIndex++ );
 			transform->SetLayer( m_layerIndex + 1 );
-			m_children.insert( child );
+			//m_children.insert( child );
+			m_children.push_back( child );
 		}
 
 		ObjectHandle SceneNode::DetachChild( const ObjectHandle& node )
 		{
-			// Find and detach the node
-			const auto found = std::find( m_children.begin(), m_children.end(), node );
-
-			if( found == m_children.end() )
+			// Find and detach the node'
+			for( unsigned i = 0U; i < m_children.size(); ++i )
 			{
-				LOG_CRIT( "Node not found" );
-				return ObjectHandle::null;
+				if( node == m_children[i] )
+				{
+					m_children[i]->GetTransform()->m_parent = ObjectHandle::null;
+					m_children.erase( m_children.begin() + i );
+					return node;
+				}
 			}
 
-			auto found_node = std::move( *found );
-			found_node->GetTransform()->m_parent = ObjectHandle::null;
-			m_children.erase( found );
-			return found_node;
+			LOG_CRIT( "Node not found" );
+			return ObjectHandle::null;
 		}
 
 		sf::Transform SceneNode::GetWorldTransform() const
@@ -44,7 +45,7 @@ namespace Reflex
 			sf::Transform worldTransform;
 
 			for( ObjectHandle node = m_owningObject; node != ObjectHandle::null; node = node->GetTransform()->m_parent )
-				worldTransform *= node->GetTransform()->getTransform();
+				worldTransform = node->GetTransform()->getTransform() * worldTransform;
 
 			return worldTransform;
 		}

@@ -15,7 +15,7 @@ namespace Reflex
 	// Logging system
 	namespace
 	{
-		inline void LOG( std::string log ) { std::cout << log << "\n"; }
+		inline void LOG( const std::string& log ) { std::cout << log << "\n"; }
 	}
 
 	#define LOG_CRIT( x ) { assert( false ); LOG( Stream( "CRIT: (" << __FUNCTION__ << ") " << x ) ); }

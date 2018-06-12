@@ -108,6 +108,9 @@
     <ClInclude Include="EntityIterator.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="MovementSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="World.cpp">
@@ -166,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="EntityAllocator.cpp">
       <Filter>Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="MovementSystem.cpp">
+      <Filter>Systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

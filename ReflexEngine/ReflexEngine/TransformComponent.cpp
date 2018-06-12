@@ -55,5 +55,26 @@ namespace Reflex
 
 			m_owningObject = owner;
 		}
+
+		void Transform::RotateForDuration( const float degrees, const float durationSec )
+		{
+			m_rotateDegreesPerSec = degrees / durationSec;
+			m_rotateDurationSec = durationSec;
+			m_finishedRotationCallback = nullptr;
+		}
+
+		void Transform::RotateForDuration( const float degrees, const float durationSec, std::function< void( const TransformHandle& ) > finishedRotationCallback )
+		{
+			m_rotateDegreesPerSec = degrees / durationSec;
+			m_rotateDurationSec = durationSec;
+			m_finishedRotationCallback = finishedRotationCallback;
+		}
+
+		void Transform::StopRotation()
+		{
+			m_rotateDegreesPerSec = 0.0f;
+			m_rotateDurationSec = 0.0f;
+			m_finishedRotationCallback = nullptr;
+		}
 	}
 }

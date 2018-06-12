@@ -9,5 +9,7 @@ namespace Reflex
 		BoardTexture,
 		Egg1,
 		Egg2,
+		ArrowLeft,
+		ArrowRight,
 	};
 }

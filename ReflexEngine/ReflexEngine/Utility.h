@@ -217,6 +217,15 @@ namespace Reflex
 		return sf::Vector2f( vector.x * cosR - vector.y * sinR, vector.y * cosR + vector.x * sinR );
 	}
 
+	inline sf::Vector2f RotateAroundPoint( const sf::Vector2f& position, const sf::Vector2f& rotateAround, const float radians )
+	{
+		const float sinR = sin( radians );
+		const float cosR = cos( radians );
+		const float diffX = position.x - rotateAround.x;
+		const float diffY = position.y - rotateAround.y;
+		return sf::Vector2f( cosR * diffX - sinR * diffY + rotateAround.x, sinR * diffX - cosR * diffY + rotateAround.y );
+	}
+
 	inline sf::Vector2i ToVector2i( const sf::Vector2f& convert )
 	{
 		return sf::Vector2i( ( int )Round( convert.x ), ( int )Round( convert.y ) );
