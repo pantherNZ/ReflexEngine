@@ -41,8 +41,9 @@ namespace Reflex
 			void SetGridIsCentred( const bool centreGrid );
 			bool GetGridIsCentred() const;
 
-			sf::Vector2f GetCellPosition( const sf::Vector2u index ) const;
-			std::pair< bool, sf::Vector2u > GetCellIndex( const sf::Vector2f position ) const;
+			sf::Vector2f GetCellPositionRelative( const sf::Vector2u index ) const;
+			sf::Vector2f GetCellPositionWorld( const sf::Vector2u index ) const;
+			std::pair< bool, sf::Vector2u > GetCellIndex( const sf::Vector2f worldPosition ) const;
 
 			void ForEachChild( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback );
 

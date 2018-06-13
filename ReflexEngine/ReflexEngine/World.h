@@ -275,7 +275,7 @@ namespace Reflex
 		template< typename Func >
 		void World::ForEachObject( Func function )
 		{
-			for( unsigned i = 0; i < m_objects.Size(); ++i )
+			for( unsigned i = 1; i < m_objects.Size(); ++i )
 				function( ( Object* )m_objects[i] );
 		}
 

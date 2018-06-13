@@ -45,7 +45,7 @@ namespace Reflex
 			transform->m_parent = GetObject();
 			transform->SetZOrder( SceneNode::s_nextRenderIndex++ );
 			transform->SetLayer( GetObject()->GetTransform()->m_layerIndex + 1 );
-			transform->setPosition( GetCellPosition( index ) );
+			transform->setPosition( GetCellPositionRelative( index ) );
 		}
 
 		ObjectHandle Grid::RemoveFromGrid( const unsigned x, const unsigned y )
@@ -133,23 +133,29 @@ namespace Reflex
 			return m_centreGrid;
 		}
 
-		sf::Vector2f Grid::GetCellPosition( const sf::Vector2u index ) const
+		sf::Vector2f Grid::GetCellPositionRelative( const sf::Vector2u index ) const
 		{
 			const auto topLeft = m_centreGrid ? sf::Vector2f( ( GetWidth() / -2.0f + 0.5f ) * m_cellSize.x, ( GetHeight() / -2.0f + 0.5f ) * m_cellSize.y ) : sf::Vector2f( 0.0f, 0.0f );
-			const auto position = topLeft + sf::Vector2f( index.x * m_cellSize.x, index.y * m_cellSize.y ); //+ gridCentre
-			const auto transform = GetObject()->GetTransform();
-			const auto gridCentre = transform->GetWorldPosition();
-			return Reflex::RotateAroundPoint( position, gridCentre, transform->GetWorldRotation() );
+			const auto position = topLeft + sf::Vector2f( index.x * m_cellSize.x, index.y * m_cellSize.y );
+			return position;
 		}
 
-		std::pair< bool, sf::Vector2u > Grid::GetCellIndex( const sf::Vector2f position ) const
+		sf::Vector2f Grid::GetCellPositionWorld( const sf::Vector2u index ) const
 		{
 			const auto transform = GetObject()->GetTransform();
 			const auto gridCentre = transform->GetWorldPosition();
-			const auto localPosition = position - ( gridCentre + GetCellPosition( sf::Vector2u( 0U, 0U ) ) );
-			const auto rotatedPosition = Reflex::RotateAroundPoint( localPosition, gridCentre, -transform->GetWorldRotation() );
-			const auto indexX = RoundToInt( rotatedPosition.x / m_cellSize.x );
-			const auto indexY = RoundToInt( rotatedPosition.y / m_cellSize.y );
+			const auto worldPosition = GetCellPositionRelative( index ) + gridCentre;
+			return Reflex::RotateAroundPoint( worldPosition, gridCentre, transform->GetWorldRotation() );
+		}
+
+		std::pair< bool, sf::Vector2u > Grid::GetCellIndex( const sf::Vector2f worldPosition ) const
+		{
+			const auto transform = GetObject()->GetTransform();
+			const auto gridCentre = transform->GetWorldPosition();
+			const auto correctedPosition = Reflex::RotateAroundPoint( worldPosition, gridCentre, -transform->GetWorldRotation() );
+			const auto localPosition = correctedPosition - GetCellPositionWorld( sf::Vector2u( 0U, 0U ) );
+			const auto indexX = RoundToInt( localPosition.x / m_cellSize.x );
+			const auto indexY = RoundToInt( localPosition.y / m_cellSize.y );
 			return std::make_pair( indexX >= 0 && indexX < ( int )GetWidth() && indexY >= 0 && indexY < ( int )GetHeight(), sf::Vector2u( indexX, indexY ) );
 		}
 
@@ -176,7 +182,7 @@ namespace Reflex
 				for( unsigned x = 0U; x < GetWidth(); ++x )
 				{
 					const auto index = sf::Vector2u( x, y );
-					m_children[GetIndex( index )]->GetTransform()->setPosition( GetCellPosition( index ) );
+					m_children[GetIndex( index )]->GetTransform()->setPosition( GetCellPositionRelative( index ) );
 				}
 			}
 		}
