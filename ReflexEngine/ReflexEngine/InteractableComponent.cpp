@@ -19,7 +19,7 @@ namespace Reflex
 
 		void Interactable::Select()
 		{
-			if( !isSelected )
+			if( !isSelected && isEnabled )
 			{
 				isSelected = true;
 

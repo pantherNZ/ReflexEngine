@@ -173,6 +173,37 @@ namespace Reflex
 		object.setOrigin( std::floor( bounds.left + bounds.width / 2.f ), std::floor( bounds.top + bounds.height / 2.f ) );
 	}
 
+	// Awful conversions
+	inline sf::Vector2i Vector2fToVector2i( const sf::Vector2f& convert )
+	{
+		return sf::Vector2i( ( int )Round( convert.x ), ( int )Round( convert.y ) );
+	}
+
+	inline sf::Vector2u Vector2fToVector2u( const sf::Vector2f& convert )
+	{
+		return sf::Vector2u( ( unsigned )Round( convert.x ), ( unsigned )Round( convert.y ) );
+	}
+
+	inline sf::Vector2f Vector2iToVector2f( const sf::Vector2i& convert )
+	{
+		return sf::Vector2f( ( float )convert.x, ( float )convert.y );
+	}
+
+	inline sf::Vector2u Vector2iToVector2u( const sf::Vector2i& convert )
+	{
+		return sf::Vector2u( ( unsigned )convert.x, ( unsigned )convert.y );
+	}
+
+	inline sf::Vector2f Vector2uToVector2f( const sf::Vector2u& convert )
+	{
+		return sf::Vector2f( ( float )convert.x, ( float )convert.y );
+	}
+
+	inline sf::Vector2i Vector2uToVector2i( const sf::Vector2u& convert )
+	{
+		return sf::Vector2i( ( int )convert.x, ( int )convert.y );
+	}
+
 	// Useful math functions
 	inline float Dot( const sf::Vector2f& a, const sf::Vector2f& b )
 	{
@@ -205,35 +236,33 @@ namespace Reflex
 		return a / distance;
 	}
 
-	inline sf::Vector2f VectorFromAngle( const float orientation, const float distance )
+	inline sf::Vector2f VectorFromAngle( const float angleDegrees, const float distance )
 	{
-		return sf::Vector2f( distance * sin( orientation ), distance * -cos( orientation ) );
+		const auto angleRadians = TORADIANS( angleDegrees );
+		return sf::Vector2f( distance * sin( angleRadians ), distance * -cos( angleDegrees ) );
 	}
 
-	inline sf::Vector2f RotateVector( const sf::Vector2f& vector, const float radians )
+	inline sf::Vector2f RotateVector( const sf::Vector2f& vector, const float angleDegrees )
 	{
-		const float sinR = sin( radians );
-		const float cosR = cos( radians );
+		const auto angleRadians = TORADIANS( angleDegrees );
+		const float sinR = sin( angleRadians );
+		const float cosR = cos( angleRadians );
 		return sf::Vector2f( vector.x * cosR - vector.y * sinR, vector.y * cosR + vector.x * sinR );
 	}
 
-	inline sf::Vector2f RotateAroundPoint( const sf::Vector2f& position, const sf::Vector2f& rotateAround, const float radians )
+	inline sf::Vector2f RotateAroundPoint( const sf::Vector2f& position, const sf::Vector2f& rotateAround, const float angleDegrees )
 	{
-		const float sinR = sin( radians );
-		const float cosR = cos( radians );
+		const auto angleRadians = TORADIANS( angleDegrees );
+		const float sinR = sin( angleRadians );
+		const float cosR = cos( angleRadians );
 		const float diffX = position.x - rotateAround.x;
 		const float diffY = position.y - rotateAround.y;
-		return sf::Vector2f( cosR * diffX - sinR * diffY + rotateAround.x, sinR * diffX - cosR * diffY + rotateAround.y );
+		return sf::Vector2f( cosR * diffX - sinR * diffY + rotateAround.x, sinR * diffX + cosR * diffY + rotateAround.y );
 	}
 
-	inline sf::Vector2i ToVector2i( const sf::Vector2f& convert )
+	inline sf::Vector2i RotateAroundPoint( const sf::Vector2i& position, const sf::Vector2i& rotateAround, const float angleDegrees )
 	{
-		return sf::Vector2i( ( int )Round( convert.x ), ( int )Round( convert.y ) );
-	}
-
-	inline sf::Vector2f ToVector2f( const sf::Vector2i& convert )
-	{
-		return sf::Vector2f( ( float )convert.x, ( float )convert.y );
+		return Vector2fToVector2i( RotateAroundPoint( Vector2iToVector2f( position ), Vector2iToVector2f( rotateAround ), angleDegrees ) );
 	}
 
 	inline void ScaleTo( sf::Sprite& sprite, const sf::Vector2f& targetScale )

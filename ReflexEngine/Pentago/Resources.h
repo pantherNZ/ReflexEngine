@@ -11,5 +11,6 @@ namespace Reflex
 		Egg2,
 		ArrowLeft,
 		ArrowRight,
+		SkipButton,
 	};
 }

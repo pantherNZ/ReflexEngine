@@ -85,6 +85,23 @@ namespace Reflex
 			return m_children[insertIndex];
 		}
 
+		Reflex::Core::ObjectHandle Grid::GetCell( const unsigned x, const unsigned y, const bool rotate ) const
+		{
+			return GetCell( sf::Vector2u( x, y ), rotate );
+		}
+
+		ObjectHandle Grid::GetCell( const sf::Vector2u index, const bool rotate ) const
+		{
+			if( index.x >= GetWidth() || index.y >= GetHeight() )
+			{
+				LOG_CRIT( "Trying to access from grid with an invalid index of (" << index.x << ", " << index.y << ")" );
+				return TransformHandle::null;
+			}
+
+			const auto insertIndex = GetIndex( ConvertCellIndex( index, rotate ).second );
+			return m_children[insertIndex];
+		}
+
 		unsigned Grid::GetWidth() const
 		{
 			return m_gridSize.x;
@@ -148,15 +165,24 @@ namespace Reflex
 			return Reflex::RotateAroundPoint( worldPosition, gridCentre, transform->GetWorldRotation() );
 		}
 
-		std::pair< bool, sf::Vector2u > Grid::GetCellIndex( const sf::Vector2f worldPosition ) const
+		std::pair< bool, sf::Vector2u > Grid::GetCellIndex( const sf::Vector2f worldPosition, bool rotated ) const
 		{
 			const auto transform = GetObject()->GetTransform();
 			const auto gridCentre = transform->GetWorldPosition();
-			const auto correctedPosition = Reflex::RotateAroundPoint( worldPosition, gridCentre, -transform->GetWorldRotation() );
-			const auto localPosition = correctedPosition - GetCellPositionWorld( sf::Vector2u( 0U, 0U ) );
+			const auto correctedPosition = rotated ? Reflex::RotateAroundPoint( worldPosition, gridCentre, -transform->GetWorldRotation() ) : worldPosition;
+			const auto localPosition = correctedPosition - ( GetCellPositionRelative( sf::Vector2u( 0U, 0U ) ) + gridCentre ); // Scale??
 			const auto indexX = RoundToInt( localPosition.x / m_cellSize.x );
 			const auto indexY = RoundToInt( localPosition.y / m_cellSize.y );
-			return std::make_pair( indexX >= 0 && indexX < ( int )GetWidth() && indexY >= 0 && indexY < ( int )GetHeight(), sf::Vector2u( indexX, indexY ) );
+			const auto valid = indexX >= 0 && indexX < ( int )GetWidth() && indexY >= 0 && indexY < ( int )GetHeight();
+			return std::make_pair( valid, sf::Vector2u( indexX, indexY ) );
+		}
+
+		std::pair< bool, sf::Vector2u > Grid::ConvertCellIndex( const sf::Vector2u index, const bool rotate ) const
+		{
+			const auto rotation = GetObject()->GetTransform()->GetWorldRotation();
+			const auto rotatedIndex = Reflex::RotateAroundPoint( Reflex::Vector2uToVector2i( index ), sf::Vector2i( 1, 1 ), rotate ? -rotation : rotation );
+			const auto valid = rotatedIndex.x >= 0 && rotatedIndex.x < ( int )GetWidth() && rotatedIndex.y >= 0 && rotatedIndex.y < ( int )GetHeight();
+			return std::make_pair( valid, Reflex::Vector2iToVector2u( rotatedIndex ) );
 		}
 
 		void Grid::ForEachChild( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback )

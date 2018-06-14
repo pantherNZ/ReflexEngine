@@ -11,9 +11,11 @@ enum class GameState
 	PlayerSpinSelection,
 	PlayerCornerSpinning,
 	AITurn,
+	AISpinSelection,
 	AICornerSpinning,
 	PlayerWin,
 	AIWin,
+	NumStates,
 };
 
 class GameBoard
@@ -24,8 +26,11 @@ public:
 	void PlaceAIMarble( const sf::Vector2u index );
 	void ToggleArrows( const bool show );
 	void RotateCorner( const unsigned x, const unsigned y, const bool rotateLeft );
-	bool CheckWin( const int locX, const int locY, const bool isPlayer );
+	GameState CheckWin();
 	void ForEachSlot( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback );
+
+protected:
+	GameState CheckWin( const int locX, const int locY, const bool rotatedIndex = true );
 
 public:
 	World& m_world;
@@ -39,4 +44,5 @@ public:
 	ObjectHandle m_playerMarble;
 	ObjectHandle m_gameBoard;
 	ObjectHandle m_cornerArrows[8];
+	ObjectHandle m_skipButton;
 };

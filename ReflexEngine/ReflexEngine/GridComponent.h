@@ -29,6 +29,8 @@ namespace Reflex
 			ObjectHandle RemoveFromGrid( const sf::Vector2u index );
 			ObjectHandle GetCell( const unsigned x, const unsigned y ) const;
 			ObjectHandle GetCell( const sf::Vector2u index ) const;
+			ObjectHandle GetCell( const unsigned x, const unsigned y, const bool rotate ) const;
+			ObjectHandle GetCell( const sf::Vector2u index, const bool rotate ) const;
 
 			unsigned GetWidth() const;
 			unsigned GetHeight() const;
@@ -43,7 +45,8 @@ namespace Reflex
 
 			sf::Vector2f GetCellPositionRelative( const sf::Vector2u index ) const;
 			sf::Vector2f GetCellPositionWorld( const sf::Vector2u index ) const;
-			std::pair< bool, sf::Vector2u > GetCellIndex( const sf::Vector2f worldPosition ) const;
+			std::pair< bool, sf::Vector2u > GetCellIndex( const sf::Vector2f worldPosition, bool rotated = true ) const;
+			std::pair< bool, sf::Vector2u > ConvertCellIndex( const sf::Vector2u index, const bool rotate ) const;
 
 			void ForEachChild( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback );
 

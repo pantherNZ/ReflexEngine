@@ -28,15 +28,12 @@ namespace Reflex
 
 		void InteractableSystem::Update( const float deltaTime )
 		{
-			const auto mousePosition = Reflex::ToVector2f( sf::Mouse::getPosition( *GetWorld().GetContext().window ) );
+			const auto mousePosition = Reflex::Vector2iToVector2f( sf::Mouse::getPosition( *GetWorld().GetContext().window ) );
 
 			ForEachSystemComponent< Transform, Interactable, SFMLObject >(
 				[&]( const TransformHandle& transform, InteractableHandle& interactable, const SFMLObjectHandle& sfmlObj )
 			{
 				auto* ptr = interactable.Get();
-
-				if( !ptr->isEnabled )
-					return;
 
 				bool collision = false;
 				

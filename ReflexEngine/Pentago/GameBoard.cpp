@@ -17,6 +17,7 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 	const auto& egg2 = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::Egg2, "Data/Textures/Egg2.png" );
 	const auto& arrowLeft = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::ArrowLeft, "Data/Textures/ArrowLeft.png" );
 	const auto& arrowRight = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::ArrowRight, "Data/Textures/ArrowRight.png" );
+	const auto& skipButton = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::SkipButton, "Data/Textures/SkipButton.png" );
 
 	// Board size will be 60% of the world boundary (screen height)
 	const auto centre = sf::Vector2f( m_world.GetBounds().left + m_world.GetBounds().width / 2.0f, m_world.GetBounds().top + m_world.GetBounds().height / 2.0f );
@@ -83,9 +84,11 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 						cornerGrid->AddToGrid( m_selectedMarble, result2.second );
 						m_selectedMarble = ObjectHandle::null;
 						
-						if( CheckWin( result.second.x * 3 + result2.second.x, result.second.y * 3 + result2.second.y, true ) )
+						const auto result3 = CheckWin( result.second.x * 3 + result2.second.x, result.second.y * 3 + result2.second.y );
+
+						if( result3 == GameState::PlayerWin )
 						{
-							m_boardState = GameState::PlayerWin;
+							m_boardState = result3;
 							m_gameState.GameOver( true );
 						}
 						else
@@ -114,13 +117,32 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 	m_cornerArrows[1] = m_world.CreateObject( centre + sf::Vector2f( -boardSize / 2.0f + arrowOffset, -boardSize / 2.0f - arrowOffset2 ), 70.0f );
 	m_cornerArrows[2] = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f - arrowOffset, -boardSize / 2.0f - arrowOffset2 ), 290.0f );
 	m_cornerArrows[3] = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + arrowOffset2, -boardSize / 2.0f + arrowOffset ), 160.0f );
-	m_cornerArrows[4] = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + arrowOffset2, boardSize / 2.0f - arrowOffset ), 20.0f );
-	m_cornerArrows[5] = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f - arrowOffset, boardSize / 2.0f + arrowOffset2 ), 250.0f );
-	m_cornerArrows[6] = m_world.CreateObject( centre + sf::Vector2f( -boardSize / 2.0f + arrowOffset, boardSize / 2.0f + arrowOffset2 ), 110.0f );
-	m_cornerArrows[7] = m_world.CreateObject( centre + sf::Vector2f( -boardSize / 2.0f - arrowOffset2, boardSize / 2.0f - arrowOffset ), -20.0f );
+	m_cornerArrows[4] = m_world.CreateObject( centre + sf::Vector2f( -boardSize / 2.0f + arrowOffset, boardSize / 2.0f + arrowOffset2 ), 110.0f );
+	m_cornerArrows[5] = m_world.CreateObject( centre + sf::Vector2f( -boardSize / 2.0f - arrowOffset2, boardSize / 2.0f - arrowOffset ), -20.0f );
+	m_cornerArrows[6] = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + arrowOffset2, boardSize / 2.0f - arrowOffset ), 20.0f );
+	m_cornerArrows[7] = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f - arrowOffset, boardSize / 2.0f + arrowOffset2 ), 250.0f );
+
+	// Skip button
+	{
+		m_skipButton = m_world.CreateObject( centre + sf::Vector2f( 0.0f, boardSize / 2.0f + arrowOffset2 ) );
+		const auto sprite = m_skipButton->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( skipButton ) );
+		sprite->GetSprite().setColor( sf::Color::Transparent );
+		auto interactable = m_skipButton->AddComponent< Reflex::Components::Interactable >();
+		interactable->selectionIsToggle = false;
+
+		interactable->selectedCallback = [this]( const InteractableHandle& interactable )
+		{
+			if( m_boardState == GameState::PlayerSpinSelection )
+			{
+				ToggleArrows( false );
+				m_boardState = GameState::AITurn;
+				m_gameState.SetTurn( false );
+			}
+		};
+	}
 
 	// Button functionality
-	for (unsigned i = 0U; i < 8; i++)
+	for( unsigned i = 0U; i < 8; i++ )
 	{
 		const auto arrowObj = m_cornerArrows[i]->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( i % 2 ? arrowRight : arrowLeft ) );
 		Reflex::ScaleTo( arrowObj->GetSprite(), sf::Vector2f( arrowSize, arrowSize ) );
@@ -141,12 +163,12 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 
 		interactable->gainedFocusCallback = [this, arrowObj, arrowSize]( const InteractableHandle& interactable )
 		{
-			Reflex::ScaleTo( arrowObj->GetSprite(), sf::Vector2f( arrowSize * 1.5f, arrowSize * 1.5f ) );
+			//Reflex::ScaleTo( arrowObj->GetSprite(), sf::Vector2f( arrowSize * 1.5f, arrowSize * 1.5f ) );
 		};
 
 		interactable->lostFocusCallback = [this, arrowObj, arrowSize]( const InteractableHandle& interactable )
 		{
-			Reflex::ScaleTo( arrowObj->GetSprite(), sf::Vector2f( arrowSize, arrowSize ) );
+			//Reflex::ScaleTo( arrowObj->GetSprite(), sf::Vector2f( arrowSize, arrowSize ) );
 		};
 	}
 
@@ -166,9 +188,11 @@ void GameBoard::PlaceAIMarble( const sf::Vector2u index )
 	auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
 	cornerGrid->AddToGrid( newObj, index.x % 3, index.y % 3 );
 
-	if( CheckWin( index.x, index.y, false ) )
+	const auto result3 = CheckWin( index.x, index.y );
+
+	if( result3 == GameState::AIWin )
 	{
-		m_boardState = GameState::AIWin;
+		m_boardState = result3;
 		m_gameState.GameOver( false );
 	}
 }
@@ -181,55 +205,107 @@ void GameBoard::ToggleArrows( const bool show )
 		m_cornerArrows[i]->GetComponent< Reflex::Components::SFMLObject >()->GetSprite().setColor( colour );
 		m_cornerArrows[i]->GetComponent< Reflex::Components::Interactable >()->isEnabled = show;
 	}
+
+	m_skipButton->GetComponent< Reflex::Components::SFMLObject >()->GetSprite().setColor( colour );
+	m_skipButton->GetComponent< Reflex::Components::Interactable >()->isEnabled = show;
 }
 
 void GameBoard::RotateCorner( const unsigned x, const unsigned y, const bool rotateLeft )
 {
-	m_boardState = GameState::PlayerCornerSpinning;
+	m_boardState = m_boardState == GameState::PlayerSpinSelection ? GameState::PlayerCornerSpinning : GameState::AICornerSpinning;
 
 	auto corner = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( x, y );
-	corner->GetComponent< Reflex::Components::Transform >()->RotateForDuration( 90.0f * ( rotateLeft ? -1.0f : 1.0f ), 2.0f,
+	corner->GetComponent< Reflex::Components::Transform >()->RotateForDuration( 90.0f * ( rotateLeft ? -1.0f : 1.0f ), 1.0f,
 	[this]( const TransformHandle& transform )
 	{
-		m_boardState = m_boardState == GameState::PlayerCornerSpinning ? GameState::AITurn : GameState::PlayerTurn;
-		m_gameState.SetTurn( m_boardState == GameState::PlayerTurn );
+		const auto result = CheckWin();
+
+		if( result != GameState::NumStates )
+		{
+			m_boardState = result;
+			m_gameState.GameOver( m_boardState == GameState::PlayerWin );
+		}
+		else
+		{
+			m_boardState = m_boardState == GameState::PlayerCornerSpinning ? GameState::AITurn : GameState::PlayerTurn;//GameState::PlayerTurn; //
+			m_gameState.SetTurn( m_boardState == GameState::PlayerTurn );
+		}
 	} );
 }
 
-bool GameBoard::CheckWin( const int locX, const int locY, const bool isPlayer )
+GameState GameBoard::CheckWin()
 {
-	int counters[4] = { 0, 0, 0, 0 };
-
-	const auto CheckGrid = [&]( unsigned x, unsigned y ) -> bool
+	// Check along the main diagonal
+	for( unsigned i = 0U; i < 6; ++i )
 	{
-		auto corner = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( x / 3, y / 3 );
-		auto cell = corner->GetComponent< Reflex::Components::Grid >()->GetCell( x % 3, y % 3 );
-		return cell && cell->GetComponent< Marble >()->isPlayer == isPlayer;
-	};
+		const auto result = CheckWin( i, i, false );
+		if( result != GameState::NumStates )
+			return result;
+	}
 
-	const auto Check = [&]( unsigned index, unsigned x, unsigned y ) -> bool
+	// Also check the middle row that is missed
+	return CheckWin( 5, 5, false );
+}
+
+GameState GameBoard::CheckWin( const int locX, const int locY, const bool rotatedIndex )
+{
+	sf::Vector2i unrotatedLoc( locX, locY );
+
+	if( rotatedIndex )
 	{
-		counters[index] = CheckGrid( x, y ) ? counters[index] + 1 : 0U;
-		return counters[index] >= 5;
+		auto corner = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( locX / 3, locY / 3 );
+		auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
+		unrotatedLoc = Reflex::Vector2uToVector2i( cornerGrid->ConvertCellIndex( sf::Vector2u( locX % 3, locY % 3 ), false ).second );
+		unrotatedLoc += sf::Vector2i( locX - ( locX % 3 ), locY - ( locY % 3 ) );
+	}
+
+	int countersPlayer[4] = { 0, 0, 0, 0 };
+	int countersAI[4] = { 0, 0, 0, 0 };
+
+	const auto Check = [&]( unsigned index, unsigned x, unsigned y ) -> GameState
+	{
+		auto corner = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( x / 3, y / 3, true );
+		auto cell = corner->GetComponent< Reflex::Components::Grid >()->GetCell( x % 3, y % 3, true );
+
+		if( !cell )
+			return GameState::NumStates;
+
+		const auto result = cell->GetComponent< Marble >()->isPlayer ? GameState::PlayerWin : GameState::AIWin;
+		auto* counter = result == GameState::PlayerWin ? countersPlayer : countersAI;
+		counter[index]++;
+		return counter[index] >= 5 ? result : GameState::NumStates;
 	};
 
 	for( int offset = 0U; offset < 6; ++offset )
 	{
-		bool win = false;
-		win |= Check( 0, offset, locY );
-		win |= Check( 1, locX, offset );
+		// X axis
+		auto result = Check( 0, offset, unrotatedLoc.y );
+		if( result != GameState::NumStates )
+			return result;
 
-		if( abs( locX - locY ) <= 1 )
-			win |= Check( 2, std::min( 5, std::max( 0, locX - locY ) + offset ), std::min( 5, std::max( 0, locY - locX ) + offset ) );
+		// Y axis
+		result = Check( 1, unrotatedLoc.x, offset );
+		if( result != GameState::NumStates )
+			return result;
 
-		if( abs( locX - locY ) >= 4 )
-			win |= Check( 3, std::max( 0, abs( locX + locY - std::min( 5, locX + locY ) ) ), std::max( 0, std::min( 5, locX + locY ) - offset ) );
+		// Top left to bot right diagonal
+		if( abs( unrotatedLoc.x - unrotatedLoc.y ) <= 1 )
+		{
+			result = Check( 2, std::min( 5, std::max( 0, unrotatedLoc.x - unrotatedLoc.y ) + offset ), std::min( 5, std::max( 0, unrotatedLoc.y - unrotatedLoc.x ) + offset ) );
+			if( result != GameState::NumStates )
+				return result;
+		}
 
-		if( win )
-			return true;
+		// Bot left to top right diagonal
+		if( abs( ( 5 - unrotatedLoc.x ) - unrotatedLoc.y ) <= 1 )
+		{
+			result = Check( 3, std::min( 5, std::max( 0, abs( unrotatedLoc.x + unrotatedLoc.y - std::min( 5, unrotatedLoc.x + unrotatedLoc.y ) ) ) + offset ), std::max( 0, std::min( 5, unrotatedLoc.x + unrotatedLoc.y ) - offset ) );
+			if( result != GameState::NumStates )
+				return result;
+		}
 	}
 
-	return false;
+	return GameState::NumStates;
 }
 
 void GameBoard::ForEachSlot( std::function< void( const ObjectHandle& obj, const sf::Vector2u index ) > callback )

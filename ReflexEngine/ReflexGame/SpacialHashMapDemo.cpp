@@ -46,7 +46,7 @@ bool SpacialHashMapDemo::Update( const float deltaTime )
 	} );
 
 	const auto mouse_position = sf::Mouse::getPosition( *GetContext().window );
-	m_world.GetTileMap().ForEachNearby( Reflex::ToVector2f( mouse_position ), [&]( ObjectHandle obj )
+	m_world.GetTileMap().ForEachNearby( Reflex::Vector2iToVector2f( mouse_position ), [&]( ObjectHandle obj )
 	{
 		obj->GetComponent< Reflex::Components::SFMLObject >()->GetCircleShape().setOutlineColor( sf::Color::Red );
 	} );

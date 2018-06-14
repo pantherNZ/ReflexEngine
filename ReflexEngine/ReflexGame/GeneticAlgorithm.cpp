@@ -370,7 +370,7 @@ void GeneticAlgorithm::AlgorithmicLayout()
 	for( unsigned i = 0U; i < size; ++i )
 	{
 		auto& connection = graph.nodes[0].connections[i];
-		graph.nodes[connection.first].position = centre + Reflex::VectorFromAngle( angle * i, GA_OptimalDistance - 20.0f + graph.nodes[connection.first].connections.size() * 20.0f );
+		graph.nodes[connection.first].position = centre + Reflex::VectorFromAngle( TODEGREES( angle * i ), GA_OptimalDistance - 20.0f + graph.nodes[connection.first].connections.size() * 20.0f );
 	}
 }
 

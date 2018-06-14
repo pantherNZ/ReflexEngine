@@ -35,7 +35,7 @@ bool PentagoGameState::Update( const float deltaTime )
 
 	if( m_board.m_selectedMarble )
 	{ 
-		const auto mousePosition = Reflex::ToVector2f( sf::Mouse::getPosition( *GetContext().window ) );
+		const auto mousePosition = Reflex::Vector2iToVector2f( sf::Mouse::getPosition( *GetContext().window ) );
 		m_board.m_selectedMarble->GetTransform()->setPosition( mousePosition );
 	}
 
@@ -90,12 +90,9 @@ void PentagoGameState::AITurn()
 		if( !m_gameOver )
 		{
 			m_AITimer = 0.5f + Reflex::RandomFloat( 1.0f );
-			m_board.m_boardState = GameState::AICornerSpinning;
+			m_board.m_boardState = GameState::AISpinSelection;
 		}
 	}
 	else
-	{
-		m_board.m_boardState = GameState::PlayerTurn;
 		m_board.RotateCorner( Reflex::RandomInt( 1U ), Reflex::RandomInt( 1U ), Reflex::RandomBool() );
-	}
 }
