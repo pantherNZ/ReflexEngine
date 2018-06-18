@@ -33,7 +33,9 @@ namespace Reflex
 			ObjectHandle GetChild( const unsigned index ) const;
 			ObjectHandle GetParent() const;
 			void SetZOrder( const unsigned renderIndex );
+			unsigned GetZOrder() const;
 			void SetLayer( const unsigned layerIndex );
+			unsigned GetRenderIndex() const;
 
 		protected:
 			ObjectHandle m_owningObject;

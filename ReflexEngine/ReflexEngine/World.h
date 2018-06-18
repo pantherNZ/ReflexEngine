@@ -164,7 +164,8 @@ namespace Reflex
 				if( tempList.size() < system->m_requiredComponentTypes.size() )
 					continue;
 
-				system->m_components.push_back( std::move( tempList ) );
+				const auto insertionIter = system->GetInsertionIndex( tempList );
+				system->m_components.insert( insertionIter, std::move( tempList ) );
 			}
 
 			auto result = m_systems.insert( std::make_pair( type, std::move( system ) ) );

@@ -1,5 +1,7 @@
 #pragma once
 
+//#define PROFILING
+
 // Includes
 #include "Precompiled.h"
 #include "World.h"

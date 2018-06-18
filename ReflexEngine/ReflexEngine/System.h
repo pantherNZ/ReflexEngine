@@ -16,24 +16,29 @@ namespace Reflex
 
 		class System : private sf::NonCopyable, public sf::Drawable
 		{
-			friend class World;
-
 		public:
+			friend class Reflex::Core::World;
+
 			//Constructors / Destructors
 			System( World& world ) : m_world( world ) { }
 			virtual ~System() { }
 
+			const std::vector< Type >& GetRequiredComponentTypes() const { return m_requiredComponentTypes; }
+			World& GetWorld() { return m_world; }
+
+			typedef std::vector< Reflex::Core::BaseHandle > ComponentsSet;
+
+		protected:
 			virtual void RegisterComponents() = 0;
 			virtual void Update( const float deltaTime ) { }
 			virtual void ProcessEvent( const sf::Event& event ) { }
 			virtual void Render( sf::RenderTarget& target, sf::RenderStates states ) const { }
+
 			virtual void OnSystemStartup() { }
 			virtual void OnSystemShutdown() { }
+			virtual void OnComponentAdded( unsigned index ) { }
+			virtual std::vector< ComponentsSet >::const_iterator GetInsertionIndex( const ComponentsSet& newSet ) const { return m_components.end(); }
 
-			const std::vector< Type >& GetRequiredComponentTypes() const { return m_requiredComponentTypes; }
-			World& GetWorld() { return m_world; }
-
-		protected:
 			template< typename T >
 			Handle< T > GetSystemComponent( const std::vector< Reflex::Core::BaseHandle >& set ) const
 			{
@@ -69,8 +74,7 @@ namespace Reflex
 			void draw( sf::RenderTarget& target, sf::RenderStates states ) const final { Render( target, states ); }
 
 		protected:
-			// Iterating this causes a lot of jumping around in memory, it isn't very efficient (if there is more then one required component)
-			std::vector< std::vector< Reflex::Core::BaseHandle > > m_components;
+			std::vector< ComponentsSet > m_components;
 			std::vector< Type > m_requiredComponentTypes;
 
 		private:

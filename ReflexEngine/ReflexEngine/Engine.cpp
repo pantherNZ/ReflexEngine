@@ -56,11 +56,14 @@ namespace Reflex
 					Render();
 				}
 
+#ifdef PROFILING
 				Profiler::GetProfiler().OutputResults( "Performance_Results.txt" );
+#endif
 			}
 			catch( std::exception& e )
 			{
 				LOG_CRIT( "*EXCEPTION* " << *e.what() );
+				throw;
 			}
 		}
 

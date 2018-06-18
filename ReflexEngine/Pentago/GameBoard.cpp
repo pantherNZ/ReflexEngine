@@ -46,6 +46,7 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 	}
 
 	m_playerMarble = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + 50.0f, 0.0f ) );
+	m_playerMarble->GetTransform()->SetLayer( 5U );
 	//auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::CircleShape( m_marbleSize / 2.0f ) );
 	auto circle = m_playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( playerIsWhite ? egg1 : egg2 ) );
 	Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
@@ -59,6 +60,7 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 			m_selectedMarble = m_world.CreateObject();
 			m_selectedMarble->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarble );
 			m_selectedMarble->AddComponent< Marble >( true );
+			m_selectedMarble->GetTransform()->SetZOrder( m_playerMarble->GetTransform()->GetZOrder() + 1U );
 		}
 	};
 
@@ -215,10 +217,13 @@ void GameBoard::RotateCorner( const unsigned x, const unsigned y, const bool rot
 	m_boardState = m_boardState == GameState::PlayerSpinSelection ? GameState::PlayerCornerSpinning : GameState::AICornerSpinning;
 
 	auto corner = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( x, y );
-	corner->GetComponent< Reflex::Components::Transform >()->RotateForDuration( 90.0f * ( rotateLeft ? -1.0f : 1.0f ), 1.0f,
-	[this]( const TransformHandle& transform )
+	corner->GetTransform()->SetZOrder( 10U );
+
+	corner->GetTransform()->RotateForDuration( 90.0f * ( rotateLeft ? -1.0f : 1.0f ), 1.0f,
+		[this]( const TransformHandle& transform )
 	{
 		const auto result = CheckWin();
+		transform->SetZOrder( 5U );
 
 		if( result != GameState::NumStates )
 		{

@@ -117,9 +117,19 @@ namespace Reflex
 			m_renderIndex = renderIndex;
 		}
 
+		unsigned SceneNode::GetZOrder() const
+		{
+			return m_renderIndex;
+		}
+
 		void SceneNode::SetLayer( const unsigned layerIndex )
 		{
 			m_layerIndex = layerIndex;
+		}
+
+		unsigned SceneNode::GetRenderIndex() const
+		{
+			return m_layerIndex * 10000 + m_renderIndex;
 		}
 	}
 }

@@ -278,7 +278,8 @@ namespace Reflex
 				if( tempList.size() < requiredTypes.size() || !canAddDueToNewComponent )
 					continue;
 
-				iter->second->m_components.push_back( std::move( tempList ) );
+				const auto insertionIter = iter->second->GetInsertionIndex( tempList );
+				iter->second->m_components.insert( insertionIter, std::move( tempList ) );
 			}
 		}
 	}

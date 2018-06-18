@@ -4,6 +4,8 @@
 #include "TransformComponent.h"
 #include "HandleFwd.hpp"
 
+#include <algorithm>
+
 namespace Reflex
 {
 	namespace Systems
@@ -12,6 +14,14 @@ namespace Reflex
 		{
 			RequiresComponent( Reflex::Components::SFMLObject );
 			RequiresComponent( Reflex::Components::Transform );
+		}
+
+		void RenderSystem::Update( const float deltaTime )
+		{
+			std::sort( m_components.begin(), m_components.end(), []( const ComponentsSet& left, const ComponentsSet& right )
+			{
+				return Handle< Reflex::Components::Transform >( left[1] )->GetRenderIndex() < Handle< Reflex::Components::Transform >( right[1] )->GetRenderIndex();
+			} );
 		}
 
 		void RenderSystem::Render( sf::RenderTarget& target, sf::RenderStates states ) const
@@ -39,6 +49,14 @@ namespace Reflex
 					target.draw( object->GetSprite(), copied_states );
 				break;
 				}
+			} );
+		}
+
+		std::vector< System::ComponentsSet >::const_iterator RenderSystem::GetInsertionIndex( const ComponentsSet& newSet ) const
+		{
+			return std::lower_bound( m_components.begin(), m_components.end(), newSet, []( const ComponentsSet& left, const ComponentsSet& right )
+			{
+				return Handle< Reflex::Components::Transform >( left[1] )->GetRenderIndex() < Handle< Reflex::Components::Transform >( right[1] )->GetRenderIndex();
 			} );
 		}
 	}
