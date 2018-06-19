@@ -35,7 +35,8 @@ bool PentagoGameState::Update( const float deltaTime )
 
 	if( m_board.m_selectedMarble )
 	{ 
-		const auto mousePosition = Reflex::Vector2iToVector2f( sf::Mouse::getPosition( *GetContext().window ) );
+		const auto window = GetContext().window;
+		const auto mousePosition = window->mapPixelToCoords( sf::Mouse::getPosition( *window ) );
 		m_board.m_selectedMarble->GetTransform()->setPosition( mousePosition );
 	}
 

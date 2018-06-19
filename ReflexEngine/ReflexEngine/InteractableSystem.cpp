@@ -28,7 +28,8 @@ namespace Reflex
 
 		void InteractableSystem::Update( const float deltaTime )
 		{
-			const auto mousePosition = Reflex::Vector2iToVector2f( sf::Mouse::getPosition( *GetWorld().GetContext().window ) );
+			const auto window = GetWorld().GetContext().window;
+			const auto mousePosition = window->mapPixelToCoords( sf::Mouse::getPosition( *window ) );
 
 			ForEachSystemComponent< Transform, Interactable, SFMLObject >(
 				[&]( const TransformHandle& transform, InteractableHandle& interactable, const SFMLObjectHandle& sfmlObj )
