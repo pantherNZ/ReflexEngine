@@ -2,14 +2,10 @@
 #include "..\ReflexEngine\Engine.h"
 
 #include "vld.h"
-#include "PentagoGameState.h"
 
-enum StateTypes : unsigned
-{
-	PentagoMenuStateType,
-	PentagoGameStateType,
-	NumStateTypes,
-};
+#include "PentagoGameState.h"
+#include "PentagoMenuState.h"
+#include "Resources.h"
 
 // Entry point
 int main( int argc, char** argv )
@@ -18,7 +14,7 @@ int main( int argc, char** argv )
 
 	Reflex::Core::Engine engine;
 
-	//engine.RegisterState< PentagoMenuState >( PentagoMenuStateType, true );
+	engine.RegisterState< PentagoMenuState >( PentagoMenuStateType, false );
 	engine.RegisterState< PentagoGameState >( PentagoGameStateType, true );
 
 	engine.Run();

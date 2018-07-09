@@ -14,3 +14,10 @@ namespace Reflex
 		SkipButton,
 	};
 }
+
+enum StateTypes : unsigned
+{
+	PentagoMenuStateType,
+	PentagoGameStateType,
+	NumStateTypes,
+};

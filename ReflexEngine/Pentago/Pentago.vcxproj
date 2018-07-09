@@ -105,6 +105,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -130,11 +131,13 @@
     <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PentagoGameState.cpp" />
+    <ClCompile Include="PentagoMenuState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameBoard.h" />
     <ClInclude Include="MarbleComponent.h" />
     <ClInclude Include="PentagoGameState.h" />
+    <ClInclude Include="PentagoMenuState.h" />
     <ClInclude Include="Resources.h" />
   </ItemGroup>
   <ItemGroup>

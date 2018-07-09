@@ -16,6 +16,7 @@ namespace Reflex
 			void Update( const float deltaTime ) final;
 			void Render( sf::RenderTarget& target, sf::RenderStates states ) const final;
 			void ProcessEvent( const sf::Event& event ) final;
+			void OnComponentAdded() final;
 			void OnSystemStartup() final {}
 			void OnSystemShutdown() final {}
 

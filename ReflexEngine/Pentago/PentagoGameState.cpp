@@ -1,5 +1,9 @@
 #include "PentagoGameState.h"
 #include "Resources.h"
+#include "MarbleComponent.h"
+#include "..\ReflexEngine\Logging.h"
+
+unsigned PentagoGameState::m_AISearchDepth = 3;
 
 PentagoGameState::PentagoGameState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
@@ -7,6 +11,7 @@ PentagoGameState::PentagoGameState( StateManager& stateManager, Context context 
 	, m_world( context, m_bounds, 100 )
 	, m_board( m_world, *this, m_playerIsWhite )
 {
+	//const auto& font = context.fontManager->GetResource( Reflex::ResourceID::ArialFont );
 	const auto& font = context.fontManager->LoadResource( Reflex::ResourceID::ArialFont, "Data/Fonts/arial.ttf" );
 
 	m_text[0] = sf::Text( "Computer's turn", font, 40U );
@@ -14,7 +19,7 @@ PentagoGameState::PentagoGameState( StateManager& stateManager, Context context 
 	m_text[2] = sf::Text( "Game Over - You lost!", font, 40U );
 	m_text[3] = sf::Text( "Well done - You won!", font, 40U );
 
-	for( unsigned i = 0U; i < 2; ++i )
+	for( unsigned i = 0U; i < 4; ++i )
 	{
 		m_text[i].setPosition( sf::Vector2f( m_board.m_boardBounds.left + m_board.m_boardBounds.width / 2.0f, m_board.m_boardBounds.top - 50.0f ) );
 		m_text[i].setFillColor( sf::Color::White );
@@ -66,7 +71,7 @@ void PentagoGameState::SetTurn( const bool playerTurn )
 	m_playerTurn = playerTurn;
 
 	if( !m_playerTurn )
-		m_AITimer = 1.0f + Reflex::RandomFloat( 3.0f );
+		m_AITimer = 0.1f;
 }
 
 void PentagoGameState::GameOver( const bool playerWin )
@@ -74,19 +79,106 @@ void PentagoGameState::GameOver( const bool playerWin )
 	m_gameOver = true;
 }
 
+int ProcessMoves( BoardData& board, const unsigned depth, int alpha, int beta, const BoardType player, Move& bestMove )
+{
+	int score = 0;
+	const auto result = board.CheckWin( score );
+
+	if( depth == 0 || result != Empty )
+		return -score;
+
+	PROFILE;
+	auto moveFound = false;
+	auto bestScore = -std::numeric_limits< int >::max() * player;
+	auto escapeLoop = false;
+
+	for( Corner corner = TopLeft; corner < Corner::NumCorners && !escapeLoop; corner = Corner( corner + 1 ) )
+	{
+		for( unsigned i = 0U; i < 9 && !escapeLoop; ++i )
+		{
+			const auto index = sf::Vector2u( i % 3, i / 3 );
+
+			if( board.GetTile( corner, index ) != BoardType::Empty )
+				continue;
+
+			// Place player piece
+			board.SetTile( corner, index, player );
+
+			bool rotateLeft = true;
+
+			for( Corner cornerRot = None; cornerRot < Corner::NumCorners && !escapeLoop; )
+			{
+				// Rotate
+				if( cornerRot != Corner::None )
+					board.RotateCorner( cornerRot, rotateLeft );
+
+				// Score
+				Move opponentbestMove;
+				const auto newScore = ProcessMoves( board, depth - 1, alpha, beta, BoardType( player * -1 ), opponentbestMove );
+
+				// A - B pruning
+				if( player == AIMarble )
+					alpha = std::max( alpha, newScore );
+				else
+					beta = std::min( beta, newScore );
+
+				// New best score
+				if( ( player == AIMarble && newScore > bestScore ) || ( player == PlayerMarble && newScore < bestScore ) )
+				{
+					bestScore = newScore;
+					bestMove.corner = corner;
+					bestMove.index = index;
+					bestMove.rotation = cornerRot;
+					bestMove.leftRotation = rotateLeft;
+					moveFound = true;
+				}
+
+				if( alpha >= beta )
+					escapeLoop = true;
+
+				// Undo rotation
+				if( cornerRot != Corner::None )
+					board.RotateCorner( cornerRot, !rotateLeft );
+
+				// Increment
+				if( rotateLeft && cornerRot != Corner::None )
+					rotateLeft = false;
+				else
+				{
+					cornerRot = Corner( cornerRot + 1 );
+					rotateLeft = true;
+				}
+			}
+
+			// Undo previous move
+			board.SetTile( corner, index, BoardType::Empty );
+		}
+	}
+
+	assert( moveFound );
+	if( !moveFound )
+		return 0;
+
+	return bestScore;
+}
+
 void PentagoGameState::AITurn()
 {
+	// Regular move
 	if( m_board.m_boardState == GameState::AITurn )
 	{
-		std::vector< sf::Vector2u > openSpots( 10 );
+		m_AIBoard = m_board.m_boardData;
 
-		m_board.ForEachSlot( [&openSpots]( const Reflex::Core::ObjectHandle& obj, const sf::Vector2u index )
-		{
-			if( !obj )
-				openSpots.emplace_back( index );
-		} );
+		int alpha = -std::numeric_limits< int >::max();
+		int beta = std::numeric_limits< int >::max();
+		const auto score = ProcessMoves( m_AIBoard, m_AISearchDepth, alpha, beta, BoardType::AIMarble, m_nextAIMove );
 
-		m_board.PlaceAIMarble( openSpots[Reflex::RandomInt( openSpots.size() - 1 )] );
+		//m_AIThread = std::make_unique<sf::Thread>( &ProcessAIThread, &m_AIBoard );
+		//m_AIThread->launch();
+
+		Reflex::LOG_INFO( "AI move: Corner = " << m_nextAIMove.corner << ", Index = ( " << m_nextAIMove.index.x << ", " << m_nextAIMove.index.y << " ) Score = " << score );
+		
+		m_board.PlaceAIMarble( m_nextAIMove.corner, m_nextAIMove.index );
 
 		if( !m_gameOver )
 		{
@@ -95,5 +187,24 @@ void PentagoGameState::AITurn()
 		}
 	}
 	else
-		m_board.RotateCorner( Reflex::RandomInt( 1U ), Reflex::RandomInt( 1U ), Reflex::RandomBool() );
+	{
+		// Rotation move
+		if( m_nextAIMove.rotation != Corner::None )
+		{
+			m_board.RotateCorner( m_nextAIMove.rotation, m_nextAIMove.leftRotation );
+		}
+		else
+		{
+			// Skip move
+			m_board.m_boardState = GameState::PlayerTurn;
+			SetTurn( true );
+		}
+	}
 }
+
+//void ProcessAIThread( void* data )
+//{
+//	std::vector< std::pair< sf::Vector2u, unsigned > > moves;
+//	const auto score = NegaMax( boardCopy, 3, -std::numeric_limits< int >::max(), std::numeric_limits< int >::max(), BoardType::AIMarble, moves );
+//	m_nextAIMove = moves.front();
+//}

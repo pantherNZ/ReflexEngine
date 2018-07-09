@@ -36,7 +36,7 @@ namespace Reflex
 
 			virtual void OnSystemStartup() { }
 			virtual void OnSystemShutdown() { }
-			virtual void OnComponentAdded( unsigned index ) { }
+			virtual void OnComponentAdded() { }
 			virtual std::vector< ComponentsSet >::const_iterator GetInsertionIndex( const ComponentsSet& newSet ) const { return m_components.end(); }
 
 			template< typename T >

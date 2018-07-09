@@ -5,32 +5,44 @@ namespace Reflex
 {
 	namespace Components
 	{
-		SFMLObject::SFMLObject( const sf::CircleShape& shape )
-			: m_type( Circle )
+		SFMLObject::SFMLObject( const sf::CircleShape& shape, const sf::Color& colour )
+			: m_type( SFMLObjectType::Circle )
 			, m_objectData( shape )
 		{
 			Reflex::CenterOrigin( m_objectData.circleShape );
+			m_objectData.circleShape.setFillColor( colour );
 		}
 
-		SFMLObject::SFMLObject( const sf::ConvexShape& shape )
-			: m_type( Convex )
+		SFMLObject::SFMLObject( const sf::ConvexShape& shape, const sf::Color& colour )
+			: m_type( SFMLObjectType::Convex )
 			, m_objectData( shape )
 		{
 			Reflex::CenterOrigin( m_objectData.convexShape );
+			m_objectData.convexShape.setFillColor( colour );
 		}
 
-		SFMLObject::SFMLObject( const sf::RectangleShape& shape )
-			: m_type( Rectangle )
+		SFMLObject::SFMLObject( const sf::RectangleShape& shape, const sf::Color& colour )
+			: m_type( SFMLObjectType::Rectangle )
 			, m_objectData( shape )
 		{
 			Reflex::CenterOrigin( m_objectData.rectShape );
+			m_objectData.rectShape.setFillColor( colour );
 		}
 
-		SFMLObject::SFMLObject( const sf::Sprite& sprite )
-			: m_type( Sprite )
+		SFMLObject::SFMLObject( const sf::Sprite& sprite, const sf::Color& colour )
+			: m_type( SFMLObjectType::Sprite )
 			, m_objectData( sprite )
 		{
 			Reflex::CenterOrigin( m_objectData.sprite );
+			m_objectData.sprite.setColor( colour );
+		}
+
+		SFMLObject::SFMLObject( const sf::Text& text, const sf::Color& colour )
+			: m_type( SFMLObjectType::Text )
+			, m_objectData( text )
+		{
+			Reflex::CenterOrigin( m_objectData.text );
+			m_objectData.text.setFillColor( colour );
 		}
 
 		SFMLObject::SFMLObject( const SFMLObject& other )
@@ -78,6 +90,16 @@ namespace Reflex
 		const sf::Sprite& SFMLObject::GetSprite() const
 		{
 			return m_objectData.sprite;
+		}
+
+		sf::Text& SFMLObject::GetText()
+		{
+			return m_objectData.text;
+		}
+
+		const sf::Text& SFMLObject::GetText() const
+		{
+			return m_objectData.text;
 		}
 
 		const Reflex::Components::SFMLObjectType SFMLObject::GetType() const

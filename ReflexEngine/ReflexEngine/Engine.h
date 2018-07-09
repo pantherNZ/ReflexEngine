@@ -1,6 +1,6 @@
 #pragma once
 
-//#define PROFILING
+#define PROFILING
 
 // Includes
 #include "Precompiled.h"

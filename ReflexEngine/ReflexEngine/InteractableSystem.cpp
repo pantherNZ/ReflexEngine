@@ -53,6 +53,9 @@ namespace Reflex
 				case SFMLObjectType::Sprite:
 					collision = CheckCollision( transform, sfmlObj->GetSprite().getLocalBounds(), mousePosition );
 				break;
+				case SFMLObjectType::Text:
+					collision = CheckCollision( transform, sfmlObj->GetText().getLocalBounds(), mousePosition );
+				break;
 				}
 
 				// Focus / highlighting
@@ -60,10 +63,10 @@ namespace Reflex
 				{
 					ptr->isFocussed = collision;
 
-					if( !collision && ptr->lostFocusCallback )
-						ptr->lostFocusCallback( interactable );
-					else if( collision && ptr->gainedFocusCallback )
-						ptr->gainedFocusCallback( interactable );
+					if( !collision && ptr->focusChangedCallback )
+						ptr->focusChangedCallback( interactable, false );
+					else if( collision && ptr->focusChangedCallback )
+						ptr->focusChangedCallback( interactable, true );
 
 					// Lost highlight, then we also unselect
 					if( !collision && !ptr->selectionIsToggle && ptr->unselectIfLostFocus )
@@ -113,6 +116,27 @@ namespace Reflex
 			//		}
 			//	}
 			//} );
+		}
+
+		void InteractableSystem::OnComponentAdded()
+		{
+			const auto newComponent = GetSystemComponent< Interactable >( m_components.back() );
+
+			if( newComponent->m_replaceCollisionObject )
+			{
+				for( auto& set : m_components )
+				{
+					const auto obj = Handle< SFMLObject >( set[2] );
+
+					if( obj->GetObject() == newComponent->m_replaceCollisionObject->GetObject() )
+					{
+						set[2] = newComponent->m_replaceCollisionObject;
+						return;
+					}
+				}
+
+				newComponent->m_replaceCollisionObject = InteractableHandle::null;
+			}
 		}
 
 		void InteractableSystem::ProcessEvent( const sf::Event& event )

@@ -6,6 +6,12 @@ namespace Reflex
 {
 	namespace Components
 	{
+		Interactable::Interactable( const SFMLObjectHandle& collisionObject )
+			: Component()
+			, m_replaceCollisionObject( collisionObject )
+		{
+
+		}
 
 		bool Interactable::IsFocussed() const
 		{
@@ -23,8 +29,8 @@ namespace Reflex
 			{
 				isSelected = true;
 
-				if( selectedCallback )
-					selectedCallback( Handle< Interactable >( m_self ) );
+				if( selectionChangedCallback )
+					selectionChangedCallback( Handle< Interactable >( m_self ), true );
 			}
 		}
 
@@ -34,8 +40,8 @@ namespace Reflex
 			{
 				isSelected = false;
 
-				if( deselectedCallback )
-					deselectedCallback( Handle< Interactable >( m_self ) );
+				if( selectionChangedCallback )
+					selectionChangedCallback( Handle< Interactable >( m_self ), false );
 			}
 		}
 	}

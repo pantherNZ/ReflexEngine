@@ -72,7 +72,7 @@ namespace Reflex
 
 	inline bool RandomBool()
 	{
-		return rand() & 1;
+		return rand() > ( RAND_MAX / 2 );
 	}
 
 	inline float RandomFloat()

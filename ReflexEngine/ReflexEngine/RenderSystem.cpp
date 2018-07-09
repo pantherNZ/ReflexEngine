@@ -36,17 +36,20 @@ namespace Reflex
 
 				switch( object->GetType() )
 				{
-				case Components::Rectangle:
+				case Components::SFMLObjectType::Rectangle:
 					target.draw( object->GetRectangleShape(), copied_states );
 				break;
-				case Components::Convex:
+				case Components::SFMLObjectType::Convex:
 					target.draw( object->GetConvexShape(), copied_states );
 				break;
-				case Components::Circle:
+				case Components::SFMLObjectType::Circle:
 					target.draw( object->GetCircleShape(), copied_states );
 				break;
-				case Components::Sprite:
+				case Components::SFMLObjectType::Sprite:
 					target.draw( object->GetSprite(), copied_states );
+				break;
+				case Components::SFMLObjectType::Text:
+					target.draw( object->GetText(), copied_states );
 				break;
 				}
 			} );

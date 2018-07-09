@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "Utility.h"
 #include "InteractableSystem.h"
+#include "SFMLObjectComponent.h"
 
 namespace Reflex
 {
@@ -24,26 +25,28 @@ namespace Reflex
 		public:
 			friend class Reflex::Systems::InteractableSystem;
 
+			Interactable( const SFMLObjectHandle& collisionObject = SFMLObjectHandle::null );
+
 			// Settings, change as you want
 			bool selectionIsToggle = true;
 			bool unselectIfLostFocus = false;
 			bool isEnabled = true;
 
 			// Callbacks
-			std::function< void( const InteractableHandle& ) > gainedFocusCallback;
-			std::function< void( const InteractableHandle& ) > lostFocusCallback;
-			std::function< void( const InteractableHandle& ) > selectedCallback;
-			std::function< void( const InteractableHandle& ) > deselectedCallback;
+			std::function< void( const InteractableHandle&, const bool ) > focusChangedCallback;
+			std::function< void( const InteractableHandle&, const bool ) > selectionChangedCallback;
 
 			bool IsFocussed() const;
 			bool IsSelected() const;
 
 		protected:
+			void Select();
+			void Deselect();
+
 			bool isFocussed = false;
 			bool isSelected = false;
 
-			void Select();
-			void Deselect();
+			SFMLObjectHandle m_replaceCollisionObject;
 		};
 	}
 }
