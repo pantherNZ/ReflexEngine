@@ -2,6 +2,7 @@
 
 #include "..\ReflexEngine\Engine.h"
 #include "..\ReflexEngine\QuadTree.h"
+#include "BitBoard.h"
 
 using namespace Reflex::Core;
 
@@ -16,43 +17,6 @@ enum class GameState
 	PlayerWin,
 	AIWin,
 	NumStates,
-};
-
-enum BoardType : char
-{
-	PlayerMarble = -1, 
-	Empty = 0,
-	AIMarble = 1,
-};
-
-enum Corner : char
-{
-	None = -1,
-	TopLeft,
-	TopRight,
-	BottomLeft,
-	BottomRight,
-	NumCorners,
-};
-
-class BoardData
-{
-public:
-	BoardData() { Reset(); }
-	void Reset();
-	BoardType GetTile( const Corner corner, const sf::Vector2u& index ) const;
-	void SetTile( const Corner corner, const sf::Vector2u& index, const BoardType player );
-	void RotateCorner( const Corner corner, const bool rotateLeft );
-	void PrintBoard();
-	BoardType CheckWin();
-	BoardType CheckWin( int& score );
-
-	//BoardType CheckWinAtIndex( const int locX, const int locY, const bool diagonalsOnly = false, const bool straightsOnly = false,
-	//	std::vector< unsigned >& runsPlayer = std::vector< unsigned >(),
-	//	std::vector< unsigned >& runsAI = std::vector< unsigned >() );
-
-private:
-	std::array< std::array< BoardType, 9 >, 4 > data;
 };
 
 class GameBoard

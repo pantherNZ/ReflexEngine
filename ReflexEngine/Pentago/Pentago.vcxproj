@@ -128,12 +128,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BitBoard.cpp" />
     <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PentagoGameState.cpp" />
     <ClCompile Include="PentagoMenuState.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BitBoard.h" />
     <ClInclude Include="GameBoard.h" />
     <ClInclude Include="MarbleComponent.h" />
     <ClInclude Include="PentagoGameState.h" />

@@ -82,7 +82,7 @@ void PentagoGameState::GameOver( const bool playerWin )
 int ProcessMoves( BoardData& board, const unsigned depth, int alpha, int beta, const BoardType player, Move& bestMove )
 {
 	int score = 0;
-	const auto result = board.CheckWin( score );
+	const auto result = board.CheckWin( true, score );
 
 	if( depth == 0 || result != Empty )
 		return -score;
@@ -167,7 +167,8 @@ void PentagoGameState::AITurn()
 	// Regular move
 	if( m_board.m_boardState == GameState::AITurn )
 	{
-		m_AIBoard = m_board.m_boardData;
+		m_AIBoard.data[0] = m_board.m_boardData.data[0];
+		m_AIBoard.data[1] = m_board.m_boardData.data[1];
 
 		int alpha = -std::numeric_limits< int >::max();
 		int beta = std::numeric_limits< int >::max();
