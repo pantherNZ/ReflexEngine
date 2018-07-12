@@ -42,7 +42,7 @@ public:
 		return count;
 	}
 
-	BoardType GetTile( const int64_t* data, const Corner corner, const sf::Vector2u& index ) const;
+	BoardType GetTile( const int64_t* copyData, const Corner corner, const sf::Vector2u& index ) const;
 
 public:
 	int64_t data[2]; // One board for each player

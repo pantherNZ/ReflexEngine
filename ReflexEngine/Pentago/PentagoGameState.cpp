@@ -3,7 +3,7 @@
 #include "MarbleComponent.h"
 #include "..\ReflexEngine\Logging.h"
 
-unsigned PentagoGameState::m_AISearchDepth = 3;
+unsigned PentagoGameState::m_AISearchDepth = 1;
 
 PentagoGameState::PentagoGameState( StateManager& stateManager, Context context )
 	: State( stateManager, context )

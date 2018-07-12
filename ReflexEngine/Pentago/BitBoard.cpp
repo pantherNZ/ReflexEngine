@@ -1,6 +1,7 @@
 #include "BitBoard.h"
 
 #include <intrin.h>  
+#include "..\ReflexEngine\Logging.h"
 
 void BoardData::Reset()
 {
@@ -13,28 +14,43 @@ BoardType BoardData::GetTile( const Corner corner, const sf::Vector2u& index ) c
 	return GetTile( data, corner, index );
 }
 
-BoardType BoardData::GetTile( const int64_t* data, const Corner corner, const sf::Vector2u& index ) const
+//static bool rotating = false;
+
+BoardType BoardData::GetTile( const int64_t* copyData, const Corner corner, const sf::Vector2u& index ) const
 {
-	const auto mask = 1ULL << ( corner * 9 + index.y * 3 + index.x );
-	return ( data[0] & mask ) ? BoardType::PlayerMarble : ( data[1] & mask ? BoardType::AIMarble : BoardType::Empty );
+	const auto index2 = ( corner / 2 ) * 18 + ( corner % 2 ) * 3 + index.y * 6 + index.x;
+	const auto mask = bitMasks[index2];
+	//if( !rotating && ( copyData[0] & mask && copyData[1] & mask ) )
+	//	throw std::runtime_error( "stahp" );
+	return ( copyData[0] & mask ) ? BoardType::PlayerMarble : ( copyData[1] & mask ? BoardType::AIMarble : BoardType::Empty );
 }
+
+constexpr auto test = 1 & 4;
 
 void BoardData::SetTile( const Corner corner, const sf::Vector2u& index, const BoardType player )
 {
-	const auto mask = 1ULL << ( corner * 9 + index.y * 3 + index.x );
+	const auto index2 = ( corner / 2 ) * 18 + ( corner % 2 ) * 3 + index.y * 6 + index.x;
+	const auto mask = bitMasks[index2];
 	if( player == BoardType::Empty )
 	{
 		data[0] &= ~mask;
 		data[1] &= ~mask;
 	}
 	else if( player == BoardType::PlayerMarble )
+	{
 		data[0] |= mask;
+		data[1] &= ~mask;
+	}
 	else
+	{
+		data[0] &= ~mask;
 		data[1] |= mask;
+	}
 }
 
 void BoardData::RotateCorner( const Corner corner, const bool rotateLeft )
 {
+	//rotating = true;
 	int64_t copy[2] = { data[0], data[1] };
 
 #define Rotate( to, from ) SetTile( corner, sf::Vector2u( to % 3, to / 3 ), GetTile( copy, corner, sf::Vector2u( from % 3, from / 3 ) ) );
@@ -61,6 +77,7 @@ void BoardData::RotateCorner( const Corner corner, const bool rotateLeft )
 		Rotate( 3, 7 );
 	}
 #undef Rotate
+	//rotating = false;
 }
 
 BoardType BoardData::CheckWin()
@@ -86,7 +103,7 @@ BoardType BoardData::CheckWin( const bool queryScore, int& score )
 		if( player && !AI )
 		{
 			if( queryScore )
-				score += scoreMaps[CountSetBits( player )];
+				score -= scoreMaps[CountSetBits( player )];
 
 			if( player == winMap )
 				result = PlayerMarble;
@@ -94,7 +111,7 @@ BoardType BoardData::CheckWin( const bool queryScore, int& score )
 		else if( !AI && player )
 		{
 			if( queryScore )
-				score -= scoreMaps[CountSetBits( AI )];
+				score += scoreMaps[CountSetBits( AI )];
 
 			if( AI == winMap )
 				result = AIMarble;
