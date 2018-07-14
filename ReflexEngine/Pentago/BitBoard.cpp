@@ -14,14 +14,10 @@ BoardType BoardData::GetTile( const Corner corner, const sf::Vector2u& index ) c
 	return GetTile( data, corner, index );
 }
 
-//static bool rotating = false;
-
 BoardType BoardData::GetTile( const int64_t* copyData, const Corner corner, const sf::Vector2u& index ) const
 {
 	const auto index2 = ( corner / 2 ) * 18 + ( corner % 2 ) * 3 + index.y * 6 + index.x;
 	const auto mask = bitMasks[index2];
-	//if( !rotating && ( copyData[0] & mask && copyData[1] & mask ) )
-	//	throw std::runtime_error( "stahp" );
 	return ( copyData[0] & mask ) ? BoardType::PlayerMarble : ( copyData[1] & mask ? BoardType::AIMarble : BoardType::Empty );
 }
 
@@ -50,7 +46,8 @@ void BoardData::SetTile( const Corner corner, const sf::Vector2u& index, const B
 
 void BoardData::RotateCorner( const Corner corner, const bool rotateLeft )
 {
-	//rotating = true;
+	PROFILE;
+
 	int64_t copy[2] = { data[0], data[1] };
 
 #define Rotate( to, from ) SetTile( corner, sf::Vector2u( to % 3, to / 3 ), GetTile( copy, corner, sf::Vector2u( from % 3, from / 3 ) ) );
@@ -77,7 +74,6 @@ void BoardData::RotateCorner( const Corner corner, const bool rotateLeft )
 		Rotate( 3, 7 );
 	}
 #undef Rotate
-	//rotating = false;
 }
 
 BoardType BoardData::CheckWin()
@@ -108,7 +104,7 @@ BoardType BoardData::CheckWin( const bool queryScore, int& score )
 			if( player == winMap )
 				result = PlayerMarble;
 		}
-		else if( !AI && player )
+		else if( AI && !player )
 		{
 			if( queryScore )
 				score += scoreMaps[CountSetBits( AI )];
@@ -117,6 +113,10 @@ BoardType BoardData::CheckWin( const bool queryScore, int& score )
 				result = AIMarble;
 		}
 	}
+
+	// Random score offset
+	if( abs( score ) > 0 )
+		score -= Reflex::RandomBool() ? Reflex::Sign( score ) : 0;
 
 	return result;
 }

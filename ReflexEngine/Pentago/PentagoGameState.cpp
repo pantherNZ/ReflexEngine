@@ -3,7 +3,7 @@
 #include "MarbleComponent.h"
 #include "..\ReflexEngine\Logging.h"
 
-unsigned PentagoGameState::m_AISearchDepth = 1;
+unsigned PentagoGameState::m_AISearchDepth = 3;
 
 PentagoGameState::PentagoGameState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
@@ -85,7 +85,7 @@ int ProcessMoves( BoardData& board, const unsigned depth, int alpha, int beta, c
 	const auto result = board.CheckWin( true, score );
 
 	if( depth == 0 || result != Empty )
-		return -score;
+		return score;
 
 	PROFILE;
 	auto moveFound = false;
