@@ -30,7 +30,12 @@ protected:
 	//int NegaMax( BoardData& board, const unsigned depth, int alpha, int beta, const BoardType player, std::vector< std::pair< sf::Vector2u, unsigned > >& bestMove );
 
 public:
-	static unsigned m_AISearchDepth;
+	static unsigned m_AIDifficulty;
+
+	Move m_nextAIMove;
+	std::unique_ptr< sf::Thread > m_AIThread;
+	mutable bool m_AIThreadFinished = false;
+	BoardData m_AIBoard;
 
 private:
 	sf::FloatRect m_bounds;
@@ -44,8 +49,4 @@ private:
 
 	GameBoard m_board;
 	sf::Text m_text[4];
-
-	Move m_nextAIMove;
-	std::unique_ptr< sf::Thread > m_AIThread;
-	BoardData m_AIBoard;
 };

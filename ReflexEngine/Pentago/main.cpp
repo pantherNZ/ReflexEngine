@@ -14,8 +14,9 @@ int main( int argc, char** argv )
 
 	Reflex::Core::Engine engine;
 
-	engine.RegisterState< PentagoMenuState >( PentagoMenuStateType, false );
-	engine.RegisterState< PentagoGameState >( PentagoGameStateType, true );
+	engine.RegisterState< PentagoMenuState >( PentagoMenuStateType, true );
+	engine.RegisterState< PentagoGameState >( PentagoGameStateType, false );
+	engine.RegisterState< SetDifficultyState >( SetDifficultyStateType, false );
 
 	engine.Run();
 

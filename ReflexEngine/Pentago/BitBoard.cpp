@@ -46,7 +46,7 @@ void BoardData::SetTile( const Corner corner, const sf::Vector2u& index, const B
 
 void BoardData::RotateCorner( const Corner corner, const bool rotateLeft )
 {
-	PROFILE;
+	//PROFILE;
 
 	int64_t copy[2] = { data[0], data[1] };
 

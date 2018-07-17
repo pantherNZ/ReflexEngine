@@ -12,6 +12,8 @@ namespace Reflex
 		ArrowLeft,
 		ArrowRight,
 		SkipButton,
+		EndScreen,
+		HelpScreen,
 	};
 }
 
@@ -19,5 +21,6 @@ enum StateTypes : unsigned
 {
 	PentagoMenuStateType,
 	PentagoGameStateType,
+	SetDifficultyStateType,
 	NumStateTypes,
 };

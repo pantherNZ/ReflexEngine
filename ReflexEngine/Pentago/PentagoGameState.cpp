@@ -3,7 +3,7 @@
 #include "MarbleComponent.h"
 #include "..\ReflexEngine\Logging.h"
 
-unsigned PentagoGameState::m_AISearchDepth = 3;
+unsigned PentagoGameState::m_AIDifficulty = 3U;
 
 PentagoGameState::PentagoGameState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
@@ -11,8 +11,13 @@ PentagoGameState::PentagoGameState( StateManager& stateManager, Context context 
 	, m_world( context, m_bounds, 100 )
 	, m_board( m_world, *this, m_playerIsWhite )
 {
-	//const auto& font = context.fontManager->GetResource( Reflex::ResourceID::ArialFont );
-	const auto& font = context.fontManager->LoadResource( Reflex::ResourceID::ArialFont, "Data/Fonts/arial.ttf" );
+	const auto& font = context.fontManager->GetResource( Reflex::ResourceID::ArialFont );
+	//const auto& font = context.fontManager->LoadResource( Reflex::ResourceID::ArialFont, "Data/Fonts/arial.ttf" );
+
+	//const auto& endGameScreen = m_world.GetContext().textureManager->LoadResource( Reflex::ResourceID::EndScreen1, "Data/Textures/EndScreen1.png" );
+	//m_gameBoard = m_world.CreateObject( centre );
+	//auto grid = m_gameBoard->AddComponent< Reflex::Components::Grid >( 2U, 2U, boardSize / 2.0f, boardSize / 2.0f );
+	//m_gameBoard->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( background ) );
 
 	m_text[0] = sf::Text( "Computer's turn", font, 40U );
 	m_text[1] = sf::Text( "Your turn", font, 40U );
@@ -53,6 +58,21 @@ bool PentagoGameState::Update( const float deltaTime )
 		{
 			m_AITimer = 0.0f;
 			AITurn();
+		}
+	}
+	else if( m_board.m_boardState == GameState::AITurn )
+	{
+		if( m_AIThread && m_AIThreadFinished )
+		{
+			Reflex::LOG_INFO( "AI move: Corner = " << m_nextAIMove.corner << ", Index = ( " << m_nextAIMove.index.x << ", " << m_nextAIMove.index.y << " )" );
+
+			m_board.PlaceAIMarble( m_nextAIMove.corner, m_nextAIMove.index );
+
+			if( !m_gameOver )
+			{
+				m_AITimer = 0.5f + Reflex::RandomFloat( 1.0f );
+				m_board.m_boardState = GameState::AISpinSelection;
+			}
 		}
 	}
 
@@ -162,6 +182,32 @@ int ProcessMoves( BoardData& board, const unsigned depth, int alpha, int beta, c
 	return bestScore;
 }
 
+void ProcessAIThread( void* data )
+{
+	PentagoGameState* gameState = static_cast< PentagoGameState* >( data );
+	int alpha = -std::numeric_limits< int >::max();
+	int beta = std::numeric_limits< int >::max();
+
+	auto searchDepth = PentagoGameState::m_AIDifficulty;
+
+	// Easy - chance for 2 search depth
+	if( searchDepth == 1 )
+	{
+		if( Reflex::RandomInt( 100 ) < 15 )
+			searchDepth = 2;
+	}
+	// Medium - chance for 1 & 3 search depth
+	else if( searchDepth == 2 )
+	{
+		if( Reflex::RandomInt( 100 ) < 30 )
+			searchDepth += Reflex::RandomInt( -1, 1 );
+	}
+
+	const auto score = ProcessMoves( gameState->m_AIBoard, searchDepth, alpha, beta, BoardType::AIMarble, gameState->m_nextAIMove );
+	Reflex::LOG_INFO( "Thread finished" );
+	gameState->m_AIThreadFinished = true;
+}
+
 void PentagoGameState::AITurn()
 {
 	// Regular move
@@ -170,22 +216,14 @@ void PentagoGameState::AITurn()
 		m_AIBoard.data[0] = m_board.m_boardData.data[0];
 		m_AIBoard.data[1] = m_board.m_boardData.data[1];
 
-		int alpha = -std::numeric_limits< int >::max();
-		int beta = std::numeric_limits< int >::max();
-		const auto score = ProcessMoves( m_AIBoard, m_AISearchDepth, alpha, beta, BoardType::AIMarble, m_nextAIMove );
+		//m_AIThreadFinished = true;
+		//int alpha = -std::numeric_limits< int >::max();
+		//int beta = std::numeric_limits< int >::max();
+		//ProcessMoves( m_AIBoard, m_AISearchDepth, alpha, beta, BoardType::AIMarble, m_nextAIMove );
 
-		//m_AIThread = std::make_unique<sf::Thread>( &ProcessAIThread, &m_AIBoard );
-		//m_AIThread->launch();
-
-		Reflex::LOG_INFO( "AI move: Corner = " << m_nextAIMove.corner << ", Index = ( " << m_nextAIMove.index.x << ", " << m_nextAIMove.index.y << " ) Score = " << score );
-		
-		m_board.PlaceAIMarble( m_nextAIMove.corner, m_nextAIMove.index );
-
-		if( !m_gameOver )
-		{
-			m_AITimer = 0.5f + Reflex::RandomFloat( 1.0f );
-			m_board.m_boardState = GameState::AISpinSelection;
-		}
+		m_AIThreadFinished = false;
+		m_AIThread.reset( new sf::Thread( &ProcessAIThread, this ) );
+		m_AIThread->launch();
 	}
 	else
 	{
@@ -202,10 +240,3 @@ void PentagoGameState::AITurn()
 		}
 	}
 }
-
-//void ProcessAIThread( void* data )
-//{
-//	std::vector< std::pair< sf::Vector2u, unsigned > > moves;
-//	const auto score = NegaMax( boardCopy, 3, -std::numeric_limits< int >::max(), std::numeric_limits< int >::max(), BoardType::AIMarble, moves );
-//	m_nextAIMove = moves.front();
-//}
