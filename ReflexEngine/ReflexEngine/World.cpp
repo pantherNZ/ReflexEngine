@@ -15,7 +15,6 @@ namespace Reflex
 			: m_context( context )
 			, m_worldView( context.window->getDefaultView() )
 			, m_worldBounds( worldBounds )
-			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
 			, m_objects( sizeof( Object ), initialMaxObjects )
 			, m_components( 10 )
 			, m_tileMap( m_worldBounds )
@@ -27,8 +26,6 @@ namespace Reflex
 			: m_context( context )
 			, m_worldView( context.window->getDefaultView() )
 			, m_worldBounds( worldBounds )
-			//, m_box2DWorld( b2Vec2( 0.0f, -9.8f ) )
-			, m_handles()
 			, m_objects( sizeof( Object ), initialMaxObjects )
 			, m_components( 10 )
 			, m_tileMap( m_worldBounds, spacialHashMapSize )
@@ -43,8 +40,6 @@ namespace Reflex
 
 		void World::Setup()
 		{
-			BaseHandle::s_handleManager = &m_handles;
-			
 			AddSystem< Reflex::Systems::RenderSystem >();
 			AddSystem< Reflex::Systems::InteractableSystem >();
 			AddSystem< Reflex::Systems::MovementSystem >();
@@ -81,14 +76,14 @@ namespace Reflex
 					if( parent )
 						parent->GetTransform()->DetachChild( objectHandle );
 
-					m_handles.Remove( objectHandle );
+					GetHandleManager().Remove( objectHandle );
 					object->RemoveAllComponents();
 					object->~Object();
 					auto moved = ( Object* )m_objects.Release( object );
 
 					// Sync handle of potentially moved object
 					if( moved )
-						m_handles.Update( moved );
+						GetHandleManager().Update( moved );
 				}
 
 				m_markedForDeletion.clear();
@@ -101,13 +96,13 @@ namespace Reflex
 			{
 				auto* object = ( Entity* )allocator[allocator.Size() - 1];
 				object->~Entity();
-				m_handles.Remove( object->m_self );
+				GetHandleManager().Remove( object->m_self );
 
 				auto moved = ( Entity* )allocator.Release( object );
 
 				// Sync handle of potentially moved object
 				if( moved )
-					m_handles.Update( moved );
+					GetHandleManager().Update( moved );
 			}
 		}
 
@@ -132,7 +127,7 @@ namespace Reflex
 			Object* newObject = ( Object* )m_objects.Allocate();
 
 			// Create handle & construct
-			auto objectHandle = m_handles.Insert( newObject );
+			auto objectHandle = GetHandleManager().Insert( newObject );
 			new ( newObject ) Object( *this );
 			newObject->m_self = objectHandle;
 
@@ -171,14 +166,14 @@ namespace Reflex
 
 		void World::DestroyComponent( Type componentType, BaseHandle component )
 		{
-			Entity* entity = m_handles.GetAs< Entity >( component );
-			m_handles.Remove( component );
+			Entity* entity = GetHandleManager().GetAs< Entity >( component );
+			GetHandleManager().Remove( component );
 			entity->~Entity();
 			auto moved = ( Entity* )m_components[componentType]->Release( entity );
 
 			// Sync handle of potentially moved object
 			if( moved )
-				m_handles.Update( moved );
+				GetHandleManager().Update( moved );
 
 			// Remove this component from any systems
 			for( auto iter = m_systems.begin(); iter != m_systems.end(); ++iter )
@@ -200,7 +195,7 @@ namespace Reflex
 
 		HandleManager& World::GetHandleManager()
 		{
-			return m_handles;
+			return *m_context.handleManager;
 		}
 
 		sf::RenderTarget& World::GetWindow()

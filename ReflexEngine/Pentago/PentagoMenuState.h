@@ -35,3 +35,18 @@ private:
 	sf::FloatRect m_bounds;
 	World m_world;
 };
+
+class InGameMenuState : public State
+{
+public:
+	InGameMenuState( StateManager& stateManager, Context context );
+
+protected:
+	void Render() final;
+	bool Update( const float deltaTime ) final;
+	bool ProcessEvent( const sf::Event& event ) final;
+
+private:
+	sf::FloatRect m_bounds;
+	//World m_world;
+};

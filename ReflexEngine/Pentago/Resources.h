@@ -14,6 +14,11 @@ namespace Reflex
 		SkipButton,
 		EndScreen,
 		HelpScreen,
+		InGameScreen,
+		CancelButton,
+		RestartButton,
+		MainMenuButton,
+		PlayAgainButton,
 	};
 }
 
@@ -22,5 +27,6 @@ enum StateTypes : unsigned
 	PentagoMenuStateType,
 	PentagoGameStateType,
 	SetDifficultyStateType,
+	InGameMenuStateType,
 	NumStateTypes,
 };

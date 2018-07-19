@@ -8,11 +8,14 @@ namespace Reflex
 	{
 		Engine::Engine()
 			: m_updateInterval( sf::seconds( 1.0f / 60.f ) )
+			, m_handleManager()
 			, m_window( sf::VideoMode::getFullscreenModes()[0], "ReflexEngine", sf::Style::Default )
 			, m_textureManager()
 			, m_fontManager()
-			, m_stateManager( Context( m_window, m_textureManager, m_fontManager ) )
+			, m_stateManager( Context( m_handleManager, m_window, m_textureManager, m_fontManager ) )
 		{
+			BaseHandle::s_handleManager = &m_handleManager;
+
 			// 2560, 1377
 			m_window.setPosition( sf::Vector2i( -6, 0 ) );
 
@@ -100,8 +103,8 @@ namespace Reflex
 
 		void Engine::KeyboardInput( const sf::Keyboard::Key key, const bool isPressed )
 		{
-			if( key == sf::Keyboard::Escape )
-				m_window.close();
+			//if( key == sf::Keyboard::Escape )
+			//	m_window.close();
 		}
 
 		void Engine::Update( const float deltaTime )

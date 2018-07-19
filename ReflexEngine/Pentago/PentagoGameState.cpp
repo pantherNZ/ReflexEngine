@@ -11,8 +11,8 @@ PentagoGameState::PentagoGameState( StateManager& stateManager, Context context 
 	, m_world( context, m_bounds, 100 )
 	, m_board( m_world, *this, m_playerIsWhite )
 {
-	const auto& font = context.fontManager->GetResource( Reflex::ResourceID::ArialFont );
-	//const auto& font = context.fontManager->LoadResource( Reflex::ResourceID::ArialFont, "Data/Fonts/arial.ttf" );
+//	const auto& font = context.fontManager->GetResource( Reflex::ResourceID::ArialFont );
+	const auto& font = context.fontManager->LoadResource( Reflex::ResourceID::ArialFont, "Data/Fonts/arial.ttf" );
 
 	//const auto& endGameScreen = m_world.GetContext().textureManager->LoadResource( Reflex::ResourceID::EndScreen1, "Data/Textures/EndScreen1.png" );
 	//m_gameBoard = m_world.CreateObject( centre );
@@ -82,6 +82,12 @@ bool PentagoGameState::Update( const float deltaTime )
 bool PentagoGameState::ProcessEvent( const sf::Event& event )
 {
 	m_world.ProcessEvent( event );
+
+	if( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )
+	{
+		//RequestStateClear();
+		RequestStackPush( InGameMenuStateType );
+	}
 
 	return true;
 }

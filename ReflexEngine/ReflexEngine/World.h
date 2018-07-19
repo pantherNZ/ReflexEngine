@@ -101,14 +101,8 @@ namespace Reflex
 			};
 
 			Context m_context;
-			//sf::RenderTarget& m_window;
 			sf::View m_worldView;
 			sf::FloatRect m_worldBounds;
-
-			//b2World m_box2DWorld;
-
-			// Handle manager which maps a handle to a void* in memory (such as in the above object allocator or a component allocator)
-			HandleManager m_handles;
 
 			// Storage for all objects in the game
 			EntityAllocator m_objects;
@@ -227,7 +221,7 @@ namespace Reflex
 			auto* component = ( T* )found->second->Allocate();
 
 			// Create handle & construct
-			const auto componentHandle = m_handles.Insert< T >( component );
+			const auto componentHandle = GetHandleManager().Insert< T >( component );
 			new ( component ) T( std::forward< Args >( args )... );
 			component->m_self = componentHandle;
 			component->SetOwningObject( owner );
@@ -286,7 +280,7 @@ namespace Reflex
 			if( m_array.Grew() )
 			{
 				for( auto i = m_array.begin< T >(); i != m_array.end< T >(); ++i )
-					m_handles.Update( &( *i ), i->m_self );
+					GetHandleManager().Update( &( *i ), i->m_self );
 				m_array.ClearGrewFlag();
 			}
 		}
@@ -295,7 +289,7 @@ namespace Reflex
 		void World::SyncHandlesForce( EntityAllocator& m_array )
 		{
 			for( auto i = m_array.begin< T >(); i != m_array.end< T >(); ++i )
-				m_handles.Update( &( *i ), i->m_self );
+				GetHandleManager().Update( &( *i ), i->m_self );
 		}
 	}
 }

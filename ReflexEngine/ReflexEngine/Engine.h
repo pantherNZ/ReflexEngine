@@ -35,9 +35,17 @@ namespace Reflex
 			void UpdateStatistics( const float deltaTime );
 		
 		protected:
+			// Handle manager which maps a handle to a void* in memory (such as in the above object allocator or a component allocator)
+			HandleManager m_handleManager;
+
+			// Core window
 			sf::RenderWindow m_window;
+
+			// Resource managers
 			TextureManager m_textureManager;
 			FontManager m_fontManager;
+
+			// State manager (handles different scenes & transitions, contains worlds which hold objects etc.)
 			StateManager m_stateManager;
 
 			const sf::Time m_updateInterval;
