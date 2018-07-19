@@ -48,5 +48,5 @@ protected:
 
 private:
 	sf::FloatRect m_bounds;
-	//World m_world;
+	World m_world;
 };

@@ -40,7 +40,6 @@ public:
 private:
 	sf::FloatRect m_bounds;
 	World m_world;
-	World m_world2;
 
 	bool m_playerIsWhite = true;
 	bool m_playerTurn = true;

@@ -18,6 +18,7 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 	const auto& arrowLeft = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::ArrowLeft, "Data/Textures/ArrowLeft.png" );
 	const auto& arrowRight = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::ArrowRight, "Data/Textures/ArrowRight.png" );
 	const auto& skipButton = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::SkipButton, "Data/Textures/SkipButton.png" );
+	const auto& displaySprite = world.GetContext().textureManager->LoadResource( Reflex::ResourceID::SideMenuScreen, "Data/Textures/PiecesBoard.png" );
 
 	// Board size will be 60% of the world boundary (screen height)
 	const auto centre = sf::Vector2f( m_world.GetBounds().left + m_world.GetBounds().width / 2.0f, m_world.GetBounds().top + m_world.GetBounds().height / 2.0f );
@@ -45,11 +46,16 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 		}
 	}
 
-	m_playerMarble = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + 50.0f, 0.0f ) );
+	const auto sideScreen = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + 100.0f, 0.0f ) );
+	sideScreen->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( displaySprite ) );
+	const auto sideGrid = sideScreen->AddComponent< Reflex::Components::Grid >( sf::Vector2u( 1, 1 ), sf::Vector2f( 0.0f, displaySprite.getSize().y / 5.0f ) );
+
+	m_playerMarble = m_world.CreateObject();
 	m_playerMarble->GetTransform()->SetLayer( 5U );
 	//auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::CircleShape( m_marbleSize / 2.0f ) );
 	auto circle = m_playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( playerIsWhite ? egg1 : egg2 ) );
 	Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
+	sideGrid->AddToGrid( m_playerMarble, sf::Vector2u( 0U, 0U ) );
 
 	auto interactable = m_playerMarble->AddComponent< Reflex::Components::Interactable >();
 	interactable->selectionIsToggle = false;

@@ -119,7 +119,7 @@ SetDifficultyState::SetDifficultyState( StateManager& stateManager, Context cont
 	sf::Vector2f startPos( m_bounds.width / 2.0f - boxSize / 2.0f, m_bounds.height / 2.0f );
 	const auto offset = sf::Vector2f( boxSize / ( menuItems - 1 ), 0.0f );
 
-	// Play game
+	// Play game7
 	const std::string buttonText[] = { "Easy", "Medium", "Hard" };
 
 	for( unsigned i = 0U; i < 3; ++i )
@@ -170,32 +170,74 @@ bool SetDifficultyState::ProcessEvent( const sf::Event& event )
 InGameMenuState::InGameMenuState( StateManager& stateManager, Context context )
 	: State( stateManager, context )
 	, m_bounds( 0.0f, 0.0f, ( float )context.window->getSize().x, ( float )context.window->getSize().y )
-	//, m_world( context, m_bounds, 15 )
+	, m_world( context, m_bounds, 15 )
 {
 	const auto& font = context.fontManager->GetResource( Reflex::ResourceID::ArialFont );
 	const auto& screen = context.textureManager->LoadResource( Reflex::ResourceID::InGameScreen, "Data/Textures/EscapeMenu.png" );
-	return;
-	//const unsigned menuItems = 3;
-	//const auto boxSize = m_bounds.width * 0.4f;
-	//sf::Vector2f startPos( m_bounds.width / 2.0f, m_bounds.height / 2.0f - m_bounds.height * 0.2f );
-	//const auto offset = sf::Vector2f( boxSize / ( menuItems - 1 ), 0.0f );
-	//
-	//const auto btn = m_world.CreateObject( startPos );
-	//const auto text = btn->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( screen ) );
-	//btn->AddComponent< Reflex::Components::SFMLObject >( sf::RectangleShape( sf::Vector2f( 400.0f, 100.0f ) ) );
+	const auto& cancelBtnSprite = context.textureManager->LoadResource( Reflex::ResourceID::CancelButton, "Data/Textures/CancelButton.png" );
+	const auto& menuBtnSprite = context.textureManager->LoadResource( Reflex::ResourceID::MainMenuButton, "Data/Textures/MainMenuButton.png" );
+	const auto& restartBtnSprite = context.textureManager->LoadResource( Reflex::ResourceID::RestartButton, "Data/Textures/RestartButton.png" );
 
-	//auto btnInteract = btn->AddComponent< Reflex::Components::Interactable >( collision );
-	//btnInteract->selectionIsToggle = false;
-	//
-	//btnInteract->selectionChangedCallback = [this]( const InteractableHandle& interactable, const bool selected )
-	//{
-	//	if( selected )
-	//	{
-	//		RequestStateClear();
-	//		RequestStackPush( PentagoGameStateType );
-	//	}
-	//};
-	//
+	const unsigned menuItems = 3;
+	const auto boxSize = m_bounds.width * 0.4f;
+	sf::Vector2f startPos( m_bounds.width / 2.0f, m_bounds.height / 2.0f - m_bounds.height * 0.3f );
+	const auto offset = sf::Vector2f( boxSize / ( menuItems - 1 ), 0.0f );
+
+	const auto display = m_world.CreateObject( startPos );
+	display->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( screen ) );
+	const auto grid = display->AddComponent< Reflex::Components::Grid >( sf::Vector2u( 3, 1 ), sf::Vector2f( screen.getSize().x / 3.0f, 0.0f ) );
+
+	const auto cancelButton = m_world.CreateObject();
+	cancelButton->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( cancelBtnSprite ) );
+
+	const auto menuButton = m_world.CreateObject();
+	menuButton->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( menuBtnSprite ) );
+
+	const auto restartButton = m_world.CreateObject();
+	restartButton->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( restartBtnSprite ) );
+
+	{
+		auto btnInteract = cancelButton->AddComponent< Reflex::Components::Interactable >();
+		btnInteract->selectionIsToggle = false;
+
+		btnInteract->selectionChangedCallback = [this]( const InteractableHandle& interactable, const bool selected )
+		{
+			if( selected )
+				RequestStackPop();
+		};
+	}
+
+	{
+		auto btnInteract = menuButton->AddComponent< Reflex::Components::Interactable >();
+		btnInteract->selectionIsToggle = false;
+
+		btnInteract->selectionChangedCallback = [this]( const InteractableHandle& interactable, const bool selected )
+		{
+			if( selected )
+			{
+				RequestStateClear();
+				RequestStackPush( PentagoMenuStateType );
+			}
+		};
+	}
+
+	{
+		auto btnInteract = restartButton->AddComponent< Reflex::Components::Interactable >();
+		btnInteract->selectionIsToggle = false;
+
+		btnInteract->selectionChangedCallback = [this]( const InteractableHandle& interactable, const bool selected )
+		{
+			if( selected )
+			{
+				RequestStateClear();
+				RequestStackPush( PentagoGameStateType );
+			}
+		};
+	}
+
+	grid->AddToGrid( cancelButton, sf::Vector2u( 0U, 0U ) );
+	grid->AddToGrid( menuButton, sf::Vector2u( 1U, 0U ) );
+	grid->AddToGrid( restartButton, sf::Vector2u( 2U, 0U ) );
 	//btnInteract->focusChangedCallback = [text]( const InteractableHandle& interactable, const bool focussed )
 	//{
 	//	text->GetText().setFillColor( focussed ? sf::Color::Magenta : sf::Color::Red );
@@ -204,19 +246,22 @@ InGameMenuState::InGameMenuState( StateManager& stateManager, Context context )
 
 void InGameMenuState::Render()
 {
-	//m_world.Render();
+	m_world.Render();
 }
 
 bool InGameMenuState::Update( const float deltaTime )
 {
-	//m_world.Update( deltaTime );
+	m_world.Update( deltaTime );
 
 	return false;
 }
 
 bool InGameMenuState::ProcessEvent( const sf::Event& event )
 {
-	//m_world.ProcessEvent( event );
+	m_world.ProcessEvent( event );
+	
+	if( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )
+		RequestStackPop();
 
 	return false;
 }

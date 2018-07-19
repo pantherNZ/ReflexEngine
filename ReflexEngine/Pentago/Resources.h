@@ -19,6 +19,7 @@ namespace Reflex
 		RestartButton,
 		MainMenuButton,
 		PlayAgainButton,
+		SideMenuScreen,
 	};
 }
 

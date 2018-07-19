@@ -79,8 +79,8 @@ namespace Reflex
 		{
 			auto inserted = m_resourceMap.insert( std::make_pair( id, std::move( newResource ) ) );
 
-			if( !inserted.second )
-				LOG_CRIT( "Resource already loaded " << filename );
+			//if( !inserted.second )
+			//	LOG_CRIT( "Resource already loaded " << filename );
 
 			auto& resource_iter = *inserted.first;
 			return *resource_iter.second;

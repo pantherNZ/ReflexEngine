@@ -84,10 +84,7 @@ bool PentagoGameState::ProcessEvent( const sf::Event& event )
 	m_world.ProcessEvent( event );
 
 	if( event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape )
-	{
-		//RequestStateClear();
 		RequestStackPush( InGameMenuStateType );
-	}
 
 	return true;
 }
