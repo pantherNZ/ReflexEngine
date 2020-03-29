@@ -5,12 +5,20 @@
 
 using namespace Reflex::Core;
 
+enum MoveType
+{
+	Default,
+	Destroyer,
+	Spinner
+};
+
 struct Move
 {
 	Corner corner;
 	sf::Vector2u index;
 	Corner rotation;
 	bool leftRotation;
+	MoveType type;
 };
 
 class PentagoGameState : public State
@@ -27,7 +35,6 @@ protected:
 	bool ProcessEvent( const sf::Event& event ) final;
 
 	void AITurn();
-	//int NegaMax( BoardData& board, const unsigned depth, int alpha, int beta, const BoardType player, std::vector< std::pair< sf::Vector2u, unsigned > >& bestMove );
 
 public:
 	static unsigned m_AIDifficulty;

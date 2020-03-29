@@ -13,7 +13,7 @@ namespace Reflex
 		public:
 			BaseHandle();
 			BaseHandle( uint32_t index, uint32_t counter );
-			BaseHandle( uint32_t handle );
+		//	BaseHandle( uint32_t handle );
 
 			explicit operator bool() const;
 			operator unsigned() const;

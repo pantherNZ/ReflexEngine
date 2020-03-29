@@ -28,6 +28,12 @@ namespace Reflex
 
 		}
 
+		SceneNode::~SceneNode()
+		{
+			if( m_parent )
+				m_parent->GetTransform()->DetachChild( m_owningObject );
+		}
+
 		void SceneNode::AttachChild( const ObjectHandle& child )
 		{
 			auto transform = child->GetTransform();
@@ -49,7 +55,9 @@ namespace Reflex
 			{
 				if( node == m_children[i] )
 				{
-					m_children[i]->GetTransform()->m_parent = ObjectHandle::null;
+					if( m_children[i] )
+						m_children[i]->GetTransform()->m_parent = ObjectHandle::null;
+
 					m_children.erase( m_children.begin() + i );
 					return node;
 				}

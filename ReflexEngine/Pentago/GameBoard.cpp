@@ -45,79 +45,103 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 			Reflex::ScaleTo( cornerVisual->GetSprite(), sf::Vector2f( m_boardBounds.width / 2.0f - 10.0f, m_boardBounds.height / 2.0f - 10.0f ) );
 		}
 	}
-
+	auto* test = m_gameBoard.Get();
 	const auto sideScreen = m_world.CreateObject( centre + sf::Vector2f( boardSize / 2.0f + 100.0f, 0.0f ) );
 	sideScreen->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( displaySprite ) );
-	const auto sideGrid = sideScreen->AddComponent< Reflex::Components::Grid >( sf::Vector2u( 1, 1 ), sf::Vector2f( 0.0f, displaySprite.getSize().y / 5.0f ) );
+	const auto sideGrid = sideScreen->AddComponent< Reflex::Components::Grid >( sf::Vector2u( 1, 3 ), sf::Vector2f( 0.0f, displaySprite.getSize().y / 3.0f ) );
 
-	m_playerMarble = m_world.CreateObject();
-	m_playerMarble->GetTransform()->SetLayer( 5U );
-	//auto circle = playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::CircleShape( m_marbleSize / 2.0f ) );
-	auto circle = m_playerMarble->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( playerIsWhite ? egg1 : egg2 ) );
-	Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
-	sideGrid->AddToGrid( m_playerMarble, sf::Vector2u( 0U, 0U ) );
 
-	auto interactable = m_playerMarble->AddComponent< Reflex::Components::Interactable >();
-	interactable->selectionIsToggle = false;
-	interactable->selectionChangedCallback = [this, grid]( const InteractableHandle& interactable, const bool selected )
+
+	// Player move types
+	const auto CreatePlayerMarble = [this, sideGrid, grid]( const sf::Texture& texture, const unsigned index )
 	{
-		if( selected )
-		{
-			if( !m_selectedMarble && m_boardState == GameState::PlayerTurn )
-			{
-				m_selectedMarble = m_world.CreateObject();
-				m_selectedMarble->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarble );
-				m_selectedMarble->AddComponent< Marble >( true );
-				m_selectedMarble->GetTransform()->SetZOrder( m_playerMarble->GetTransform()->GetZOrder() + 1U );
-			}
-		}
-		else if( m_selectedMarble )
-		{
-			const auto mousePosition = m_selectedMarble->GetTransform()->getPosition();
-			auto result = grid->GetCellIndex( mousePosition );
+		m_playerMarbles[index] = m_world.CreateObject();
+		m_playerMarbles[index]->GetTransform()->SetLayer( 5U );
+		auto circle = m_playerMarbles[index]->AddComponent< Reflex::Components::SFMLObject >( sf::Sprite( texture ) );
+		Reflex::ScaleTo( circle->GetSprite(), sf::Vector2f( m_marbleSize, m_marbleSize ) );
+		sideGrid->AddToGrid( m_playerMarbles[index], sf::Vector2u( 0U, index ) );
 
-			if( result.first )
+		auto interactable = m_playerMarbles[index]->AddComponent< Reflex::Components::Interactable >();
+		interactable->selectionIsToggle = false;
+		interactable->selectionChangedCallback = [this, grid]( const InteractableHandle& interactable, const bool selected )// , const MoveType moveType )
+		{
+			if( selected )
 			{
-				auto corner = grid->GetCell( result.second );
-				auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
-				const auto result2 = cornerGrid->GetCellIndex( mousePosition );
-
-				if( result2.first )
+				if( !m_selectedMarble && m_boardState == GameState::PlayerTurn )
 				{
-					auto object = cornerGrid->GetCell( result2.second );
-
-					if( !object )
-					{
-						cornerGrid->AddToGrid( m_selectedMarble, result2.second );
-						m_selectedMarble = ObjectHandle::null;
-						const auto finalIndex = cornerGrid->ConvertCellIndex( result2.second, false ).second;
-						const auto cornerIndex = result.second.y * 2 + result.second.x;
-						m_boardData.SetTile( Corner( cornerIndex ), finalIndex, BoardType::PlayerMarble );
-						const auto result3 = CheckWin();
-
-						Reflex::LOG_INFO( "Player move: Corner = " << cornerIndex << ", Index = ( " << finalIndex.x << ", " << finalIndex.y << " )" );
-						m_boardData.PrintBoard();
-
-						if( result3 == GameState::PlayerWin )
-						{
-							m_boardState = result3;
-							m_gameState.GameOver( true );
-						}
-						else
-						{
-							ToggleArrows( true );
-							m_boardState = GameState::PlayerSpinSelection;
-						}
-
-						return;
-					}
+					auto* test = m_gameBoard.Get();
+					m_doubleRotate = false;
+					m_selectedMarble = m_world.CreateObject();
+					m_selectedMarble->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarbles[0] );// moveType] );
+					m_selectedMarble->AddComponent< Marble >( true );
+					m_selectedMarble->GetTransform()->SetLayer( 10U );
 				}
 			}
+			else if( m_selectedMarble )
+			{
+				const auto mousePosition = m_selectedMarble->GetTransform()->getPosition();
+				auto result = grid->GetCellIndex( mousePosition );
 
-			m_selectedMarble->Destroy();
-			m_selectedMarble = ObjectHandle::null;
-		}
+				if( result.first )
+				{
+					auto corner = grid->GetCell( result.second );
+					auto cornerGrid = corner->GetComponent< Reflex::Components::Grid >();
+					const auto result2 = cornerGrid->GetCellIndex( mousePosition );
+
+					if( result2.first )
+					{
+						auto object = cornerGrid->GetCell( result2.second );
+						//
+						//if( moveType == Default || moveType == Spinner )
+						//	PlacePlayerMarble( object, cornerGrid, result.second, result2.second );
+						//else if( moveType == Destroyer )
+						//	RemoveAIMarble( object, cornerGrid, result.second, result2.second );
+						//
+						//return;
+						if( !object )
+						{
+							cornerGrid->AddToGrid( m_selectedMarble, result2.second );
+							m_selectedMarble = ObjectHandle::null;
+							const auto finalIndex = cornerGrid->ConvertCellIndex( result2.second, false ).second;
+							const auto cornerIndex = result.second.y * 2 + result.second.x;
+							m_boardData.SetTile( Corner( cornerIndex ), finalIndex, BoardType::PlayerMarble );
+							const auto result3 = CheckWin();
+
+							Reflex::LOG_INFO( "Player move: Corner = " << cornerIndex << ", Index = ( " << finalIndex.x << ", " << finalIndex.y << " )" );
+							m_boardData.PrintBoard();
+
+							if( result3 == GameState::PlayerWin )
+							{
+								m_boardState = result3;
+								m_gameState.GameOver( true );
+							}
+							else
+							{
+								ToggleArrows( true );
+								m_boardState = GameState::PlayerSpinSelection;
+							}
+
+							return;
+						}
+					}
+				}
+
+				m_selectedMarble->Destroy();
+				m_selectedMarble = ObjectHandle::null;
+			}
+		};// [this, grid, index, selectionChangedCallback]( const InteractableHandle& interactable, const bool selected )
+		//{
+		//	selectionChangedCallback( interactable, selected, MoveType( index ) );
+		//};
 	};
+
+	CreatePlayerMarble( playerIsWhite ? egg1 : egg2, 0U );
+
+	if( !m_classicMode )
+	{
+		CreatePlayerMarble( playerIsWhite ? egg1 : egg2, 1U );
+		CreatePlayerMarble( playerIsWhite ? egg1 : egg2, 2U );
+	}
 
 	// Arrows
 	const auto arrowOffset = boardSize / 4.0f;
@@ -171,6 +195,12 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 			{
 				ToggleArrows( false );
 				RotateCorner( Corner( i / 2U ), i % 2 == 0 );
+
+				if( m_doubleRotate )
+				{
+					RotateCorner( Corner( i / 2U ), i % 2 == 0 );
+					m_doubleRotate = false;
+				}
 			}
 		};
 
@@ -186,12 +216,67 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 	//		PlaceMarble( x, y );
 }
 
+void GameBoard::PlacePlayerMarble( Reflex::Core::ObjectHandle object, Reflex::Core::GridHandle cornerGrid, const sf::Vector2u& cornerIndex, const sf::Vector2u& index )
+{
+	if( !object )
+	{
+		cornerGrid->AddToGrid( m_selectedMarble, index );
+		const auto finalIndex = cornerGrid->ConvertCellIndex( index, false ).second;
+		const auto cornerType = cornerIndex.y * 2 + cornerIndex.x;
+		m_boardData.SetTile( Corner( cornerType ), finalIndex, BoardType::PlayerMarble );
+		const auto winResult = CheckWin();
+
+		m_boardData.PrintBoard();
+
+		if( winResult == GameState::PlayerWin )
+		{
+			m_boardState = winResult;
+			m_gameState.GameOver( true );
+		}
+		else
+		{
+			ToggleArrows( true );
+			m_boardState = GameState::PlayerSpinSelection;
+		}
+
+		Reflex::LOG_INFO( "Player move | Type = Default, Corner = " << cornerType << ", Index = ( " << finalIndex.x << ", " << finalIndex.y << " )" );
+
+		m_selectedMarble = ObjectHandle::null;
+		return;
+	}
+
+	m_selectedMarble->Destroy();
+	m_selectedMarble = ObjectHandle::null;
+}
+
+void GameBoard::RemoveAIMarble( Reflex::Core::ObjectHandle object, Reflex::Core::GridHandle cornerGrid, const sf::Vector2u& cornerIndex, const sf::Vector2u& index )
+{
+	if( object && !object->GetComponent< Marble >()->isPlayer )
+	{
+		cornerGrid->RemoveFromGrid( index );
+		const auto finalIndex = cornerGrid->ConvertCellIndex( index, false ).second;
+		const auto cornerType = cornerIndex.y * 2 + cornerIndex.x;
+		m_boardData.SetTile( Corner( cornerType ), finalIndex, BoardType::Empty );
+
+		m_boardData.PrintBoard();
+
+		ToggleArrows( true );
+		m_boardState = GameState::PlayerSpinSelection;
+
+		Reflex::LOG_INFO( "Player move | Type = Removal, Corner = " << cornerType << ", Index = ( " << finalIndex.x << ", " << finalIndex.y << " )" );
+		m_doubleRotate = true;
+	}
+
+	m_selectedMarble->Destroy();
+	m_selectedMarble = ObjectHandle::null;
+}
+
 void GameBoard::PlaceAIMarble( const Corner corner, const sf::Vector2u& index )
 {
 	assert( m_boardData.GetTile( corner, index ) == BoardType::Empty );
 
 	auto newObj = m_world.CreateObject();
-	newObj->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarble );
+	newObj->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarbles[0] );
 	newObj->GetComponent< Reflex::Components::SFMLObject >()->GetSprite().setTexture( m_world.GetContext().textureManager->GetResource( Reflex::ResourceID::Egg2 ) );
 	newObj->AddComponent< Marble >( false );
 	auto cornerObj = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( corner % 2, corner / 2 );

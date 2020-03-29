@@ -24,7 +24,11 @@ class GameBoard
 public:
 	GameBoard( World& world, class PentagoGameState& gameState, const bool playerIsWhite );
 
+	void PlacePlayerMarble( Reflex::Core::ObjectHandle object, Reflex::Core::GridHandle cornerGrid, const sf::Vector2u& cornerIndex, const sf::Vector2u& index );
+	void RemoveAIMarble( Reflex::Core::ObjectHandle object, Reflex::Core::GridHandle cornerGrid, const sf::Vector2u& cornerIndex, const sf::Vector2u& index );
+
 	void PlaceAIMarble( const Corner corner, const sf::Vector2u& index );
+
 	void ToggleArrows( const bool show );
 	void RotateCorner( const Corner corner, const bool rotateLeft );
 	GameState CheckWin();
@@ -39,7 +43,9 @@ public:
 	PentagoGameState& m_gameState;
 
 	ObjectHandle m_selectedMarble;
-	ObjectHandle m_playerMarble;
+	ObjectHandle m_playerMarbles[2];
+	bool m_classicMode = false;
+	bool m_doubleRotate = false;
 	ObjectHandle m_gameBoard;
 	ObjectHandle m_cornerArrows[8];
 	ObjectHandle m_skipButton;

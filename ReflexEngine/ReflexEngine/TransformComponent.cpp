@@ -13,6 +13,16 @@ namespace Reflex
 			setScale( scale );
 		}
 
+		Transform::Transform( const Transform& other )
+			: SceneNode( other )
+			, Component( other )
+			, m_rotateDegreesPerSec( other.m_rotateDegreesPerSec )
+			, m_rotateDurationSec( other.m_rotateDurationSec )
+			, m_finishedRotationCallback( other.m_finishedRotationCallback )
+		{
+
+		}
+
 		void Transform::OnConstructionComplete()
 		{
 			m_object->GetWorld().GetTileMap().Insert( m_object, sf::FloatRect( GetWorldPosition(), sf::Vector2f( 0.0f, 0.0f ) ) );

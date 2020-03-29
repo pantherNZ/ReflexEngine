@@ -50,6 +50,8 @@ bool PentagoGameState::Update( const float deltaTime )
 		m_board.m_selectedMarble->GetTransform()->setPosition( mousePosition );
 	}
 
+	auto* test = m_board.m_gameBoard.Get();
+
 	if( m_AITimer > 0.0f )
 	{
 		m_AITimer -= deltaTime;

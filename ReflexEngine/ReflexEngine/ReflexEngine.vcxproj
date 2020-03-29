@@ -22,7 +22,7 @@
     <ProjectGuid>{21E5AB50-28B8-44C0-B20E-01637BED9F76}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ReflexEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

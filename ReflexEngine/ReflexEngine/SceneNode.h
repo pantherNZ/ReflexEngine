@@ -14,6 +14,7 @@ namespace Reflex
 			friend class Reflex::Components::Grid;
 			SceneNode();
 			SceneNode( const SceneNode& other );
+			~SceneNode();
 
 			void AttachChild( const ObjectHandle& child );
 			ObjectHandle DetachChild( const ObjectHandle& node );

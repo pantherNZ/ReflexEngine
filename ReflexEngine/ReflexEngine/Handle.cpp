@@ -22,11 +22,11 @@ namespace Reflex
 		{
 		}
 
-		BaseHandle::BaseHandle( uint32_t handle )
-		{
-			// Cast this to an unsigned pointer, deference and then set this to the handle (which will set each member respectively)
-			*( ( uint32_t* )this ) = handle;
-		}
+		//BaseHandle::BaseHandle( uint32_t handle )
+		//{
+		//	// Cast this to an unsigned pointer, deference and then set this to the handle (which will set each member respectively)
+		//	*( ( uint32_t* )this ) = handle;
+		//}
 
 		BaseHandle::operator bool() const
 		{

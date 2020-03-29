@@ -167,9 +167,9 @@ namespace Reflex
 		void World::DestroyComponent( Type componentType, BaseHandle component )
 		{
 			Entity* entity = GetHandleManager().GetAs< Entity >( component );
-			GetHandleManager().Remove( component );
 			entity->~Entity();
 			auto moved = ( Entity* )m_components[componentType]->Release( entity );
+			GetHandleManager().Remove( component );
 
 			// Sync handle of potentially moved object
 			if( moved )
