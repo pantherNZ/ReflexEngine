@@ -286,4 +286,88 @@ namespace Reflex
 	bool IntersectPolygonSquare( const std::vector< sf::Vector2f >& polygon, const sf::Vector2f& square_position, const float half_width );
 
 	bool IntersectCircleSquare( const sf::Vector2f& circle_position, const float circle_radius, const sf::Vector2f& square_position, const float half_width );
+
+	template< typename T >
+	const typename T::value_type& RandomElement(const T& container)
+	{
+		if (container.empty())
+			throw std::runtime_error("RandomElement called on empty container");
+		return container[RandomUnsigned((unsigned)container.size())];
+	}
+
+	template< typename T >
+	typename T::value_type& RandomElement(const T& container)
+	{
+		if (container.empty())
+			throw std::runtime_error("RandomElement called on empty container");
+		return container[RandomUnsigned((unsigned)container.size())];
+	}
+
+	template< typename T >
+	typename std::vector<T>::const_iterator Erase(std::vector<T>& container, const T& value)
+	{
+		return container.erase(container.begin(), container.end(), value);
+	}
+
+	template< typename T, typename Pred >
+	typename std::vector<T>::const_iterator EraseIf(std::vector<T>& container, const Pred& pred)
+	{
+		return container.erase(std::remove_if(container.begin(), container.end(), pred), container.end());
+	}
+
+	template< typename T >
+	typename std::vector<T>::const_iterator Find(const std::vector<T>& container, const T& value)
+	{
+		return std::find(container.begin(), container.end(), value);
+	}
+
+	template< typename T, typename Pred >
+	typename std::vector<T>::const_iterator FindIf(const std::vector<T>& container, const Pred& pred)
+	{
+		return std::find_if(container.begin(), container.end(), pred);
+	}
+
+	template< typename T >
+	bool Contains(const std::vector< T >& container, const T& value)
+	{
+		return Find(container, value) != container.end();
+	}
+
+	template< typename T, typename Pred >
+	bool ContainsIf(const std::vector< T >& container, const Pred& pred)
+	{
+		return FindIf(container, pred) != container.end();
+	}
+
+	template< typename T, typename... Args >
+	bool PushBack(const std::vector< T >& container, Args&&... args)
+	{
+		return (container.push_back(args), ...);
+	}
+
+	// Hash stuff
+	template <typename T, typename... Rest>
+	void HashCombine(std::size_t& seed, const T& v, const Rest& ... rest)
+	{
+		seed ^= std::hash<T>{}(v)+0x9e3779b9 + (seed << 6) + (seed >> 2);
+		(HashCombine(seed, rest), ...);
+	}
+
+#define MAKE_HASHABLE( type, ... ) \
+    namespace std \
+	{ \
+        template<> struct hash<type> \
+		{ \
+            std::size_t operator()( const type& t) const \
+			{ \
+                std::size_t ret = 0; \
+                Reflex::HashCombine( ret, __VA_ARGS__ ); \
+                return ret; \
+            } \
+        }; \
+    }
 }
+
+MAKE_HASHABLE(sf::Vector2f, t.x, t.y)
+MAKE_HASHABLE(sf::Vector2i, t.x, t.y)
+MAKE_HASHABLE(sf::Vector2u, t.x, t.y)

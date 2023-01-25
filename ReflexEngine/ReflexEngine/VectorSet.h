@@ -20,7 +20,7 @@ namespace Reflex
 		VectorSet( VectorSet< T >&& other ) noexcept : m_vector( std::move( other.m_vector ) ) {}
 		VectorSet( const VectorSet< T >& other ) : m_vector( other.m_vector ) {}
 
-		VectorSet( std::initializer_list< T > ilist ) : vec( std::move( ilist ) ) { validate(); }
+		VectorSet( std::initializer_list< T > ilist ) : m_vector( std::move( ilist ) ) { validate(); }
 
 		bool insert( const T& t );
 		bool insert( T&& t );

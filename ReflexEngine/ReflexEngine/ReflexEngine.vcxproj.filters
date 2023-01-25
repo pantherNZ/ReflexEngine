@@ -69,7 +69,7 @@
     <ClInclude Include="TransformComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.h">
+    <ClInclude Include="BaseObject.h">
       <Filter>Objects</Filter>
     </ClInclude>
     <ClInclude Include="TileMap.h">
@@ -109,6 +109,9 @@
       <Filter>Memory</Filter>
     </ClInclude>
     <ClInclude Include="MovementSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseSystem.h">
       <Filter>Systems</Filter>
     </ClInclude>
   </ItemGroup>

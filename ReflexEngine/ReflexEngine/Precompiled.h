@@ -15,7 +15,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/NonCopyable.hpp>
 //#include <Box2D.h>
-#include "vld.h"
 
 #include "Utility.h"
 #include "Logging.h"

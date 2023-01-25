@@ -1,8 +1,6 @@
 // Includes
 #include "..\ReflexEngine\Engine.h"
 
-#include "vld.h"
-
 #include "PentagoGameState.h"
 #include "PentagoMenuState.h"
 #include "Resources.h"
