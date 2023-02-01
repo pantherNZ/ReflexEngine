@@ -67,5 +67,53 @@ namespace Reflex
 		{
 			return m_world;
 		}
+
+		void Object::RemoveComponentInternal(const Core::Type& componentType, const BaseHandle& handle)
+		{
+			const auto found = std::find_if(m_components.begin(), m_components.end(), [&](const std::pair< Type, BaseHandle >& component)
+				{
+					return component.second == handle;
+				});
+
+			if (found != m_components.end())
+			{
+				m_world.DestroyComponent(componentType, found->second);
+				m_components.erase(found);
+			}
+		}
+
+		void Object::RemoveComponentInternal(const Core::Type& componentType)
+		{
+			const auto found = std::find_if(m_components.begin(), m_components.end(), [&componentType](const std::pair< Type, BaseHandle >& componentHandle)
+				{
+					if (!componentHandle.second.IsValid())
+						return false;
+
+					return componentType == componentHandle.first;
+				});
+
+			if (found != m_components.end())
+			{
+				m_world.DestroyComponent(componentType, found->second);
+				m_components.erase(found);
+			}
+		}
+
+		void Object::RemoveComponentsInternal(const Core::Type& componentType)
+		{
+			m_components.erase(std::remove_if(m_components.begin(), m_components.end(), [&](const std::pair< Type, BaseHandle >& component)
+				{
+					if (!component.second.IsValid())
+						return false;
+
+					if (componentType != component.first)
+						return false;
+
+					m_world.DestroyComponent(componentType, component.second);
+
+					return true;
+				}
+			), m_components.end());
+		}
 	}
 }

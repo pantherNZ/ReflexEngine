@@ -19,7 +19,7 @@ namespace Reflex
 				Clear,
 			};
 
-			explicit StateManager( Context& context );
+			StateManager( const Context& context );
 
 			template< typename T >
 			void RegisterState( unsigned stateID );

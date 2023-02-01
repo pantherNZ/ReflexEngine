@@ -68,7 +68,7 @@ namespace Reflex
 
 			// Copy components from another object to this object
 			template< typename... Args >
-			void CopyComponentsFrom( const ObjectHandle& other );
+			void CopyComponentsFrom(const ObjectHandle& other);
 
 			TransformHandle GetTransform() const;
 
@@ -86,6 +86,9 @@ namespace Reflex
 			//			return true;
 			//	return false;
 			//}
+			void RemoveComponentInternal(const Core::Type& componentType, const BaseHandle& handle);
+			void RemoveComponentInternal(const Core::Type& componentType);
+			void RemoveComponentsInternal(const Core::Type& componentType);
 
 		protected:
 			World& m_world;
@@ -97,68 +100,25 @@ namespace Reflex
 		};
 
 		// Template definitions
-		template< class T, typename... Args >
-		Handle< T > Object::AddComponent( Args&&... args )
-		{
-			auto component = m_world.CreateComponent< T >( ObjectHandle( m_self ), std::forward< Args >( args )... );
-			m_components.emplace_back( Type( typeid( T ) ), component );
-			component->OnConstructionComplete();
-			return component;
-		}
-
 		template< class T >
 		void Object::RemoveComponents()
 		{
 			const auto componentType = Type( typeid( T ) );
-
-			m_components.erase( std::remove_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >& component )
-			{ 
-				if( !component.second.IsValid() )
-					return false;
-
-				if( componentType != component.first )
-					return false;
-				
-				m_world.DestroyComponent( component.second );
-
-				return true;
-			} 
-			), m_components.end() );
+			RemoveComponentsInternal(componentType);
 		}
 
 		template< class T >
 		void Object::RemoveComponent( Handle< T > handle )
 		{
-			const auto found = std::find_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >& component )
-			{
-				return component.second == handle;
-			} );
-
-			if( found != m_components.end() )
-			{
-				m_world.DestroyComponent( found->second );
-				m_components.erase( found );
-			}
+			const auto componentType = Type(typeid(T));
+			RemoveComponentInternal(componentType, handle);
 		}
 
 		template< class T >
 		void Object::RemoveComponent()
 		{
 			const auto componentType = Type( typeid( T ) );
-
-			const auto found = std::find_if( m_components.begin(), m_components.end(), [&componentType]( const std::pair< Type, BaseHandle >& componentHandle )
-			{
-				if( !componentHandle.second.IsValid() )
-					return false;
-
-				return componentType == componentHandle.first;
-			} );
-
-			if( found != m_components.end() )
-			{
-				m_world.DestroyComponent( componentType, found->second );
-				m_components.erase( found );
-			}
+			RemoveComponentInternal(componentType);
 		}
 
 		template< class T >
@@ -217,12 +177,6 @@ namespace Reflex
 			}
 
 			return std::move( results );
-		}
-
-		template< typename... Args >
-		void Object::CopyComponentsFrom( const ObjectHandle& other )
-		{
-			m_world.CopyComponentsFrom< Args... >( m_self, other );
 		}
 	}
 }

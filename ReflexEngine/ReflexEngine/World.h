@@ -68,6 +68,10 @@ namespace Reflex
 			const sf::FloatRect GetBounds() const;
 			ObjectHandle GetSceneObject( const unsigned index = 0U ) const;
 
+			// Copy components from another object to this object
+			template< typename T, typename... Args >
+			void CopyComponentsFrom(const ObjectHandle& to, const ObjectHandle& from);
+
 		protected:
 			template< class T, typename... Args >
 			Handle< T > CreateComponent( const ObjectHandle& owner, Args&&... args );
@@ -76,10 +80,6 @@ namespace Reflex
 
 			template< class T >
 			void DestroyComponent( Handle< T > component );
-
-			// Copy components from another object to this object
-			template< typename T, typename... Args >
-			void CopyComponentsFrom( const ObjectHandle& to, const ObjectHandle& from );
 
 			// Use SFINAE to remove the base case where there is 0 argument types (above function calls itself recursively until we reach 0 template arguments)
 			template< typename... Args >
@@ -234,6 +234,15 @@ namespace Reflex
 			return componentHandle;
 		}
 
+		template< class T, typename... Args >
+		Handle< T > Object::AddComponent(Args&&... args)
+		{
+			auto component = m_world.CreateComponent< T >(ObjectHandle(m_self), std::forward< Args >(args)...);
+			m_components.emplace_back(Type(typeid(T)), component);
+			component->OnConstructionComplete();
+			return component;
+		}
+
 		template< class T >
 		void World::DestroyComponent( Handle< T > component )
 		{
@@ -265,6 +274,12 @@ namespace Reflex
 
 			// Recursively pop arguments off the variadic template args and continue
 			CopyComponentsFrom< Args... >( to, from );
+		}
+
+		template< typename... Args >
+		void Object::CopyComponentsFrom(const ObjectHandle& other)
+		{
+			m_world.CopyComponentsFrom< Args... >(m_self, other);
 		}
 
 		template< typename Func >

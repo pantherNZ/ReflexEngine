@@ -5,10 +5,18 @@
 #include "PentagoMenuState.h"
 #include "Resources.h"
 
+template <typename... Args>
+void doPrint(std::ostream& out, Args&&... args)
+{
+	((out << ',' << std::forward<Args>(args)), ...);
+}
+
 // Entry point
 int main( int argc, char** argv )
 {
 	srand( ( unsigned )time( 0 ) );
+
+	doPrint(std::cout, 5, 6, 7, 8);
 
 	Reflex::Core::Engine engine;
 

@@ -2,7 +2,6 @@
 
 namespace Reflex
 {
-
 	namespace Core
 	{
 		template< class T >

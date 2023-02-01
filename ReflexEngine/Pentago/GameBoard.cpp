@@ -73,6 +73,7 @@ GameBoard::GameBoard( World& world, PentagoGameState& gameState, const bool play
 					m_doubleRotate = false;
 					m_selectedMarble = m_world.CreateObject();
 					m_selectedMarble->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarbles[0] );// moveType] );
+					//m_world.CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject>(m_selectedMarble, m_playerMarbles[0]);
 					m_selectedMarble->AddComponent< Marble >( true );
 					m_selectedMarble->GetTransform()->SetLayer( 10U );
 				}
@@ -277,6 +278,7 @@ void GameBoard::PlaceAIMarble( const Corner corner, const sf::Vector2u& index )
 
 	auto newObj = m_world.CreateObject();
 	newObj->CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >( m_playerMarbles[0] );
+	//m_world.CopyComponentsFrom< Reflex::Components::Transform, Reflex::Components::SFMLObject >(newObj, m_playerMarbles[0]);
 	newObj->GetComponent< Reflex::Components::SFMLObject >()->GetSprite().setTexture( m_world.GetContext().textureManager->GetResource( Reflex::ResourceID::Egg2 ) );
 	newObj->AddComponent< Marble >( false );
 	auto cornerObj = m_gameBoard->GetComponent< Reflex::Components::Grid >()->GetCell( corner % 2, corner / 2 );

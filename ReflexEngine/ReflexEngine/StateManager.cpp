@@ -5,7 +5,7 @@ namespace Reflex
 {
 	namespace Core
 	{
-		StateManager::StateManager( Context& context )
+		StateManager::StateManager( const Context& context )
 			: m_context( context )
 		{
 
